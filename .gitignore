@@ -130,3 +130,4 @@ dmypy.json
 
 ### Stuff qu'on ajoute nous-mêmes dans le git ignore ###
 .sqlite
+.idea
