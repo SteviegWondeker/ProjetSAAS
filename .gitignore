@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+### Stuff qu'on ajoute nous-mêmes dans le git ignore ###
+.sqlite
