@@ -214,43 +214,43 @@ class Vue():
         self.signup_label=Label(self.cadre_creation,text="Création pour GestMedia",font=("Arial",18),
                               borderwidth=2,relief=GROOVE)
 
-        self.signup_lab_pre=Label(self.cadre_creation,text="Prénom",font=("Arial",14))
-        self.signup_pre=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.signup_lab_pre= self.create_label("Prénom")
+        self.signup_pre=self.create_entry()
         self.list_entry.append(self.signup_pre)
         self.list_lab.append(self.signup_lab_pre)
 
-        self.signup_lab_nom=Label(self.cadre_creation,text="Nom",font=("Arial",14))
-        self.signup_nom=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.signup_lab_nom=self.create_label("Nom")
+        self.signup_nom=self.create_entry()
         self.list_entry.append(self.signup_nom)
         self.list_lab.append(self.signup_lab_nom)
 
-        self.signup_lab_mail=Label(self.cadre_creation,text="Courriel",font=("Arial",14))
-
-        self.list_entry.append(        (self.signup_mail=Entry(self.cadre_creation,font=("Arial",14),width=30)))
+        self.signup_lab_mail=self.create_label("Courriel")
+        self.signup_mail=self.create_entry()
+        self.list_entry.append(self.signup_mail)
         self.list_lab.append(self.signup_lab_mail)
 
-        self.signup_lab_tel=Label(self.cadre_creation,text="Télephone",font=("Arial",14))
-        self.signup_tel=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.signup_lab_tel=self.create_label("Télephone")
+        self.signup_tel=self.create_entry()
         self.list_entry.append(self.signup_tel)
         self.list_lab.append(self.signup_lab_tel)
         
-        self.signup_lab_mdp=Label(self.cadre_creation,text="Mot de Passe",font=("Arial",14))
+        self.signup_lab_mdp=self.create_label("Mot de passe")
         self.signup_mdp=Entry(self.cadre_creation,font=("Arial",14),show="*",width=30)
         self.list_entry.append(self.signup_mdp)
         self.list_lab.append(self.signup_lab_mdp)
 
-        self.signup_lab_mdpval=Label(self.cadre_creation,text="Confirmation de mot de passe",font=("Arial",14))
+        self.signup_lab_mdpval=self.create_label("Confirmation de mot de passe")
         self.signup_mdpval=Entry(self.cadre_creation,font=("Arial",14),show="*",width=30)
         self.list_entry.append(self.signup_mdpval)
         self.list_lab.append(self.signup_lab_mdpval)
 
-        self.signup_lab_nom_org=Label(self.cadre_creation,text="Nom organisation",font=("Arial",14))
-        self.signup_nom_org=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.signup_lab_nom_org=self.create_label("Nom de l'organisation")
+        self.signup_nom_org=self.create_entry()
         self.list_entry.append(self.signup_nom_org)
         self.list_lab.append(self.signup_lab_nom_org)
 
-        self.signup_lab_type_org=Label(self.cadre_creation,text="Type d'organisation",font=("Arial",14))
-        self.signup_type_org=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.signup_lab_type_org=self.create_label("Type d'organisation")
+        self.signup_type_org=self.create_entry()
         self.list_entry.append(self.signup_type_org)
         self.list_lab.append(self.signup_lab_type_org)
 
@@ -270,8 +270,17 @@ class Vue():
 
         return self.cadre_creation
 
+    def create_label(self, champ):
+        label = Label(self.cadre_creation,text=champ,font=("Arial",14))
+        return label
+
+    def create_entry(self):
+        entry = Entry(self.cadre_creation,font=("Arial",14),width=30)
+        return entry
+
     def annuler_signup(self):
         self.afficherlogin()
+
 
     def valider_signup(self):
         valide = True
