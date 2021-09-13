@@ -30,6 +30,7 @@ class Vue():
             
     def creercadres(self):
         self.cadres["login"]=self.creercadrelogin()
+        self.cadres["creation"]=self.creer_cadre_creation()
         #self.cadres["principal"]=self.creercadreprincipal()
         
     def creercadrelogin(self):
@@ -46,6 +47,8 @@ class Vue():
         # les boutons d'actions
         self.btnannulerlogin=Button(self.cadrelogin,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.annulerlogin)
         self.btnidentifierlogin=Button(self.cadrelogin,text="Identifier",font=("Arial",12),padx=10,pady=10,command=self.identifierlogin)
+
+        self.btn_creation=Button(self.cadrelogin,text="Creer un usager",font=("Arial",12),padx=10,pady=10,command=self.creation_compte)
         
         self.loginlabel.grid(row=10,column=10,columnspan=20,padx=10,pady=10,ipadx=10,ipady=10)
         self.loginlabnom.grid(row=20,column=10,sticky=E,padx=5,pady=5)
@@ -55,10 +58,12 @@ class Vue():
         
         self.btnannulerlogin.grid(row=40,column=20,sticky=W,padx=10,pady=10)
         self.btnidentifierlogin.grid(row=40,column=20,padx=10,pady=10)
+
+        self.btn_creation.grid(row=40,column=30,padx=10,pady=10)
         
         return self.cadrelogin
     
-    def creercadreprincipal(self,usager):
+    def creercadreprincipal(self, usager):
         self.root.title("GestionMedia")
         self.cadreprincipal=Frame(self.cadreapp,width=400,height=400)
         
@@ -174,6 +179,9 @@ class Vue():
         nom=self.loginnom.get()
         mdp=self.loginmdp.get()
         self.parent.identifierusager(nom,mdp)
+
+    def creation_compte(self):
+        self.parent.creation_compte(nom,mdp)
         
     def avertirusager(self,titre,message):
         rep=messagebox.askyesno(titre,message)
@@ -191,7 +199,98 @@ class Vue():
         y = (hs/3) - (h/2)
         self.root.geometry('%dx%d+%d+%d' % (w, h, x, y))
         
+    ####
+
+    def creation_compte(self):
+        self.parent.creation_compte()
+
+    def creer_cadre_creation(self):
+        self.root.title("Creation")
+        self.cadre_creation=Frame(self.cadreapp,width=800,height=400)
+
+        self.list_entry=[]
+        self.list_lab=[]
+
+        self.signup_label=Label(self.cadre_creation,text="Création pour GestMedia",font=("Arial",18),
+                              borderwidth=2,relief=GROOVE)
+
+        self.signup_lab_pre=Label(self.cadre_creation,text="Prénom",font=("Arial",14))
+        self.signup_pre=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.list_entry.append(self.signup_pre)
+        self.list_lab.append(self.signup_lab_pre)
+
+        self.signup_lab_nom=Label(self.cadre_creation,text="Nom",font=("Arial",14))
+        self.signup_nom=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.list_entry.append(self.signup_nom)
+        self.list_lab.append(self.signup_lab_nom)
+
+        self.signup_lab_mail=Label(self.cadre_creation,text="Courriel",font=("Arial",14))
+
+        self.list_entry.append(        (self.signup_mail=Entry(self.cadre_creation,font=("Arial",14),width=30)))
+        self.list_lab.append(self.signup_lab_mail)
+
+        self.signup_lab_tel=Label(self.cadre_creation,text="Télephone",font=("Arial",14))
+        self.signup_tel=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.list_entry.append(self.signup_tel)
+        self.list_lab.append(self.signup_lab_tel)
         
+        self.signup_lab_mdp=Label(self.cadre_creation,text="Mot de Passe",font=("Arial",14))
+        self.signup_mdp=Entry(self.cadre_creation,font=("Arial",14),show="*",width=30)
+        self.list_entry.append(self.signup_mdp)
+        self.list_lab.append(self.signup_lab_mdp)
+
+        self.signup_lab_mdpval=Label(self.cadre_creation,text="Confirmation de mot de passe",font=("Arial",14))
+        self.signup_mdpval=Entry(self.cadre_creation,font=("Arial",14),show="*",width=30)
+        self.list_entry.append(self.signup_mdpval)
+        self.list_lab.append(self.signup_lab_mdpval)
+
+        self.signup_lab_nom_org=Label(self.cadre_creation,text="Nom organisation",font=("Arial",14))
+        self.signup_nom_org=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.list_entry.append(self.signup_nom_org)
+        self.list_lab.append(self.signup_lab_nom_org)
+
+        self.signup_lab_type_org=Label(self.cadre_creation,text="Type d'organisation",font=("Arial",14))
+        self.signup_type_org=Entry(self.cadre_creation,font=("Arial",14),width=30)
+        self.list_entry.append(self.signup_type_org)
+        self.list_lab.append(self.signup_lab_type_org)
+
+        for i in range(len(self.list_entry)):
+            temp = 10*(i+1)
+            self.list_lab[i].grid(row=temp,column=10, sticky=E,padx=10,pady=5)
+            self.list_entry[i].grid(row=temp,column=20,sticky=E,padx=5,pady=5)
+
+
+        self.btn_annuler_signup=Button(self.cadre_creation,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.annuler_signup)
+        self.btn_valider_signup=Button(self.cadre_creation,text="Valider",font=("Arial",12),padx=10,pady=10,command=self.valider_signup)
+
+        self.btn_annuler_signup.grid(row=100,column=20,sticky=W,padx=10,pady=10)
+        self.btn_valider_signup.grid(row=100,column=20,padx=10,pady=10)
+
+        self.cadres["creation"]=self.cadre_creation
+
+        return self.cadre_creation
+
+    def annuler_signup(self):
+        self.afficherlogin()
+
+    def valider_signup(self):
+        valide = True
+
+        for i in self.list_entry:
+            if not i.get():
+                self.avertirusager("Invalide","Des champs sont vides, reprendre?")
+                valide=False
+                break
+
+        if ((self.signup_mdp.get() != self.signup_mdpval.get()) and valide == True):
+            valide=False
+            self.avertirusager("Invalide","Mots de passe ne concordent pas, reprendre?")
+
+        if valide == True:
+            self.parent.signup_usager(nom,mdp)
+            pass
+#        
+                
 class Modele():
     def __init__(self,parent):
         self.parent=parent 
@@ -265,7 +364,29 @@ class Controleur:
         if "inconnu" in mondict:
             self.vue.avertirusager("Inconnu","Reprendre?")
         else:
-            
+            self.modele.inscrireusager(mondict)
+            self.vue.creercadreprincipal(self.modele)
+            self.vue.changercadre("principal")
+
+####
+
+    def creation_compte(self): 
+        #url = self.urlserveur+"/identifierusager"
+        
+        self.vue.creer_cadre_creation()
+        self.vue.changercadre("creation")
+
+    def signup_usager(self,dict): 
+        #url = self.urlserveur+"/identifierusager"
+        params = {"nom":nom,
+                  "mdp":mdp}
+        reptext=self.appelserveur(url,params)
+        
+        mondict=json.loads(reptext)
+        print(mondict)
+        if "inconnu" in mondict:
+            self.vue.avertirusager("Inconnu","Reprendre?")
+        else:
             self.modele.inscrireusager(mondict)
             self.vue.creercadreprincipal(self.modele)
             self.vue.changercadre("principal")
