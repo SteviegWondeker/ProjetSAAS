@@ -30,6 +30,7 @@ class Vue():
             
     def creercadres(self):
         self.cadres["login"]=self.creercadrelogin()
+        self.cadres["nouveau_membre"]=self.creer_cadre_membre()
         #self.cadres["principal"]=self.creercadreprincipal()
         
     def creercadrelogin(self):
@@ -57,12 +58,56 @@ class Vue():
         self.btnidentifierlogin.grid(row=40,column=20,padx=10,pady=10)
         
         return self.cadrelogin
+
+    def creer_cadre_membre(self):
+        self.cadre_inscrire_membre = Frame(self.cadreapp, width=800, height=400)
+
+        self.membre_titre = Label(self.cadre_inscrire_membre, text="Ajout d'un nouveau membre à votre compagnie", font=("Arial", 18),
+                                borderwidth=2, relief=GROOVE)
+
+        self.membre_lab_prenom = Label(self.cadre_inscrire_membre, text="Prénom:", font=("Arial", 14))
+        self.membre_prenom = Entry(self.cadre_inscrire_membre, font=("Arial", 14), width=30)
+        self.membre_lab_nom = Label(self.cadre_inscrire_membre, text="Nom:", font=("Arial", 14))
+        self.membre_nom = Entry(self.cadre_inscrire_membre, font=("Arial", 14), show="*", width=30)
+        self.membre_lab_role = Label(self.cadre_inscrire_membre, text="Rôle:", font=("Arial", 14))
+        self.membre_role = Entry(self.cadre_inscrire_membre, font=("Arial", 14), show="*", width=30)
+        self.membre_lab_id = Label(self.cadre_inscrire_membre, text="#ID d'employé:", font=("Arial", 14))
+        self.membre_id = Entry(self.cadre_inscrire_membre, font=("Arial", 14), show="*", width=30)
+        self.membre_lab_courriel = Label(self.cadre_inscrire_membre, text="Courriel:", font=("Arial", 14))
+        self.membre_courriel = Entry(self.cadre_inscrire_membre, font=("Arial", 14), show="*", width=30)
+        self.membre_lab_telephone = Label(self.cadre_inscrire_membre, text="# téléphone:", font=("Arial", 14))
+        self.membre_telephone = Entry(self.cadre_inscrire_membre, font=("Arial", 14), show="*", width=30)
+        self.membre_lab_mdp = Label(self.cadre_inscrire_membre, text="Mot de passe (par défaut):", font=("Arial", 14))
+        self.membre_mdp = Label(self.cadre_inscrire_membre, text="AAAaaa111", font=("Arial", 14), width=30)
+
+        self.btn_inscrire_membre = Button(self.cadre_inscrire_membre, text="Inscrire le nouveau membre", font=("Arial", 12), padx=10, pady=10,
+                                      command=self.inscrire_membre)
+
+        self.membre_titre.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
+        self.membre_lab_prenom.grid(row=20, column=10, sticky=E, padx=5, pady=5)
+        self.membre_prenom.grid(row=20, column=20, padx=10, pady=5)
+        self.membre_lab_nom.grid(row=30, column=10, sticky=E, padx=5, pady=5)
+        self.membre_nom.grid(row=30, column=20, padx=10, pady=5)
+        self.membre_lab_role.grid(row=40, column=10, sticky=E, padx=5, pady=5)
+        self.membre_role.grid(row=40, column=20, padx=10, pady=5)
+        self.membre_lab_id.grid(row=50, column=10, sticky=E, padx=5, pady=5)
+        self.membre_id.grid(row=50, column=20, padx=10, pady=5)
+        self.membre_lab_courriel.grid(row=60, column=10, sticky=E, padx=5, pady=5)
+        self.membre_courriel.grid(row=60, column=20, padx=10, pady=5)
+        self.membre_lab_telephone.grid(row=70, column=10, sticky=E, padx=5, pady=5)
+        self.membre_telephone.grid(row=70, column=20, padx=10, pady=5)
+        self.membre_lab_mdp.grid(row=80, column=10, sticky=E, padx=5, pady=5)
+        self.membre_mdp.grid(row=80, column=20, padx=10, pady=5)
+
+        self.btn_inscrire_membre.grid(row=100, column=20, sticky=E, padx=10, pady=10)
+
+        return self.cadre_inscrire_membre
     
     def creercadreprincipal(self,usager):
         self.root.title("GestionMedia")
         self.cadreprincipal=Frame(self.cadreapp,width=400,height=400)
         
-        self.cadretitre=Frame(self.cadreapp,width=400,height=400)
+        self.cadretitre=Frame(self.cadreprincipal,width=400,height=400)
         self.titreprincipal=Label(self.cadretitre,text="GestMedia"+" pour "+usager.compagnie["nom"],font=("Arial",18),
                               borderwidth=2,relief=GROOVE)
         
@@ -87,6 +132,10 @@ class Vue():
         self.cadrecontenu=Frame(self.cadreprincipal, width=600,height=400,bg="green")
         self.cadrecontenu.pack()
         self.cadrepied=Frame(self.cadreprincipal, width=600,height=80)
+        self.btn_ajouter_membre = Button(self.cadrepied, text="Inscrire un nouvel usager", font=("Arial", 12),
+                                          padx=10, pady=10,
+                                          command=self.form_inscrire_membre)
+        #self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
         self.cadrepied.pack()
         
         self.creertableau()
@@ -156,16 +205,27 @@ class Vue():
         listemembres=self.parent.trouvermembres()
         entete=["identifiant","permission","titre"]
         self.integretableau(listemembres,entete)
+        #self.cadrepied.pack()
+        self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
+
+    def form_inscrire_membre(self):
+        self.changercadre("nouveau_membre")
+
+    def inscrire_membre(self):
+        self.changercadre("principal")
+        pass
              
     def gererprojets(self):
         listeprojets=self.parent.trouverprojets()
         entete=["compagnie","projet","date de fin"]
         self.integretableau(listeprojets,entete)
+        self.btn_ajouter_membre.grid_remove()      # Enlever le bouton "Inscrire un membre" quand on change de cadre
              
     def gerermodules(self):
         listemodules=self.parent.trouvermodules()
         entete=["modules disponibles"]
         self.integretableau(listemodules,entete)
+        self.btn_ajouter_membre.grid_remove()  # Enlever le bouton "Inscrire une usager" quand on change de cadre
     
     def annulerlogin(self):
         self.root.destroy()
