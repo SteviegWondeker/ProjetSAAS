@@ -213,10 +213,13 @@ class Vue():
         #self.cadrepied.pack()
         self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
 
+    # Ouvre le cadre pour inscrire un nouveau membre
     def form_inscrire_membre(self):
         self.changercadre("nouveau_membre")
 
+    # Méthode à utiliser pour inscrire un membre dans la BD
     def inscrire_membre(self):
+        # bla bla bla
         self.changercadre("principal")
         pass
              
@@ -356,7 +359,7 @@ class Vue():
             self.avertirusager("Invalide","Mots de passe ne concordent pas, reprendre?")
 
         if valide == True:
-            self.parent.signup_usager(nom,mdp)
+            #self.parent.signup_usager(nom,mdp)
             pass
 #        
                 
