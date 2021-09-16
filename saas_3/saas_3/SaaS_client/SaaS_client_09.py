@@ -273,6 +273,7 @@ class Vue():
 
         self.list_entry=[]
         self.list_lab=[]
+        self.params=[]
 
         self.signup_label=Label(self.cadre_creation,text="Création pour GestMedia",font=("Arial",18),
                               borderwidth=2,relief=GROOVE)
@@ -322,7 +323,6 @@ class Vue():
             self.list_lab[i].grid(row=temp,column=10, sticky=E,padx=10,pady=5)
             self.list_entry[i].grid(row=temp,column=20,sticky=E,padx=5,pady=5)
 
-
         self.btn_annuler_signup=Button(self.cadre_creation,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.annuler_signup)
         self.btn_valider_signup=Button(self.cadre_creation,text="Valider",font=("Arial",12),padx=10,pady=10,command=self.valider_signup)
 
@@ -346,21 +346,27 @@ class Vue():
 
 
     def valider_signup(self):
-        valide = True
+        form_valide = True 
+
+        self.form=[]
+
+
 
         for i in self.list_entry:
             if not i.get():
                 self.avertirusager("Invalide","Des champs sont vides, reprendre?")
-                valide=False
+                form_valide=False
                 break
+            else:
+                self.form.append(i.get())
 
         if ((self.signup_mdp.get() != self.signup_mdpval.get()) and valide == True):
-            valide=False
+            form_valide=False
             self.avertirusager("Invalide","Mots de passe ne concordent pas, reprendre?")
 
-        if valide == True:
-            #self.parent.signup_usager(nom,mdp)
-            pass
+        if form_valide == True:
+            if not self.parent.verifier_usager(self.form):
+                self.parent.inscrire_usager(self.form)
 #        
                 
 class Modele():
@@ -448,20 +454,33 @@ class Controleur:
         self.vue.creer_cadre_creation()
         self.vue.changercadre("creation")
 
-    def signup_usager(self,dict): 
-        #url = self.urlserveur+"/identifierusager"
-        params = {"nom":nom,
-                  "mdp":mdp}
+    def verifier_usager(self,form): 
+        url = self.urlserveur+"/verifierusager"
+        identifiant = form[0]+" "+form[1]
+        params = {"nom_user":identifiant,
+                  "nom_org":form[6]}
+        reptext=self.appelserveur(url,params)
+        
+        mondict=json.loads(reptext)
+        if len(mondict[0])>0 or len(mondict[1])>0:
+            self.vue.avertirusager("Existe déjà","Reprendre?")
+            return True
+        else:
+            return False
+
+    def inscrire_usager(self,form): 
+        url = self.urlserveur+"/inscrireusager"
+        identifiant = form[0]+" "+form[1]
+        params = {"nom_user":identifiant,
+                  "courriel":form[2],
+                  "telephone":form[3],
+                  "mdp":form[4],
+                  "nom_org":form[6],
+                  "type_org":form[7]}
         reptext=self.appelserveur(url,params)
         
         mondict=json.loads(reptext)
         print(mondict)
-        if "inconnu" in mondict:
-            self.vue.avertirusager("Inconnu","Reprendre?")
-        else:
-            self.modele.inscrireusager(mondict)
-            self.vue.creercadreprincipal(self.modele)
-            self.vue.changercadre("principal")
 
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
     def appelserveur(self,url,params):

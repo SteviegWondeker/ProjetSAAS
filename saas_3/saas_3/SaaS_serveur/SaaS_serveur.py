@@ -60,6 +60,30 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
     def fermerdb(self):
         self.conn.close()
 
+    ##
+    def verifier_usager(self,nom_org, nom_user):
+        sql_org=("select * from 'compagnie' where nomcompagnie=:nom_org")
+        sql_user=("select * from 'membre' where identifiant=:nom_user")
+        self.curs.execute(sql_org, {'nom_org': nom_org})
+        info_org = self.curs.fetchall()
+        self.curs.execute(sql_user, { 'nom_user':nom_user})
+        info_user=self.curs.fetchall()
+
+        return [info_org,info_user]
+
+    def inscrire_usager(self,nom, courriel, telephone, mdp, nom_org, type_org):
+        sql_org=("insert into 'compagnie' ('nomcompagnie', 'type_entreprise') values (:nom_org, :type_org)")
+        sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'courriel', 'telephone') values (:nom_org, :nom, :mdp, :courriel, :telephone)")
+        self.curs.execute(sql_org, {'nom_org': nom_org,
+                                    'type_org': type_org})                          
+    #    self.curs.execute(sql_nom, {'nom_org': nom_org,
+    #                                'nom': nom,
+    #                                'mdp': mdp,
+    #                                'courriel': courriel,
+    #                                'telephone': telephone})                            
+        self.conn.commit()
+        return "test"
+
 def demanderclients():
     db=Dbclient()
     clients=db.trouverclients()
@@ -107,6 +131,8 @@ def identifierusager():
     else:
         return repr("pas ok")
 
+
+
 @app.route('/trouverprojets', methods=["GET","POST"])
 def trouverprojets():
     if request.method=="POST":
@@ -142,6 +168,41 @@ def requeteserveur():
         #return repr(usager)
     else:
         return repr("pas ok")
+##
+
+@app.route('/verifierusager', methods=["GET","POST"])
+def verifier_usager():
+    if request.method=="POST":
+        nom_org=request.form["nom_org"]
+        nom_user=request.form["nom_user"]
+        db=Dbman()
+        usager=db.verifier_usager(nom_org, nom_user)
+
+        #db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/inscrireusager', methods=["GET","POST"])
+def inscrire_usager():
+    if request.method=="POST":
+        nom=request.form["nom_user"]
+        courriel=request.form["courriel"]
+        telephone=request.form["telephone"]
+        mdp=request.form["mdp"]
+        nom_org=request.form["nom_org"]
+        type_org=request.form["type_org"]
+
+        db=Dbman()
+        usager=db.inscrire_usager(nom, courriel, telephone, mdp, nom_org, type_org)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
 if __name__ == '__main__':
     #print(flask.__version__)
     #app.run(debug=True)
