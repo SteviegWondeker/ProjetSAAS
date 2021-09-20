@@ -67,26 +67,25 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.conn.close()
 
     ##
-    def verifier_usager(self,nom_org, nom_user):
+    def verifier_usager(self,nom_org, courriel):
         sql_org=("select * from 'compagnie' where nomcompagnie=:nom_org")
-        sql_user=("select * from 'membre' where identifiant=:nom_user")
+        sql_user=("select * from 'membre' where courriel=:courriel")
         self.curs.execute(sql_org, {'nom_org': nom_org})
         info_org = self.curs.fetchall()
-        self.curs.execute(sql_user, { 'nom_user':nom_user})
+        self.curs.execute(sql_user, { 'courriel':courriel})
         info_user=self.curs.fetchall()
 
         return [info_org,info_user]
 
     def inscrire_usager(self,nom, courriel, telephone, mdp, nom_org, type_org):
         sql_org=("insert into 'compagnie' ('nomcompagnie', 'type_entreprise') values (:nom_org, :type_org)")
-        sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'courriel', 'telephone') values (:nom_org, :nom, :mdp, :courriel, :telephone)")
+        sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'permission', 'titre', 'courriel', 'telephone') values ((select idcompagnie from 'compagnie' where nomcompagnie=:nom_org), :courriel, :mdp,  'admin', 'président', :courriel, :telephone)")
         self.curs.execute(sql_org, {'nom_org': nom_org,
                                     'type_org': type_org})                          
-    #    self.curs.execute(sql_nom, {'nom_org': nom_org,
-    #                                'nom': nom,
-    #                                'mdp': mdp,
-    #                                'courriel': courriel,
-    #                                'telephone': telephone})                            
+        self.curs.execute(sql_nom, {'nom_org': nom_org,
+                                    'mdp': mdp,
+                                    'courriel': courriel,
+                                    'telephone': telephone})                       
         self.conn.commit()
         return "test"
 
@@ -192,9 +191,9 @@ def requeteserveur():
 def verifier_usager():
     if request.method=="POST":
         nom_org=request.form["nom_org"]
-        nom_user=request.form["nom_user"]
+        courriel=request.form["courriel"]
         db=Dbman()
-        usager=db.verifier_usager(nom_org, nom_user)
+        usager=db.verifier_usager(nom_org, courriel)
 
         #db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
