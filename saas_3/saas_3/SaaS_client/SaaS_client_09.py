@@ -1,14 +1,14 @@
 ## -*- Encoding: UTF-8 -*-
 import urllib.request
-import urllib.parse 
-import json 
+import urllib.parse
+import json
 
 from tkinter import *
 from tkinter.simpledialog import *
 from tkinter import ttk
 
 import sys
-from subprocess import Popen 
+from subprocess import Popen
 ##################
 
 class Vue():
@@ -20,48 +20,49 @@ class Vue():
         self.cadreapp.pack()
         self.cadreactif=None
         self.creercadres()
-    
+
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
         if self.cadreactif:
             self.cadreactif.pack_forget()
         self.cadreactif=cadre
         self.cadreactif.pack()
-            
+
     def creercadres(self):
         self.cadres["login"]=self.creercadrelogin()
         self.cadres["nouveau_membre"]=self.creer_cadre_membre()
         self.cadres["creation"]=self.creer_cadre_creation()
+        self.cadres["Rôles"]=self.creer_cadre_role()
         #self.cadres["principal"]=self.creercadreprincipal()
-        
+
     def creercadrelogin(self):
         self.cadrelogin=Frame(self.cadreapp,width=800,height=400)
-        
+
         self.loginlabel=Label(self.cadrelogin,text="Identification pour GestMedia",font=("Arial",18),
                               borderwidth=2,relief=GROOVE)
-        
+
         self.loginlabnom=Label(self.cadrelogin,text="Nom",font=("Arial",14))
         self.loginnom=Entry(self.cadrelogin,font=("Arial",14),width=30)
         self.loginlabmdp=Label(self.cadrelogin,text="MotdePasse",font=("Arial",14))
         self.loginmdp=Entry(self.cadrelogin,font=("Arial",14),show="*",width=30)
-        
+
         # les boutons d'actions
         self.btnannulerlogin=Button(self.cadrelogin,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.annulerlogin)
         self.btnidentifierlogin=Button(self.cadrelogin,text="Identifier",font=("Arial",12),padx=10,pady=10,command=self.identifierlogin)
 
         self.btn_creation=Button(self.cadrelogin,text="Creer un usager",font=("Arial",12),padx=10,pady=10,command=self.creation_compte)
-        
+
         self.loginlabel.grid(row=10,column=10,columnspan=20,padx=10,pady=10,ipadx=10,ipady=10)
         self.loginlabnom.grid(row=20,column=10,sticky=E,padx=5,pady=5)
         self.loginnom.grid(row=20,column=20,padx=10,pady=5)
         self.loginlabmdp.grid(row=30,column=10,sticky=E,padx=5,pady=5)
         self.loginmdp.grid(row=30,column=20,padx=10,pady=5)
-        
+
         self.btnannulerlogin.grid(row=40,column=20,sticky=W,padx=10,pady=10)
         self.btnidentifierlogin.grid(row=40,column=20,padx=10,pady=10)
 
         self.btn_creation.grid(row=40,column=30,padx=10,pady=10)
-        
+
         return self.cadrelogin
 
     def creer_cadre_membre(self):
@@ -107,20 +108,20 @@ class Vue():
         self.btn_inscrire_membre.grid(row=100, column=20, sticky=E, padx=10, pady=10)
 
         return self.cadre_inscrire_membre
-    
+
     def creercadreprincipal(self, usager):
         self.root.title("GestionMedia")
         self.cadreprincipal=Frame(self.cadreapp,width=400,height=400)
-        
+
         self.cadretitre=Frame(self.cadreprincipal,width=400,height=400)
         self.titreprincipal=Label(self.cadretitre,text="GestMedia"+" pour "+usager.compagnie["nom"],font=("Arial",18),
                               borderwidth=2,relief=GROOVE)
-        
+
         self.usagercourant=Label(self.cadretitre,text=usager.nom+", "+usager.titre +" : "+usager.droit,font=("Arial",14))
         self.titreprincipal.pack()
         self.usagercourant.pack()
         self.cadretitre.pack()
-        
+
         # commande possible
         self.cadrecommande=Frame(self.cadreprincipal,width=400,height=400)
         btnsaction=[]
@@ -140,60 +141,63 @@ class Vue():
         self.btn_ajouter_membre = Button(self.cadrepied, text="Inscrire un nouvel usager", font=("Arial", 12),
                                           padx=10, pady=10,
                                           command=self.form_inscrire_membre)
+
         #self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
+        self.btn_gerer_role = Button(self.cadrepied, text="Définir les rôles", font=("Arial", 12),
+                                     padx = 10, pady = 10,
+                                     command = self.form_inscrire_role)
         self.cadrepied.pack()
-        
+
         self.creertableau()
         self.cadres["principal"]=self.cadreprincipal
-    
+
     def creertableau(self):
         f = Frame(self.cadrecontenu)
         f.pack(side=TOP, fill=BOTH, expand=Y)
-                
+
         self.tableau = ttk.Treeview(show = 'headings')
-        
+
         self.tableau.bind("<Double-1>",self.affichertelecharger)
-        
+
         ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
         xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
         self.tableau['yscroll'] = ysb.set
         self.tableau['xscroll'] = xsb.set
-        
+
         # add tableau and scrollbars to frame
         self.tableau.grid(in_=f, row=0, column=0, sticky=NSEW)
         ysb.grid(in_=f, row=0, column=1, sticky=NS)
         xsb.grid(in_=f, row=1, column=0, sticky=EW)
-        
+
         # set frame resize priorities
         f.rowconfigure(0, weight=1)
-        f.columnconfigure(0, weight=1) 
-               
+        f.columnconfigure(0, weight=1)
+
     def affichertelecharger(self,evt):
         item = self.tableau.selection()
         for i in item:
             fichier=self.tableau.item(i, "values")[0]
         self.parent.telechargermodule(fichier)
-        
-        
+
     def ecriretableau(self):
         for i in self.tableau.get_children():
             self.tableau.delete(i)
-        for item in self.data: 
-            self.tableau.insert('', 'end', values=item)   
-    
+        for item in self.data:
+            self.tableau.insert('', 'end', values=item)
+
     def integretableau(self,listemembre,entete):
         self.data=listemembre
         self.colonnestableau = entete
-        
+
         self.tableau.config(columns=self.colonnestableau)
         n=1
         for i in self.colonnestableau:
             no="#"+str(n)
             self.tableau.heading(no, text=i)
             n+=1
-            
+
         self.ecriretableau()
-    
+
     def afficherlogin(self,nom="",mdp=""):
         self.root.title("GestMedia: Identification")
         if nom:
@@ -205,39 +209,45 @@ class Vue():
         # centrer au depart
         #self.root.update()
         #self.centrerfenetre()
-        
+
     def gerermembres(self):
         listemembres=self.parent.trouvermembres()
         entete=["identifiant","permission","titre"]
         self.integretableau(listemembres,entete)
         #self.cadrepied.pack()
         self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
+        self.btn_gerer_role.grid(row=40, column=40, sticky=W, padx=10, pady=10)
 
     # Ouvre le cadre pour inscrire un nouveau membre
     def form_inscrire_membre(self):
         self.changercadre("nouveau_membre")
+
+    def form_inscrire_role(self):
+        self.changercadre("Rôles")
 
     # Méthode à utiliser pour inscrire un membre dans la BD
     def inscrire_membre(self):
         # bla bla bla
         self.changercadre("principal")
         pass
-             
+
     def gererprojets(self):
         listeprojets=self.parent.trouverprojets()
         entete=["compagnie","projet","date de fin"]
         self.integretableau(listeprojets,entete)
         self.btn_ajouter_membre.grid_remove()      # Enlever le bouton "Inscrire un membre" quand on change de cadre
-             
+        self.btn_gerer_role.grid_remove()         # Enlever le bouton "définir un role" quand on change de cadre
+
     def gerermodules(self):
         listemodules=self.parent.trouvermodules()
         entete=["modules disponibles"]
         self.integretableau(listemodules,entete)
         self.btn_ajouter_membre.grid_remove()  # Enlever le bouton "Inscrire une usager" quand on change de cadre
-    
+        self.btn_gerer_role.grid_remove()  # Enlever le bouton "définir un role" quand on change de cadre
+
     def annulerlogin(self):
         self.root.destroy()
-        
+
     def identifierlogin(self):
         nom=self.loginnom.get()
         mdp=self.loginmdp.get()
@@ -245,12 +255,12 @@ class Vue():
 
     def creation_compte(self):
         self.parent.creation_compte(nom,mdp)
-        
+
     def avertirusager(self,titre,message):
         rep=messagebox.askyesno(titre,message)
         if not rep:
             self.root.destroy()
-            
+
     def centrerfenetre(self):
         w=self.root.winfo_width()
         h=self.root.winfo_height()
@@ -258,10 +268,10 @@ class Vue():
         ws = self.root.winfo_screenwidth()
         hs = self.root.winfo_screenheight()
         # calculate position x, y
-        x = (ws/2) - (w/2)    
+        x = (ws/2) - (w/2)
         y = (hs/3) - (h/2)
         self.root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        
+
     ####
 
     def creation_compte(self):
@@ -297,7 +307,7 @@ class Vue():
         self.signup_tel=self.create_entry()
         self.list_entry.append(self.signup_tel)
         self.list_lab.append(self.signup_lab_tel)
-        
+
         self.signup_lab_mdp=self.create_label("Mot de passe")
         self.signup_mdp=Entry(self.cadre_creation,font=("Arial",14),show="*",width=30)
         self.list_entry.append(self.signup_mdp)
@@ -344,13 +354,10 @@ class Vue():
     def annuler_signup(self):
         self.afficherlogin()
 
-
     def valider_signup(self):
-        form_valide = True 
+        form_valide = True
 
         self.form=[]
-
-
 
         for i in self.list_entry:
             if not i.get():
@@ -367,12 +374,40 @@ class Vue():
         if form_valide == True:
             if not self.parent.verifier_usager(self.form):
                 self.parent.inscrire_usager(self.form)
-#        
-                
+#
+#########################################################################
+#Sam
+
+    def creer_role(self):
+        self.parent.creation_role()
+
+    def creer_cadre_role(self):
+        self.root.title("Rôles")
+        liste_roles = self.parent.trouver_roles()
+        self.cadre_role = Frame(self.cadreapp, width=800, height=400)
+
+        self.label_nouveau_nom_du_role = Label(self.cadre_role, text="Rôle", font=("Arial", 12))
+        self.champ_nouveau_role = Entry(self.cadre_role, font=("Arial", 12), width=30)
+
+        self.btn_annuler_signup = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10,
+                                         command=self.annuler_signup)
+        self.btn_valider_signup = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10,
+                                         command=self.valider_signup)
+        self.label_nouveau_nom_du_role.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
+        self.champ_nouveau_role.grid(row=10, column=40, sticky=E, padx=5, pady=5)
+        self.btn_annuler_signup.grid(row=40,column=20,sticky=W,padx=10,pady=10)
+        self.btn_valider_signup.grid(row=40, column=40, sticky=W, padx=10, pady=10)
+
+        #self.loginlabnom = Label(self.cadrelogin, text="Nom", font=("Arial", 14))
+        #self.loginnom = Entry(self.cadrelogin, font=("Arial", 14), width=30)
+
+        return self.cadre_role
+############################################
+
 class Modele():
     def __init__(self,parent):
-        self.parent=parent 
-    
+        self.parent=parent
+
     def inscrireusager(self,dictinfo):
         self.nom=dictinfo[0][0][2]
         self.droit=dictinfo[0][0][4]
@@ -388,7 +423,7 @@ class Controleur:
         self.vue=Vue(self)
         self.vue.afficherlogin("jmd","jmd1")
         self.vue.root.mainloop()
-    
+
     def telechargermodule(self,fichier):
         leurl=self.urlserveur+"/telechargermodule"
         params = {"fichier":fichier}
@@ -398,45 +433,52 @@ class Controleur:
         fichier1.write(rep)
         fichier1.close()
         usager=json.dumps([self.modele.nom,self.modele.compagnie])
-        pid = Popen([sys.executable, "./SaaS_modules/"+fichier,self.urlserveur,usager],shell=1).pid 
-                  
+        pid = Popen([sys.executable, "./SaaS_modules/"+fichier,self.urlserveur,usager],shell=1).pid
+
     def testsimple(self):
         leurl=self.urlserveur
         r=urllib.request.urlopen(leurl)
         rep=r.read()
         dict=rep.decode('utf-8')
         print("testserveurSIMPLE", dict)
-    
-    def trouvermodules(self): 
+
+    def trouvermodules(self):
         url = self.urlserveur+"/trouvermodules"
         params = {}
         reptext=self.appelserveur(url,params)
-        
+
         mondict=json.loads(reptext)
-        return mondict  
-    
-    def trouverprojets(self): 
+        return mondict
+
+    def trouverprojets(self):
         url = self.urlserveur+"/trouverprojets"
         params = {}
         reptext=self.appelserveur(url,params)
-        
+
         mondict=json.loads(reptext)
         return mondict
-     
-    def trouvermembres(self): 
+
+    def trouvermembres(self):
         url = self.urlserveur+"/trouvermembres"
         params = {}
-        reptext=self.appelserveur(url,params)
-        
+        reptext=self.appelserveur(url, params)
+
         mondict=json.loads(reptext)
         return mondict
-    
-    def identifierusager(self,nom,mdp): 
+
+    def trouver_roles(self):
+        url = self.urlserveur+"/trouver_roles"
+        params = {}
+        reptext=self.appelserveur(url, params)
+        mondict=json.loads(reptext)
+        return mondict
+
+    def identifierusager(self,nom,mdp):
         url = self.urlserveur+"/identifierusager"
         params = {"nom":nom,
                   "mdp":mdp}
         reptext=self.appelserveur(url,params)
-        
+
         mondict=json.loads(reptext)
         print(mondict)
         if "inconnu" in mondict:
@@ -448,19 +490,19 @@ class Controleur:
 
 ####
 
-    def creation_compte(self): 
+    def creation_compte(self):
         #url = self.urlserveur+"/identifierusager"
-        
+
         self.vue.creer_cadre_creation()
         self.vue.changercadre("creation")
 
-    def verifier_usager(self,form): 
+    def verifier_usager(self,form):
         url = self.urlserveur+"/verifierusager"
         identifiant = form[0]+" "+form[1]
         params = {"nom_user":identifiant,
                   "nom_org":form[6]}
         reptext=self.appelserveur(url,params)
-        
+
         mondict=json.loads(reptext)
         if len(mondict[0])>0 or len(mondict[1])>0:
             self.vue.avertirusager("Existe déjà","Reprendre?")
@@ -468,7 +510,7 @@ class Controleur:
         else:
             return False
 
-    def inscrire_usager(self,form): 
+    def inscrire_usager(self,form):
         url = self.urlserveur+"/inscrireusager"
         identifiant = form[0]+" "+form[1]
         params = {"nom_user":identifiant,
@@ -478,7 +520,7 @@ class Controleur:
                   "nom_org":form[6],
                   "type_org":form[7]}
         reptext=self.appelserveur(url,params)
-        
+
         mondict=json.loads(reptext)
         print(mondict)
 
@@ -486,11 +528,11 @@ class Controleur:
     def appelserveur(self,url,params):
         query_string = urllib.parse.urlencode( params )
         data = query_string.encode( "ascii" )
-        url = url + "?" + query_string 
-        rep=urllib.request.urlopen(url , data)
+        url = url + "?" + query_string
+        rep=urllib.request.urlopen(url, data)
         reptext=rep.read()
         return reptext
-    
+
 if __name__ == '__main__':
     c=Controleur()
     print("FIN DE PROGRAMME")
