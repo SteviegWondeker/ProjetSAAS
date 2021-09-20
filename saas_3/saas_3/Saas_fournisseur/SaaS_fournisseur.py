@@ -84,17 +84,18 @@ class Vue():
         self.cadretitre.pack()
 
         # commande possible
-        self.cadrecommande = Frame(self.cadreprincipal, width=400, height=400)
-        btnsaction = []
-        for i in btnsaction:
-            i.pack(side=LEFT, pady=10, padx=10)
-        self.cadrecommande.pack()
+        #self.cadrecommande = Frame(self.cadreprincipal, width=400, height=400)
+        #btnsaction = []
+        #for i in btnsaction:
+        #    i.pack(side=LEFT, pady=10, padx=10)
+        #self.cadrecommande.pack()
         self.cadrecontenu = Frame(self.cadreprincipal, width=600, height=400, bg="green")
         self.cadrecontenu.pack()
         self.cadrepied = Frame(self.cadreprincipal, width=600, height=80)
         self.cadrepied.pack()
 
         self.creertableau()
+        self.gerermembres()
         self.cadres["principal"] = self.cadreprincipal
 
     def creertableau(self):
@@ -116,6 +117,30 @@ class Vue():
         # set frame resize priorities
         f.rowconfigure(0, weight=1)
         f.columnconfigure(0, weight=1)
+
+    def integretableau(self, listemembre, entete):
+        self.data = listemembre
+        self.colonnestableau = entete
+
+        self.tableau.config(columns=self.colonnestableau)
+        n = 1
+        for i in self.colonnestableau:
+            no = "#" + str(n)
+            self.tableau.heading(no, text=i)
+            n += 1
+
+        self.ecriretableau()
+
+    def ecriretableau(self):
+        for i in self.tableau.get_children():
+            self.tableau.delete(i)
+        for item in self.data:
+            self.tableau.insert('', 'end', values=item)
+
+    def gerermembres(self):
+        listemembres=self.parent.trouvermembres()
+        entete=["identifiant","permission","titre"]
+        self.integretableau(listemembres,entete)
 
     def creation_compte(self):
         self.parent.creation_compte(nom,mdp)
