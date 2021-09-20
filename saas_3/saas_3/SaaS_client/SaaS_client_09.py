@@ -32,6 +32,7 @@ class Vue():
         self.cadres["login"]=self.creercadrelogin()
         self.cadres["nouveau_membre"]=self.creer_cadre_membre()
         self.cadres["creation"]=self.creer_cadre_creation()
+        self.cadres["nouveau_projet"]=self.creer_cadre_projet()
         #self.cadres["principal"]=self.creercadreprincipal()
         
     def creercadrelogin(self):
@@ -140,6 +141,8 @@ class Vue():
         self.btn_ajouter_membre = Button(self.cadrepied, text="Inscrire un nouvel usager", font=("Arial", 12),
                                           padx=10, pady=10,
                                           command=self.form_inscrire_membre)
+        self.btn_ajouter_projet = Button(self.cadrepied, text="Ajouter un projet", font=("Arial", 12),
+                                         padx=10, pady=10, command=self.form_inscrire_projet)
         #self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
         self.cadrepied.pack()
         
@@ -211,14 +214,23 @@ class Vue():
         entete=["identifiant","permission","titre"]
         self.integretableau(listemembres,entete)
         #self.cadrepied.pack()
+        self.btn_ajouter_projet.grid_remove() 
         self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
 
     # Ouvre le cadre pour inscrire un nouveau membre
     def form_inscrire_membre(self):
         self.changercadre("nouveau_membre")
 
+    def form_inscrire_projet(self):
+        self.changercadre("nouveau_projet")
+
     # Méthode à utiliser pour inscrire un membre dans la BD
     def inscrire_membre(self):
+        # bla bla bla
+        self.changercadre("principal")
+        pass
+
+    def retour_cadre_principal(self):
         # bla bla bla
         self.changercadre("principal")
         pass
@@ -227,12 +239,17 @@ class Vue():
         listeprojets=self.parent.trouverprojets()
         entete=["compagnie","projet","date de fin"]
         self.integretableau(listeprojets,entete)
+
+
+        self.btn_ajouter_projet.grid(row=40, column=20, sticky=W, padx=10, pady=10)
+
         self.btn_ajouter_membre.grid_remove()      # Enlever le bouton "Inscrire un membre" quand on change de cadre
              
     def gerermodules(self):
         listemodules=self.parent.trouvermodules()
         entete=["modules disponibles"]
         self.integretableau(listemodules,entete)
+        self.btn_ajouter_projet.grid_remove() 
         self.btn_ajouter_membre.grid_remove()  # Enlever le bouton "Inscrire une usager" quand on change de cadre
     
     def annulerlogin(self):
@@ -243,8 +260,6 @@ class Vue():
         mdp=self.loginmdp.get()
         self.parent.identifierusager(nom,mdp)
 
-    def creation_compte(self):
-        self.parent.creation_compte(nom,mdp)
         
     def avertirusager(self,titre,message):
         rep=messagebox.askyesno(titre,message)
@@ -278,43 +293,43 @@ class Vue():
         self.signup_label=Label(self.cadre_creation,text="Création pour GestMedia",font=("Arial",18),
                               borderwidth=2,relief=GROOVE)
 
-        self.signup_lab_pre= self.create_label("Prénom")
-        self.signup_pre=self.create_entry()
+        self.signup_lab_pre= self.create_label("Prénom", self.cadre_creation)
+        self.signup_pre=self.create_entry(self.cadre_creation)
         self.list_entry.append(self.signup_pre)
         self.list_lab.append(self.signup_lab_pre)
 
-        self.signup_lab_nom=self.create_label("Nom")
-        self.signup_nom=self.create_entry()
+        self.signup_lab_nom=self.create_label("Nom", self.cadre_creation)
+        self.signup_nom=self.create_entry(self.cadre_creation)
         self.list_entry.append(self.signup_nom)
         self.list_lab.append(self.signup_lab_nom)
 
-        self.signup_lab_mail=self.create_label("Courriel")
-        self.signup_mail=self.create_entry()
+        self.signup_lab_mail=self.create_label("Courriel", self.cadre_creation)
+        self.signup_mail=self.create_entry(self.cadre_creation)
         self.list_entry.append(self.signup_mail)
         self.list_lab.append(self.signup_lab_mail)
 
-        self.signup_lab_tel=self.create_label("Télephone")
-        self.signup_tel=self.create_entry()
+        self.signup_lab_tel=self.create_label("Télephone", self.cadre_creation)
+        self.signup_tel=self.create_entry(self.cadre_creation)
         self.list_entry.append(self.signup_tel)
         self.list_lab.append(self.signup_lab_tel)
         
-        self.signup_lab_mdp=self.create_label("Mot de passe")
+        self.signup_lab_mdp=self.create_label("Mot de passe", self.cadre_creation)
         self.signup_mdp=Entry(self.cadre_creation,font=("Arial",14),show="*",width=30)
         self.list_entry.append(self.signup_mdp)
         self.list_lab.append(self.signup_lab_mdp)
 
-        self.signup_lab_mdpval=self.create_label("Confirmation de mot de passe")
+        self.signup_lab_mdpval=self.create_label("Confirmation de mot de passe", self.cadre_creation)
         self.signup_mdpval=Entry(self.cadre_creation,font=("Arial",14),show="*",width=30)
         self.list_entry.append(self.signup_mdpval)
         self.list_lab.append(self.signup_lab_mdpval)
 
-        self.signup_lab_nom_org=self.create_label("Nom de l'organisation")
-        self.signup_nom_org=self.create_entry()
+        self.signup_lab_nom_org=self.create_label("Nom de l'organisation", self.cadre_creation)
+        self.signup_nom_org=self.create_entry(self.cadre_creation)
         self.list_entry.append(self.signup_nom_org)
         self.list_lab.append(self.signup_lab_nom_org)
 
-        self.signup_lab_type_org=self.create_label("Type d'organisation")
-        self.signup_type_org=self.create_entry()
+        self.signup_lab_type_org=self.create_label("Type d'organisation", self.cadre_creation)
+        self.signup_type_org=self.create_entry(self.cadre_creation)
         self.list_entry.append(self.signup_type_org)
         self.list_lab.append(self.signup_lab_type_org)
 
@@ -323,7 +338,7 @@ class Vue():
             self.list_lab[i].grid(row=temp,column=10, sticky=E,padx=10,pady=5)
             self.list_entry[i].grid(row=temp,column=20,sticky=E,padx=5,pady=5)
 
-        self.btn_annuler_signup=Button(self.cadre_creation,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.annuler_signup)
+        self.btn_annuler_signup=Button(self.cadre_creation,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.afficherlogin)
         self.btn_valider_signup=Button(self.cadre_creation,text="Valider",font=("Arial",12),padx=10,pady=10,command=self.valider_signup)
 
         self.btn_annuler_signup.grid(row=100,column=20,sticky=W,padx=10,pady=10)
@@ -333,25 +348,17 @@ class Vue():
 
         return self.cadre_creation
 
-    def create_label(self, champ):
-        label = Label(self.cadre_creation,text=champ,font=("Arial",14))
+    def create_label(self, champ, cadre):
+        label = Label(cadre, text=champ,font=("Arial",14))
         return label
 
-    def create_entry(self):
-        entry = Entry(self.cadre_creation,font=("Arial",14),width=30)
+    def create_entry(self, cadre):
+        entry = Entry(cadre,font=("Arial",14),width=30)
         return entry
-
-    def annuler_signup(self):
-        self.afficherlogin()
-
 
     def valider_signup(self):
         form_valide = True 
-
         self.form=[]
-
-
-
         for i in self.list_entry:
             if not i.get():
                 self.avertirusager("Invalide","Des champs sont vides, reprendre?")
@@ -360,13 +367,84 @@ class Vue():
             else:
                 self.form.append(i.get())
 
-        if ((self.signup_mdp.get() != self.signup_mdpval.get()) and valide == True):
+        if ((self.signup_mdp.get() != self.signup_mdpval.get()) and form_valide == True):
             form_valide=False
             self.avertirusager("Invalide","Mots de passe ne concordent pas, reprendre?")
 
         if form_valide == True:
             if not self.parent.verifier_usager(self.form):
                 self.parent.inscrire_usager(self.form)
+                self.avertirusager('Terminer', "Organisation et compte admin crées")
+                self.afficherlogin()
+#        
+
+    def creer_cadre_projet(self):
+        self.root.title("Creation")
+        self.cadre_projet=Frame(self.cadreapp,width=800,height=400)
+
+        self.list_entry=[]
+        self.list_lab=[]
+        self.params=[]
+
+        self.projet_label=Label(self.cadre_projet,text="Ajout d'un projet",font=("Arial",18),
+                              borderwidth=2,relief=GROOVE)
+
+        self.projet_lab_nom=self.create_label("Nom du projet", self.cadre_projet)
+        self.projet_nom=self.create_entry(self.cadre_projet)
+        self.list_entry.append(self.projet_nom)
+        self.list_lab.append(self.projet_lab_nom)
+
+        self.projet_lab_org=self.create_label("Nom de l'organisation", self.cadre_projet)
+        self.projet_org=self.create_entry(self.cadre_projet)
+        self.list_entry.append(self.projet_org)
+        self.list_lab.append(self.projet_lab_org)
+
+        self.projet_lab_res=self.create_label("Responsable du projet", self.cadre_projet)
+        self.projet_res=self.create_entry(self.cadre_projet)
+        self.list_entry.append(self.projet_res)
+        self.list_lab.append(self.projet_lab_res)
+
+        self.projet_lab_date_deb=self.create_label("Date début", self.cadre_projet)
+        self.projet_date_deb=self.create_entry(self.cadre_projet)
+        self.list_entry.append(self.projet_date_deb)
+        self.list_lab.append(self.projet_lab_date_deb)
+
+        self.projet_lab_date_fin=self.create_label("Date fin", self.cadre_projet)
+        self.projet_date_fin=self.create_entry(self.cadre_projet)
+        self.list_entry.append(self.projet_date_fin)
+        self.list_lab.append(self.projet_lab_date_fin)
+
+        for i in range(len(self.list_entry)):
+            temp = 10*(i+1)
+            self.list_lab[i].grid(row=temp,column=10, sticky=E,padx=10,pady=5)
+            self.list_entry[i].grid(row=temp,column=20,sticky=E,padx=5,pady=5)
+
+        self.btn_annuler_signup=Button(self.cadre_projet,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.retour_cadre_principal)
+        self.btn_valider_signup=Button(self.cadre_projet,text="Valider",font=("Arial",12),padx=10,pady=10,command=self.valider_signup)
+
+        self.btn_annuler_signup.grid(row=100,column=20,sticky=W,padx=10,pady=10)
+        self.btn_valider_signup.grid(row=100,column=20,padx=10,pady=10)
+
+        self.cadres["nouveau_projet"]=self.cadre_projet
+
+        return self.cadre_projet
+
+    def valider_projet(self):
+        form_valide = True 
+        self.form=[]
+        for i in self.list_entry:
+            if not i.get():
+                self.avertirusager("Invalide","Des champs sont vides, reprendre?")
+                form_valide=False
+                break
+            else:
+                self.form.append(i.get())
+        if form_valide == True:
+            pass
+#            if not self.parent.verifier_usager(self.form):
+ #               self.parent.inscrire_usager(self.form)
+  #              self.avertirusager('Terminer', "Organisation et compte admin crées")
+   #             self.afficherlogin()
 #        
                 
 class Modele():
@@ -449,21 +527,18 @@ class Controleur:
 ####
 
     def creation_compte(self): 
-        #url = self.urlserveur+"/identifierusager"
-        
         self.vue.creer_cadre_creation()
         self.vue.changercadre("creation")
 
     def verifier_usager(self,form): 
         url = self.urlserveur+"/verifierusager"
-        identifiant = form[0]+" "+form[1]
-        params = {"nom_user":identifiant,
+        params = {"courriel":form[2],
                   "nom_org":form[6]}
         reptext=self.appelserveur(url,params)
         
         mondict=json.loads(reptext)
         if len(mondict[0])>0 or len(mondict[1])>0:
-            self.vue.avertirusager("Existe déjà","Reprendre?")
+            self.vue.avertirusager("Compte existe déjà","Reprendre?")
             return True
         else:
             return False
