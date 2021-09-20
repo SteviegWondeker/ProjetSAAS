@@ -55,6 +55,18 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.curs.execute(sqlnom)
         info=self.curs.fetchall()
         return info
+#####################################################################################################
+    def trouver_membres_par_compagnie(self):        # Alex
+        sqlnom = ("select identifiant, permission,titre from 'membre' where compagnie=:compagnie")
+        self.curs.execute(sqlnom)
+        info = self.curs.fetchall()
+        return info
+#####################################################################################################
+    def trouver_compagnies(self):           # Alex
+        sqlnom=("select nomcompagnie from 'compagnie'")
+        self.curs.execute(sqlnom)
+        info=self.curs.fetchall()
+        return info
 
 
     def fermerdb(self):
@@ -154,6 +166,18 @@ def trouvermembres():
 
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/trouvercompagnies', methods=["GET","POST"])        # Alex
+def trouvercompagnies():
+    if request.method=="POST":
+        db=Dbman()
+        compagnies=db.trouver_compagnies()
+
+        db.fermerdb()
+        return Response(json.dumps(compagnies), mimetype='application/json')
         #return repr(usager)
     else:
         return repr("pas ok")

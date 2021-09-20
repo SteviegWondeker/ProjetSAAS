@@ -17,6 +17,7 @@ class Vue():
         self.root=Tk()
         self.cadreapp=Frame(self.root) # le cadre qui va afficher ou non tous les autres
         self.cadres={}
+        self.tableaux = {}
         self.cadreapp.pack()
         self.cadreactif=None
         self.creercadres()
@@ -29,46 +30,10 @@ class Vue():
         self.cadreactif.pack()
 
     def creercadres(self):
-        self.cadres["login"] = self.creercadrelogin()
-        # self.cadres["principal"]=self.creercadreprincipal()
+         self.cadres["principal"]=self.creercadreprincipal()
 
-    def creercadrelogin(self):
-        self.cadrelogin = Frame(self.cadreapp, width=800, height=400)
 
-        self.loginlabel = Label(self.cadrelogin, text="SaaS - Logiciel d'administration", font=("Arial", 18),
-                                borderwidth=2, relief=GROOVE)
-
-        self.loginlabnom = Label(self.cadrelogin, text="Nom", font=("Arial", 14))
-        self.loginnom = Entry(self.cadrelogin, font=("Arial", 14), width=30)
-        self.loginlabmdp = Label(self.cadrelogin, text="MotdePasse", font=("Arial", 14))
-        self.loginmdp = Entry(self.cadrelogin, font=("Arial", 14), show="*", width=30)
-
-        # les boutons d'actions
-        self.btnannulerlogin = Button(self.cadrelogin, text="Annuler", font=("Arial", 12), padx=10, pady=10,
-                                      command=self.annulerlogin)
-        self.btnidentifierlogin = Button(self.cadrelogin, text="Identifier", font=("Arial", 12), padx=10, pady=10,
-                                         command=self.identifierlogin)
-
-        self.loginlabel.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
-        self.loginlabnom.grid(row=20, column=10, sticky=E, padx=5, pady=5)
-        self.loginnom.grid(row=20, column=20, padx=10, pady=5)
-        self.loginlabmdp.grid(row=30, column=10, sticky=E, padx=5, pady=5)
-        self.loginmdp.grid(row=30, column=20, padx=10, pady=5)
-
-        self.btnannulerlogin.grid(row=40, column=20, sticky=W, padx=10, pady=10)
-        self.btnidentifierlogin.grid(row=40, column=20, padx=10, pady=10)
-
-        return self.cadrelogin
-
-    def annulerlogin(self):
-        self.root.destroy()
-
-    def identifierlogin(self):
-        nom=self.loginnom.get()
-        mdp=self.loginmdp.get()
-        self.parent.identifierusager(nom,mdp)
-
-    def creercadreprincipal(self, usager):
+    def creercadreprincipal(self):          # Alex
         self.root.title("SaaS - ADMIN")
         self.cadreprincipal = Frame(self.cadreapp, width=400, height=400)
 
@@ -77,7 +42,7 @@ class Vue():
                                     font=("Arial", 18),
                                     borderwidth=2, relief=GROOVE)
 
-        self.usagercourant = Label(self.cadretitre, text=usager.nom + ", " + usager.titre + " : " + usager.droit,
+        self.usagercourant = Label(self.cadretitre, text="ADMIN",# + ", " + usager.titre + " : " + usager.droit,
                                    font=("Arial", 14))
         self.titreprincipal.pack()
         self.usagercourant.pack()
@@ -89,28 +54,37 @@ class Vue():
         #for i in btnsaction:
         #    i.pack(side=LEFT, pady=10, padx=10)
         #self.cadrecommande.pack()
-        self.cadrecontenu = Frame(self.cadreprincipal, width=600, height=400, bg="green")
+
+        self.options_list = self.parent.trouver_compagnies()
+        self.value_inside = StringVar(self.cadreprincipal)
+        self.value_inside.set("Option")
+        self.menu_deroulant = ttk.OptionMenu(self.cadreprincipal, self.value_inside, self.options_list[0], *self.options_list)
+        self.menu_deroulant.pack()
+        self.cadrecontenu = Frame(self.cadreprincipal, width=600, height=400)
         self.cadrecontenu.pack()
         self.cadrepied = Frame(self.cadreprincipal, width=600, height=80)
         self.cadrepied.pack()
 
-        self.creertableau()
+        self.creertableau(0)
+        self.creertableau(1)
+
         self.gerermembres()
-        self.cadres["principal"] = self.cadreprincipal
 
-    def creertableau(self):
+        return self.cadreprincipal
+
+    def creertableau(self, id):             # Modifié par Alex
         f = Frame(self.cadrecontenu)
-        f.pack(side=TOP, fill=BOTH, expand=Y)
+        f.pack(side=TOP, fill=BOTH, expand=Y, padx=(15, 0))
 
-        self.tableau = ttk.Treeview(show='headings')
+        self.tableaux[id] = ttk.Treeview(show='headings')
 
-        ysb = ttk.Scrollbar(orient=VERTICAL, command=self.tableau.yview)
-        xsb = ttk.Scrollbar(orient=HORIZONTAL, command=self.tableau.xview)
-        self.tableau['yscroll'] = ysb.set
-        self.tableau['xscroll'] = xsb.set
+        ysb = ttk.Scrollbar(orient=VERTICAL, command=self.tableaux[id].yview)
+        xsb = ttk.Scrollbar(orient=HORIZONTAL, command=self.tableaux[id].xview)
+        self.tableaux[id]['yscroll'] = ysb.set
+        self.tableaux[id]['xscroll'] = xsb.set
 
         # add tableau and scrollbars to frame
-        self.tableau.grid(in_=f, row=0, column=0, sticky=NSEW)
+        self.tableaux[id].grid(in_=f, row=0, column=0, sticky=NSEW)
         ysb.grid(in_=f, row=0, column=1, sticky=NS)
         xsb.grid(in_=f, row=1, column=0, sticky=EW)
 
@@ -118,41 +92,37 @@ class Vue():
         f.rowconfigure(0, weight=1)
         f.columnconfigure(0, weight=1)
 
-    def integretableau(self, listemembre, entete):
-        self.data = listemembre
+    def integretableau(self, listeinfos, entete, id):       # Modifié par Alex
+        self.data = listeinfos
         self.colonnestableau = entete
 
-        self.tableau.config(columns=self.colonnestableau)
+        self.tableaux[id].config(columns=self.colonnestableau)
         n = 1
         for i in self.colonnestableau:
             no = "#" + str(n)
-            self.tableau.heading(no, text=i)
+            self.tableaux[id].heading(no, text=i)
             n += 1
 
-        self.ecriretableau()
+        self.ecriretableau(id)
 
-    def ecriretableau(self):
-        for i in self.tableau.get_children():
-            self.tableau.delete(i)
+    def ecriretableau(self, id):        # Modifié par Alex
+        for i in self.tableaux[id].get_children():
+            self.tableaux[id].delete(i)
         for item in self.data:
-            self.tableau.insert('', 'end', values=item)
+            self.tableaux[id].insert('', 'end', values=item)
 
     def gerermembres(self):
         listemembres=self.parent.trouvermembres()
         entete=["identifiant","permission","titre"]
-        self.integretableau(listemembres,entete)
+        self.integretableau(listemembres,entete, 0)
 
     def creation_compte(self):
         self.parent.creation_compte(nom,mdp)
 
-    def afficherlogin(self,nom="",mdp=""):
-        self.root.title("GestMedia: Identification")
-        if nom:
-            self.loginnom.insert(0,nom)
-        if mdp:
-            self.loginmdp.insert(0,mdp)
-        self.loginnom.focus_set()
-        self.changercadre("login")
+    def avertirusager(self,titre,message):
+        rep=messagebox.askyesno(titre,message)
+        if not rep:
+            self.root.destroy()
 
 class Modele():
     def __init__(self,parent):
@@ -171,7 +141,7 @@ class Controleur:
         # self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
         self.modele = Modele(self)
         self.vue = Vue(self)
-        self.vue.afficherlogin("jmd", "jmd1")
+        self.vue.changercadre("principal")
         self.vue.root.mainloop()
 
     def telechargermodule(self, fichier):
@@ -216,20 +186,30 @@ class Controleur:
         mondict = json.loads(reptext)
         return mondict
 
-    def identifierusager(self, nom, mdp):
-        url = self.urlserveur + "/identifierusager"
-        params = {"nom": nom,
-                  "mdp": mdp}
+    def trouver_compagnies(self):           # Alex
+        url = self.urlserveur + "/trouvercompagnies"
+        params = {}
         reptext = self.appelserveur(url, params)
 
         mondict = json.loads(reptext)
-        print(mondict)
-        if "inconnu" in mondict:
-            self.vue.avertirusager("Inconnu", "Reprendre?")
-        else:
-            self.modele.inscrireusager(mondict)
-            self.vue.creercadreprincipal(self.modele)
-            self.vue.changercadre("principal")
+        return mondict
+
+    # def identifierusager(self, nom, mdp):
+    #     url = self.urlserveur + "/identifierusager"
+    #     params = {"nom": nom,
+    #               "mdp": mdp}
+    #     reptext = self.appelserveur(url, params)
+    #
+    #     mondict = json.loads(reptext)
+    #     print(mondict)
+    #     if "inconnu" in mondict:
+    #         self.vue.avertirusager("Inconnu", "Reprendre?")
+    #     elif "Cineclub" not in mondict[1][0][0]:
+    #         self.vue.avertirusager("Compte non autorisé", "Voulez-vous vous connecter avec un autre compte?")
+    #     else:
+    #         self.modele.inscrireusager(mondict)
+    #         self.vue.creercadreprincipal(self.modele)
+    #         self.vue.changercadre("principal")
 
     ####
 
@@ -238,21 +218,6 @@ class Controleur:
 
         self.vue.creer_cadre_creation()
         self.vue.changercadre("creation")
-
-    def signup_usager(self, dict):
-        # url = self.urlserveur+"/identifierusager"
-        params = {"nom": nom,
-                  "mdp": mdp}
-        reptext = self.appelserveur(url, params)
-
-        mondict = json.loads(reptext)
-        print(mondict)
-        if "inconnu" in mondict:
-            self.vue.avertirusager("Inconnu", "Reprendre?")
-        else:
-            self.modele.inscrireusager(mondict)
-            self.vue.creercadreprincipal(self.modele)
-            self.vue.changercadre("principal")
 
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
     def appelserveur(self, url, params):
