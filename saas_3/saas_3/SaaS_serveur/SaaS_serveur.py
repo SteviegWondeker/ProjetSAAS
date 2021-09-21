@@ -68,6 +68,12 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         info=self.curs.fetchall()
         return info
 
+    def trouver_roles(self):
+        sql_role = ("select id_role, nom_role from 'Tbl_role'")
+        self.curs.execute(sql_role)
+        info = self.curs.fetchall()
+        return info
+
 
     def fermerdb(self):
         self.conn.close()
@@ -177,6 +183,14 @@ def trouvercompagnies():
 
         db.fermerdb()
         return Response(json.dumps(compagnies), mimetype='application/json')
+@app.route('/trouver_roles', methods=["GET","POST"])
+def trouver_roles():
+    if request.method == "POST":
+        db = Dbman()
+        roles = db.trouver_roles()
+
+        db.fermerdb()
+        return Response(json.dumps(roles), mimetype='application/json')
         #return repr(usager)
     else:
         return repr("pas ok")
