@@ -75,6 +75,8 @@ class Vue():
         self.membre_titre = Label(self.cadre_inscrire_membre, text="Ajout d'un nouveau membre à votre compagnie", font=("Arial", 18),
                                 borderwidth=2, relief=GROOVE)
 
+        self.list_entry_membre = []
+
         self.membre_lab_prenom = Label(self.cadre_inscrire_membre, text="Prénom:", font=("Arial", 14))
         self.membre_prenom = Entry(self.cadre_inscrire_membre, font=("Arial", 14), width=30)
         self.membre_lab_nom = Label(self.cadre_inscrire_membre, text="Nom:", font=("Arial", 14))
@@ -89,6 +91,14 @@ class Vue():
         self.membre_telephone = Entry(self.cadre_inscrire_membre, font=("Arial", 14), show="*", width=30)
         self.membre_lab_mdp = Label(self.cadre_inscrire_membre, text="Mot de passe (par défaut):", font=("Arial", 14))
         self.membre_mdp = Label(self.cadre_inscrire_membre, text="AAAaaa111", font=("Arial", 14), width=30)
+
+                
+        self.list_entry_membre.append(self.membre_prenom)
+        self.list_entry_membre.append(self.membre_nom)
+        self.list_entry_membre.append(self.membre_role)
+        self.list_entry_membre.append(self.membre_id)
+        self.list_entry_membre.append(self.membre_courriel)
+        self.list_entry_membre.append(self.membre_telephone)
 
         self.btn_inscrire_membre = Button(self.cadre_inscrire_membre, text="Inscrire le nouveau membre", font=("Arial", 12), padx=10, pady=10,
                                       command=self.inscrire_membre)
@@ -230,26 +240,22 @@ class Vue():
     def form_inscrire_membre(self):
         self.changercadre("nouveau_membre")
 
-
     def form_inscrire_role(self):
         self.changercadre("Rôles")
 
     def form_inscrire_projet(self):
         self.changercadre("nouveau_projet")
 
-
     # Méthode à utiliser pour inscrire un membre dans la BD
     def inscrire_membre(self):
-        # bla bla bla
+        self.valider_membre()
         self.changercadre("principal")
         pass
-
 
     def retour_cadre_principal(self):
         # bla bla bla
         self.changercadre("principal")
-        pass
-             
+        pass    
 
     def gererprojets(self):
         listeprojets=self.parent.trouverprojets()
@@ -390,7 +396,6 @@ class Vue():
 
         self.form=[]
 
-
         for i in self.list_entry:
             if not i.get():
                 self.avertirusager("Invalide","Des champs sont vides, reprendre?")
@@ -409,6 +414,24 @@ class Vue():
 
                 self.avertirusager('Terminer', "Organisation et compte admin crées")
                 self.afficherlogin()
+
+    def valider_membre(self):
+        form_valide = True
+
+        self.form=[]
+
+        for i in self.list_entry_membre:
+            if not i.get():
+                self.avertirusager("Invalide","Des champs sont vides, reprendre?")
+                form_valide=False
+                break
+            else:
+                self.form.append(i.get())
+
+        if form_valide == True:
+            if not self.parent.verifier_membre(self.form):
+                self.parent.inscrire_membre(self.form)
+
 #
 #########################################################################
 #Sam
@@ -418,36 +441,40 @@ class Vue():
 
     def creer_cadre_role(self):
         self.root.title("Rôles")
-        liste_roles = self.parent.trouver_roles()
-        self.cadre_role = Frame(self.cadreapp, width=800, height=400)
+        self.cadre_role = Frame(self.cadreapp)
+        #self.cadre_role = Frame(self.cadreapp, width=800, height=400)
 
         self.label_nouveau_nom_du_role = Label(self.cadre_role, text="Rôle", font=("Arial", 12))
         self.champ_nouveau_role = Entry(self.cadre_role, font=("Arial", 12), width=30)
+        self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
+        self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.annuler_signup)
+        self.btn_valider = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.select_module)
 
-        self.btn_annuler_signup = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10,
-                                         command=self.annuler_signup)
-        self.btn_valider_signup = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10,
-                                         command=self.valider_signup)
-        self.label_nouveau_nom_du_role.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
-        self.champ_nouveau_role.grid(row=10, column=40, sticky=E, padx=5, pady=5)
-        self.btn_annuler_signup.grid(row=40,column=20,sticky=W,padx=10,pady=10)
-        self.btn_valider_signup.grid(row=40, column=40, sticky=W, padx=10, pady=10)
+        listemodules=self.parent.trouvermodules()
+        entete=["modules disponibles"]
+        self.integretableau(listemodules,entete)
+        
 
-        #self.loginlabnom = Label(self.cadrelogin, text="Nom", font=("Arial", 14))
-        #self.loginnom = Entry(self.cadrelogin, font=("Arial", 14), width=30)
-
+        self.label_nouveau_nom_du_role.grid (row=1, column=1, sticky='w')
+        self.champ_nouveau_role.grid        (row=1, column=2, sticky='w')
+        self.tableau.grid                   (row=2, column=1, columnspan='10')
+        self.btn_annuler.grid               (row=3, column=1)
+        self.btn_valider.grid               (row=3, column=2, sticky='w')
+        
         return self.cadre_role
+
+    def select_module(self):
+        test = self.tableau.item(self.tableau.focus())
+        print(test)
+
 ############################################
-
-
-#        
 
     def creer_cadre_projet(self):
         self.root.title("Creation")
         self.cadre_projet=Frame(self.cadreapp,width=800,height=400)
 
-        self.list_entry=[]
-        self.list_lab=[]
+        self.list_entry_projet=[]
+        self.list_lab_projet=[]
         self.params=[]
 
         self.projet_label=Label(self.cadre_projet,text="Ajout d'un projet",font=("Arial",18),
@@ -455,36 +482,36 @@ class Vue():
 
         self.projet_lab_nom=self.create_label("Nom du projet", self.cadre_projet)
         self.projet_nom=self.create_entry(self.cadre_projet)
-        self.list_entry.append(self.projet_nom)
-        self.list_lab.append(self.projet_lab_nom)
+        self.list_entry_projet.append(self.projet_nom)
+        self.list_lab_projet.append(self.projet_lab_nom)
 
-        self.projet_lab_org=self.create_label("Nom de l'organisation", self.cadre_projet)
+        self.projet_lab_org=self.create_label("Nom de l'organisation client", self.cadre_projet)
         self.projet_org=self.create_entry(self.cadre_projet)
-        self.list_entry.append(self.projet_org)
-        self.list_lab.append(self.projet_lab_org)
+        self.list_entry_projet.append(self.projet_org)
+        self.list_lab_projet.append(self.projet_lab_org)
 
         self.projet_lab_res=self.create_label("Responsable du projet", self.cadre_projet)
         self.projet_res=self.create_entry(self.cadre_projet)
-        self.list_entry.append(self.projet_res)
-        self.list_lab.append(self.projet_lab_res)
+        self.list_entry_projet.append(self.projet_res)
+        self.list_lab_projet.append(self.projet_lab_res)
 
         self.projet_lab_date_deb=self.create_label("Date début", self.cadre_projet)
         self.projet_date_deb=self.create_entry(self.cadre_projet)
-        self.list_entry.append(self.projet_date_deb)
-        self.list_lab.append(self.projet_lab_date_deb)
+        self.list_entry_projet.append(self.projet_date_deb)
+        self.list_lab_projet.append(self.projet_lab_date_deb)
 
         self.projet_lab_date_fin=self.create_label("Date fin", self.cadre_projet)
         self.projet_date_fin=self.create_entry(self.cadre_projet)
-        self.list_entry.append(self.projet_date_fin)
-        self.list_lab.append(self.projet_lab_date_fin)
+        self.list_entry_projet.append(self.projet_date_fin)
+        self.list_lab_projet.append(self.projet_lab_date_fin)
 
-        for i in range(len(self.list_entry)):
+        for i in range(len(self.list_entry_projet)):
             temp = 10*(i+1)
-            self.list_lab[i].grid(row=temp,column=10, sticky=E,padx=10,pady=5)
-            self.list_entry[i].grid(row=temp,column=20,sticky=E,padx=5,pady=5)
+            self.list_lab_projet[i].grid(row=temp,column=10, sticky=E,padx=10,pady=5)
+            self.list_entry_projet[i].grid(row=temp,column=20,sticky=E,padx=5,pady=5)
 
         self.btn_annuler_signup=Button(self.cadre_projet,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.retour_cadre_principal)
-        self.btn_valider_signup=Button(self.cadre_projet,text="Valider",font=("Arial",12),padx=10,pady=10,command=self.valider_signup)
+        self.btn_valider_signup=Button(self.cadre_projet,text="Valider",font=("Arial",12),padx=10,pady=10,command=self.ajouter_projet)
 
         self.btn_annuler_signup.grid(row=100,column=20,sticky=W,padx=10,pady=10)
         self.btn_valider_signup.grid(row=100,column=20,padx=10,pady=10)
@@ -493,23 +520,25 @@ class Vue():
 
         return self.cadre_projet
 
+    def ajouter_projet(self):
+        if self.valider_projet():
+            self.parent.ajouter_projet(self.form)
+            self.retour_cadre_principal()
+
+
+
     def valider_projet(self):
-        form_valide = True 
         self.form=[]
-        for i in self.list_entry:
+        for i in self.list_entry_projet:
             if not i.get():
                 self.avertirusager("Invalide","Des champs sont vides, reprendre?")
-                form_valide=False
-                break
+                return False
             else:
                 self.form.append(i.get())
-        if form_valide == True:
-            pass
-#            if not self.parent.verifier_usager(self.form):
- #               self.parent.inscrire_usager(self.form)
-  #              self.avertirusager('Terminer', "Organisation et compte admin crées")
-   #             self.afficherlogin()
-#        
+
+        if not self.parent.verifier_projet(self.form):
+            return True
+
 
 class Modele():
     def __init__(self,parent):
@@ -603,6 +632,18 @@ class Controleur:
         self.vue.creer_cadre_creation()
         self.vue.changercadre("creation")
 
+    def verifier_membre(self,form):
+        url = self.urlserveur+"/verifiermembre"
+        params = {"id":form[4]}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        if len(mondict)>0:
+            self.vue.avertirusager("Compte existe déjà","Reprendre?")
+            return True
+        else:
+            return False
+
     def verifier_usager(self,form):
         url = self.urlserveur+"/verifierusager"
         params = {"courriel":form[2],
@@ -616,6 +657,35 @@ class Controleur:
         else:
             return False
 
+    def verifier_projet(self,form):
+        url = self.urlserveur+"/verifierprojet"
+        params = {"nom_projet":form[0],
+                "nom_client":form[1]}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        if len(mondict[0])>0 or len(mondict[1])==0:
+            self.vue.avertirusager("Erreur c'est produite", " Verifiez vos informations, reprendre?")
+            return True
+        else:
+            return False
+
+    def inscrire_membre(self,form):
+        url = self.urlserveur+"/inscriremembre"
+        identifiant_nom = form[0]+" "+form[1]
+        identifiant_id = form[1]+form[3]
+        params = {"nom_user":identifiant_nom,
+                    "nom_role": form[2],
+                    "id":identifiant_id,
+                  "courriel":form[4],
+                  "telephone":form[5],
+                  "mdp":"AAAaaa111",
+                  "nom_admin":self.vue.loginnom.get()}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        print(mondict)
+
     def inscrire_usager(self,form):
         url = self.urlserveur+"/inscrireusager"
         identifiant = form[0]+" "+form[1]
@@ -628,6 +698,17 @@ class Controleur:
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
+        print(mondict)
+
+    def ajouter_projet(self,form):
+        url = self.urlserveur+"/ajouterprojet"
+        params = {"nom_projet":form[0],
+                "nom_client":form[1],
+                "responsable":form[2],
+                "date_deb":form[3],
+                "date_fin":form[4]}
+        reptext=self.appelserveur(url,params)
+        mondict=json.loads(reptext)         
         print(mondict)
 
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
