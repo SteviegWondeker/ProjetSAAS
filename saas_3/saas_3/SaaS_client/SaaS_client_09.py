@@ -230,13 +230,11 @@ class Vue():
     def form_inscrire_membre(self):
         self.changercadre("nouveau_membre")
 
-
     def form_inscrire_role(self):
         self.changercadre("Rôles")
 
     def form_inscrire_projet(self):
         self.changercadre("nouveau_projet")
-
 
     # Méthode à utiliser pour inscrire un membre dans la BD
     def inscrire_membre(self):
@@ -244,12 +242,10 @@ class Vue():
         self.changercadre("principal")
         pass
 
-
     def retour_cadre_principal(self):
         # bla bla bla
         self.changercadre("principal")
-        pass
-             
+        pass    
 
     def gererprojets(self):
         listeprojets=self.parent.trouverprojets()
@@ -418,29 +414,33 @@ class Vue():
 
     def creer_cadre_role(self):
         self.root.title("Rôles")
-        liste_roles = self.parent.trouver_roles()
-        self.cadre_role = Frame(self.cadreapp, width=800, height=400)
+        self.cadre_role = Frame(self.cadreapp)
+        #self.cadre_role = Frame(self.cadreapp, width=800, height=400)
 
         self.label_nouveau_nom_du_role = Label(self.cadre_role, text="Rôle", font=("Arial", 12))
         self.champ_nouveau_role = Entry(self.cadre_role, font=("Arial", 12), width=30)
+        self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
+        self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.annuler_signup)
+        self.btn_valider = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.select_module)
 
-        self.btn_annuler_signup = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10,
-                                         command=self.annuler_signup)
-        self.btn_valider_signup = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10,
-                                         command=self.valider_signup)
-        self.label_nouveau_nom_du_role.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
-        self.champ_nouveau_role.grid(row=10, column=40, sticky=E, padx=5, pady=5)
-        self.btn_annuler_signup.grid(row=40,column=20,sticky=W,padx=10,pady=10)
-        self.btn_valider_signup.grid(row=40, column=40, sticky=W, padx=10, pady=10)
+        listemodules=self.parent.trouvermodules()
+        entete=["modules disponibles"]
+        self.integretableau(listemodules,entete)
+        
 
-        #self.loginlabnom = Label(self.cadrelogin, text="Nom", font=("Arial", 14))
-        #self.loginnom = Entry(self.cadrelogin, font=("Arial", 14), width=30)
-
+        self.label_nouveau_nom_du_role.grid (row=1, column=1, sticky='w')
+        self.champ_nouveau_role.grid        (row=1, column=2, sticky='w')
+        self.tableau.grid                   (row=2, column=1, columnspan='10')
+        self.btn_annuler.grid               (row=3, column=1)
+        self.btn_valider.grid               (row=3, column=2, sticky='w')
+        
         return self.cadre_role
+
+    def select_module(self):
+        test = self.tableau.item(self.tableau.focus())
+        print(test)
+
 ############################################
-
-
-#        
 
     def creer_cadre_projet(self):
         self.root.title("Creation")
