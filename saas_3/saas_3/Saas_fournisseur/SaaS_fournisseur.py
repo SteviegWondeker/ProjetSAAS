@@ -58,7 +58,7 @@ class Vue():
         self.options_list = self.parent.trouver_compagnies()
         self.value_inside = StringVar(self.cadreprincipal)
         self.value_inside.set("Option")
-        self.menu_deroulant = ttk.OptionMenu(self.cadreprincipal, self.value_inside, self.options_list[0], *self.options_list)
+        self.menu_deroulant = ttk.OptionMenu(self.cadreprincipal, self.value_inside, self.options_list[0], *self.options_list, command=self.trouver_membres_par_compagnie)
         self.menu_deroulant.pack()
         self.cadrecontenu = Frame(self.cadreprincipal, width=600, height=400)
         self.cadrecontenu.pack()
@@ -68,7 +68,6 @@ class Vue():
         self.creertableau(0)
         self.creertableau(1)
 
-        self.gerermembres()
 
         return self.cadreprincipal
 
@@ -82,6 +81,11 @@ class Vue():
         xsb = ttk.Scrollbar(orient=HORIZONTAL, command=self.tableaux[id].xview)
         self.tableaux[id]['yscroll'] = ysb.set
         self.tableaux[id]['xscroll'] = xsb.set
+
+        if id == 0:
+            ######################### INSÉRER MÉTHODE POUR REFRESH 2e TABLE SELON SÉLECTION
+            self.tableaux[0].bind("<ButtonRelease-1>", self.trouver_permissions_par_membre)
+            pass
 
         # add tableau and scrollbars to frame
         self.tableaux[id].grid(in_=f, row=0, column=0, sticky=NSEW)
@@ -123,6 +127,21 @@ class Vue():
         rep=messagebox.askyesno(titre,message)
         if not rep:
             self.root.destroy()
+
+    def trouver_membres_par_compagnie(self, comp):
+        listemembres = self.parent.trouver_membres_par_compagnie(comp)
+        entete = ["identifiant", "permission", "titre"]
+        self.integretableau(listemembres, entete, 0)
+
+    def trouver_permissions_par_membre(self, evt):
+        membre = None
+        item = self.tableaux[0].selection()
+        for i in item:
+            membre = self.tableaux[0].item(i, "values")[0]
+        if(membre):     # Safety au cas ou membre serait null
+            listemembres = self.parent.trouver_permissions_par_membre(membre)
+            entete = ["Rôles"]
+            self.integretableau(listemembres, entete, 1)
 
 class Modele():
     def __init__(self,parent):
@@ -189,6 +208,22 @@ class Controleur:
     def trouver_compagnies(self):           # Alex
         url = self.urlserveur + "/trouvercompagnies"
         params = {}
+        reptext = self.appelserveur(url, params)
+
+        mondict = json.loads(reptext)
+        return mondict
+
+    def trouver_membres_par_compagnie(self, comp):           # Alex
+        url = self.urlserveur + "/trouver_membres_par_compagnie"
+        params = {"comp": comp[0]}
+        reptext = self.appelserveur(url, params)
+
+        mondict = json.loads(reptext)
+        return mondict
+
+    def trouver_permissions_par_membre(self, membre):           # Alex
+        url = self.urlserveur + "/trouver_permissions_par_membre"
+        params = {"membre": membre[0]}
         reptext = self.appelserveur(url, params)
 
         mondict = json.loads(reptext)

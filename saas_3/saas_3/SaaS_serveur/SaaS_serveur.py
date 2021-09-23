@@ -56,9 +56,19 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         info=self.curs.fetchall()
         return info
 #####################################################################################################
-    def trouver_membres_par_compagnie(self):        # Alex
-        sqlnom = ("select identifiant, permission,titre from 'membre' where compagnie=:compagnie")
-        self.curs.execute(sqlnom)
+    def trouver_membres_par_compagnie(self, comp):        # Alex
+        sqlnom = ("select identifiant, permission,titre from 'membre' INNER JOIN 'compagnie' ON membre.compagnie=compagnie.idcompagnie WHERE compagnie.nomcompagnie=:comp")
+        self.curs.execute(sqlnom, {'comp': comp})
+        info = self.curs.fetchall()
+        return info
+
+    def trouver_permissions_par_membre(self, membre):        # Alex
+        sqlnom = ("select nommodule from 'modules' "
+                  "INNER JOIN 'Tbl_role_module' ON modules.idmodule=Tbl_role_module.id_role_module "
+                  "INNER JOIN 'Tbl_role' ON Tbl_role_module.role=Tbl_role.id_role "
+                  "INNER JOIN 'Tbl_membre_role' ON Tbl_role.id_role=Tbl_membre_role.role "
+                  "INNER JOIN 'membre' ON Tbl_membre_role.membre=membre.idmembre WHERE membre.identifiant=:membre")
+        self.curs.execute(sqlnom, {'membre': membre})
         info = self.curs.fetchall()
         return info
 #####################################################################################################
@@ -183,6 +193,27 @@ def trouvercompagnies():
 
         db.fermerdb()
         return Response(json.dumps(compagnies), mimetype='application/json')
+
+@app.route('/trouver_membres_par_compagnie', methods=["GET","POST"])        # Alex
+def trouver_membres_par_compagnie():
+    if request.method=="POST":
+        db=Dbman()
+        comp = request.form["comp"]
+        membres=db.trouver_membres_par_compagnie(comp)
+
+        db.fermerdb()
+        return Response(json.dumps(membres), mimetype='application/json')
+
+@app.route('/trouver_permissions_par_membre', methods=["GET","POST"])        # Alex
+def trouver_permissions_par_membre():
+    if request.method=="POST":
+        db=Dbman()
+        membre = request.form["membre"]
+        membres=db.trouver_permissions_par_membre(membre)
+
+        db.fermerdb()
+        return Response(json.dumps(membres), mimetype='application/json')
+
 @app.route('/trouver_roles', methods=["GET","POST"])
 def trouver_roles():
     if request.method == "POST":
