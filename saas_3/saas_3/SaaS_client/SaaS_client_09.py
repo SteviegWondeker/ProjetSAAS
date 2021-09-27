@@ -444,28 +444,52 @@ class Vue():
         self.cadre_role = Frame(self.cadreapp)
         #self.cadre_role = Frame(self.cadreapp, width=800, height=400)
 
-        self.label_nouveau_nom_du_role = Label(self.cadre_role, text="Rôle", font=("Arial", 12))
+        self.label_nouveau_role = Label(self.cadre_role, text="Nouveau Rôle", font=("Arial", 12))
         self.champ_nouveau_role = Entry(self.cadre_role, font=("Arial", 12), width=30)
+        self.btn_ajouter_role = Button(self.cadre_role, text="Ajouter", font=("Arial", 12), padx=10, pady=10, command=self.ajouter_role)
+
+        self.label_choix_existant = Label(self.cadre_role, text="choisir un role existant : ", font=("Arial", 12))
+        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=("pasUnVraiRole1, pasUnVraiRole2"))
         self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
+        self.btn_inscrire_modules = Button(self.cadre_role, text="inscrire les modules", font=("Arial", 12), padx=10, pady=10, command=self.inscrire_modules_au_role)
+        
         self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.annuler_signup)
-        self.btn_valider = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.select_module)
+        self.btn_retour = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.retour)
 
         listemodules=self.parent.trouvermodules()
         entete=["modules disponibles"]
         self.integretableau(listemodules,entete)
+
+        self.label_nouveau_role.grid        (row=1, column=1, sticky='w')
+        self.champ_nouveau_role.grid        (row=1, column=2, sticky='w')
+        self.btn_ajouter_role.grid          (row=1, column=3, sticky='w')
+
+        self.label_choix_existant.grid      (row=2, column=1)
+        self.comboBox_choix_du_role.grid    (row=2, column=2)
+        self.btn_inscrire_modules.grid      (row=2, column=3)
+        self.tableau.grid                   (row=3, column=1, columnspan='10')
         
 
-        self.label_nouveau_nom_du_role.grid (row=1, column=1, sticky='w')
-        self.champ_nouveau_role.grid        (row=1, column=2, sticky='w')
-        self.tableau.grid                   (row=2, column=1, columnspan='10')
-        self.btn_annuler.grid               (row=3, column=1)
-        self.btn_valider.grid               (row=3, column=2, sticky='w')
+        self.btn_annuler.grid               (row=5, column=1)
+        self.btn_retour.grid                (row=5, column=2, sticky='w')
         
         return self.cadre_role
 
-    def select_module(self):
-        test = self.tableau.item(self.tableau.focus())
-        print(test)
+    def retour(self):
+        pass
+        #retour menu precedent
+
+    def get_role(self):
+        pass
+        #retrouve les roles inscrits pour la compagnie de l'utilisateur actif
+
+    def ajouter_role(self, role):
+        pass
+        #ajoute le role dont le nom est inscrit dans le champs_nouveau_role
+
+    def inscrire_modules_au_role(self, role, modules):
+        pass
+
 
 ############################################
 
