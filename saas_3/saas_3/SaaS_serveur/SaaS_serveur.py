@@ -79,7 +79,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.curs.execute(sqlnom)
         info=self.curs.fetchall()
         return info
-#####################################################################################################
+
     def trouver_membres_par_compagnie(self, comp):        # Alex
         sqlnom = ("select identifiant, permission,titre from 'membre' INNER JOIN 'compagnie' ON membre.compagnie=compagnie.idcompagnie WHERE compagnie.nomcompagnie=:comp")
         self.curs.execute(sqlnom, {'comp': comp})
@@ -95,7 +95,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.curs.execute(sqlnom, {'membre': membre})
         info = self.curs.fetchall()
         return info
-#####################################################################################################
+
     def trouver_compagnies(self):           # Alex
         sqlnom=("select nomcompagnie from 'compagnie'")
         self.curs.execute(sqlnom)

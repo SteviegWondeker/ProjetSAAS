@@ -595,8 +595,8 @@ class Controleur:
         return mondict
 
     def trouvermembres(self):
-        url = self.urlserveur+"/trouvermembres"
-        params = {}
+        url = self.urlserveur+"/trouver_membres_par_compagnie"
+        params = {"comp": self.modele.compagnie["nom"]}
         reptext=self.appelserveur(url, params)
 
         mondict=json.loads(reptext)

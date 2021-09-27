@@ -140,7 +140,7 @@ class Vue():
             membre = self.tableaux[0].item(i, "values")[0]
         if(membre):     # Safety au cas ou membre serait null
             listemembres = self.parent.trouver_permissions_par_membre(membre)
-            entete = ["Rôles"]
+            entete = ["Modules accesibles"]
             self.integretableau(listemembres, entete, 1)
 
 class Modele():
