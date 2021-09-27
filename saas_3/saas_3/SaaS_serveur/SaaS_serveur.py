@@ -57,6 +57,9 @@ class Dbclient():   # Base de données du locateur
         self.conn.commit()
         return "test"
 
+    def ajouter_role():
+        pass
+
 class Dbman():  # DB Manager - Base donnée du fournisseur
     def __init__(self):
         self.conn = sqlite3.connect("CVMJMD_clientscorpo.sqlite")
