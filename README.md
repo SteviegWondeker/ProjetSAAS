@@ -18,4 +18,4 @@ Instruction :
 Fonctionnalités :
   - L'utilisateur peut sélectionner la compagnie qu'il désire consulter en utilisant le menu déroulant
   - Le premier cadre affiche la liste de membres de la compagnie sélectionnée
-  - Quand l'utilisateur sélectionne un nom dans la liste, le cadre inférieur affiche la liste des rôles pour cet utilisateur
+  - Quand l'utilisateur sélectionne un nom dans la liste, le cadre inférieur affiche la liste des modules pour cet utilisateur
