@@ -136,6 +136,16 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     
         info_role=self.curs.fetchall()
         
+    def retourner_role(self):
+        sql_user=("select nom_role from 'tbl_role'")
+        self.curs.execute(sql_user)
+        info_user=self.curs.fetchall()
+        sql_role=("select * from 'TBL_role' where nom_role=:role")
+        self.curs.execute(sql_role, {
+                                    'role': role})
+                                    
+        info_role=self.curs.fetchall()
+        
 
 
         return [info_user,info_role]
@@ -150,6 +160,14 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     'courriel': courriel,
                                     'telephone': telephone})                       
         self.conn.commit()
+        return "test"
+
+    def inscrire_module_role(self,nom_module, nom_role):
+        
+       # sql_module=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role, (select idmodule from 'modules' where nommodule=:nom_module))")                    
+       # self.curs.execute(sql_module, {'nom_role': nom_role,
+       #                                 'nom_module': nom_module})                       
+       # self.conn.commit()
         return "test"
 
     def inscrire_membre(self,nom, courriel, telephone, mdp, id_complet, id_emp, nom_admin, nom_role):
@@ -355,6 +373,21 @@ def inscrire_usager():
 
         db=Dbman()
         usager=db.inscrire_usager(nom, courriel, telephone, mdp, nom_org, type_org)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/inscriremodulemembre', methods=["GET","POST"])
+def inscrire_module_role():
+    if request.method=="POST":
+        nom_module=request.form["nom_module"]
+        nom_role=request.form["nom_role"]
+
+        db=Dbman()
+        usager=db.inscrire_module_role(nom_module,nom_role)
 
         db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')

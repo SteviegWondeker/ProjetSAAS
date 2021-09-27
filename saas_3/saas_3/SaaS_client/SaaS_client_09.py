@@ -449,26 +449,35 @@ class Vue():
         self.btn_ajouter_role = Button(self.cadre_role, text="Ajouter", font=("Arial", 12), padx=10, pady=10, command=self.ajouter_role)
 
         self.label_choix_existant = Label(self.cadre_role, text="choisir un role existant : ", font=("Arial", 12))
-        #self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=("pasUnVraiRole1, pasUnVraiRole2"))
-        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=)
+        self.list_role=self.parent.retourner_role()
+        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=self.list_role)
         self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
         self.btn_inscrire_modules = Button(self.cadre_role, text="inscrire les modules", font=("Arial", 12), padx=10, pady=10, command=self.inscrire_modules_au_role)
         
         self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.retour_cadre_principal)
         self.btn_retour = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.retour)
 
+
+        self.listbox = Listbox(self.cadre_role, font=("Arial", 16), selectmode="multiple")
         listemodules=self.parent.trouvermodules()
-        entete=["modules disponibles"]
-        self.integretableau(listemodules,entete)
+    
+        entete="modules disponibles"
+        for items in listemodules:
+            self.listbox.insert(END, items)
+
+        #self.integretableau(listemodules,entete)
+
+        #self.tableau.bind('<Button 1>', self.inscrire_modules_au_role)
 
         self.label_nouveau_role.grid        (row=1, column=1, sticky='w')
         self.champ_nouveau_role.grid        (row=1, column=2, sticky='w')
         self.btn_ajouter_role.grid          (row=1, column=3, sticky='w')
 
-        self.label_choix_existant.grid      (row=2, column=1, sticky='w')
-        self.comboBox_choix_du_role.grid    (row=2, column=2, sticky='w')
-        self.btn_inscrire_modules.grid      (row=2, column=3, sticky='w')
-        self.tableau.grid                   (row=3, column=1, columnspan='10')
+        self.label_choix_existant.grid      (row=2, column=1)
+        self.comboBox_choix_du_role.grid    (row=2, column=2)
+        self.btn_inscrire_modules.grid      (row=2, column=3)
+        #self.tableau.grid                   (row=3, column=1, columnspan='10')
+        self.listbox.grid (row=3, column=1, columnspan='10')
         
 
         self.btn_annuler.grid               (row=5, column=1)
@@ -487,11 +496,15 @@ class Vue():
     def ajouter_role(self):
         self.role = self.champ_nouveau_role.get()
         self.parent.ajouter_role(self.role)
+        self.list_role=self.parent.retourner_role()
+        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=self.list_role)        
+        self.comboBox_choix_du_role.grid    (row=2, column=2)
         pass
         #ajoute le role dont le nom est inscrit dans le champs_nouveau_role
 
     def inscrire_modules_au_role(self):
-        pass
+        for i in self.listbox.curselection():
+            self.parent.inscrire_module_role(self.listbox.get(i), self.comboBox_choix_du_role.get())
 
 
 ############################################
@@ -552,6 +565,8 @@ class Vue():
             self.parent.ajouter_projet(self.form)
             self.retour_cadre_principal()
 
+
+
     def valider_projet(self):
         self.form=[]
         for i in self.list_entry_projet:
@@ -563,6 +578,7 @@ class Vue():
 
         if not self.parent.verifier_projet(self.form):
             return True
+
 
 class Modele():
     def __init__(self,parent):
@@ -726,6 +742,15 @@ class Controleur:
         mondict=json.loads(reptext)
         print(mondict)
 
+    def inscrire_module_role(self,nom_module, nom_role):
+        url = self.urlserveur+"/inscriremodulemembre"
+        params = {"nom_module":nom_module,
+                "nom_role": nom_role}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        print(mondict)
+
     def ajouter_projet(self,form):
         url = self.urlserveur+"/ajouterprojet"
         params = {"nom_projet":form[0],
@@ -743,6 +768,13 @@ class Controleur:
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
+
+    def retourner_role(self):
+        url = self.urlserveur+"/trouver_roles"
+        params = {}
+        reptext=self.appelserveur(url,params)
+        mondict=json.loads(reptext)         
+        return (mondict)
 
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
     def appelserveur(self,url,params):
