@@ -19,3 +19,6 @@ Fonctionnalités :
   - L'utilisateur peut sélectionner la compagnie qu'il désire consulter en utilisant le menu déroulant
   - Le premier cadre affiche la liste de membres de la compagnie sélectionnée
   - Quand l'utilisateur sélectionne un nom dans la liste, le cadre inférieur affiche la liste des modules pour cet utilisateur
+  
+NOTES :
+  - Pour l'instant, on ne voit pas de rôles affichés lorsqu'on sélectionne un membre puisque les rôles ne sont pas encore inscrits aux usagers tel que prévu.
