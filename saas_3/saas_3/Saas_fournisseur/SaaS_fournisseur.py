@@ -83,7 +83,6 @@ class Vue():
         self.tableaux[id]['xscroll'] = xsb.set
 
         if id == 0:
-            ######################### INSÉRER MÉTHODE POUR REFRESH 2e TABLE SELON SÉLECTION
             self.tableaux[0].bind("<ButtonRelease-1>", self.trouver_permissions_par_membre)
             pass
 
