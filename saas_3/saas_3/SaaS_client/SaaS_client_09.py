@@ -449,7 +449,8 @@ class Vue():
         self.btn_ajouter_role = Button(self.cadre_role, text="Ajouter", font=("Arial", 12), padx=10, pady=10, command=self.ajouter_role)
 
         self.label_choix_existant = Label(self.cadre_role, text="choisir un role existant : ", font=("Arial", 12))
-        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=("pasUnVraiRole1, pasUnVraiRole2"))
+        #self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=("pasUnVraiRole1, pasUnVraiRole2"))
+        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=)
         self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
         self.btn_inscrire_modules = Button(self.cadre_role, text="inscrire les modules", font=("Arial", 12), padx=10, pady=10, command=self.inscrire_modules_au_role)
         
@@ -464,9 +465,9 @@ class Vue():
         self.champ_nouveau_role.grid        (row=1, column=2, sticky='w')
         self.btn_ajouter_role.grid          (row=1, column=3, sticky='w')
 
-        self.label_choix_existant.grid      (row=2, column=1)
-        self.comboBox_choix_du_role.grid    (row=2, column=2)
-        self.btn_inscrire_modules.grid      (row=2, column=3)
+        self.label_choix_existant.grid      (row=2, column=1, sticky='w')
+        self.comboBox_choix_du_role.grid    (row=2, column=2, sticky='w')
+        self.btn_inscrire_modules.grid      (row=2, column=3, sticky='w')
         self.tableau.grid                   (row=3, column=1, columnspan='10')
         
 
@@ -549,8 +550,6 @@ class Vue():
             self.parent.ajouter_projet(self.form)
             self.retour_cadre_principal()
 
-
-
     def valider_projet(self):
         self.form=[]
         for i in self.list_entry_projet:
@@ -562,7 +561,6 @@ class Vue():
 
         if not self.parent.verifier_projet(self.form):
             return True
-
 
 class Modele():
     def __init__(self,parent):
