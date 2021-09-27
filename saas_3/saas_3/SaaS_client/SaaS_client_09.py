@@ -454,7 +454,7 @@ class Vue():
         self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
         self.btn_inscrire_modules = Button(self.cadre_role, text="inscrire les modules", font=("Arial", 12), padx=10, pady=10, command=self.inscrire_modules_au_role)
         
-        self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.annuler_signup)
+        self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.retour_cadre_principal)
         self.btn_retour = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.retour)
 
         listemodules=self.parent.trouvermodules()
@@ -484,11 +484,13 @@ class Vue():
         pass
         #retrouve les roles inscrits pour la compagnie de l'utilisateur actif
 
-    def ajouter_role(self, role):
+    def ajouter_role(self):
+        self.role = self.champ_nouveau_role.get()
+        self.parent.ajouter_role(self.role)
         pass
         #ajoute le role dont le nom est inscrit dans le champs_nouveau_role
 
-    def inscrire_modules_au_role(self, role, modules):
+    def inscrire_modules_au_role(self):
         pass
 
 
@@ -656,11 +658,12 @@ class Controleur:
 
     def verifier_membre(self,form):
         url = self.urlserveur+"/verifiermembre"
-        params = {"id":form[4]}
+        params = {"id":form[4],
+                    "role":form[2]}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
-        if len(mondict)>0:
+        if len(mondict[0])>0 or len(mondict[1])==0:
             self.vue.avertirusager("Compte existe déjà","Reprendre?")
             return True
         else:
@@ -698,7 +701,8 @@ class Controleur:
         identifiant_id = form[1]+form[3]
         params = {"nom_user":identifiant_nom,
                     "nom_role": form[2],
-                    "id":identifiant_id,
+                    "id_complet":identifiant_id,
+                    "id":form[3],
                   "courriel":form[4],
                   "telephone":form[5],
                   "mdp":"AAAaaa111",
@@ -729,6 +733,13 @@ class Controleur:
                 "responsable":form[2],
                 "date_deb":form[3],
                 "date_fin":form[4]}
+        reptext=self.appelserveur(url,params)
+        mondict=json.loads(reptext)         
+        print(mondict)
+
+    def ajouter_role(self,role):
+        url = self.urlserveur+"/ajouterrole"
+        params = {"nom_role":role}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
