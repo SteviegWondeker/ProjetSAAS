@@ -498,7 +498,7 @@ class Vue():
         pass
         #retrouve les roles inscrits pour la compagnie de l'utilisateur actif
 
-    def ajouter_role(self):
+    def ajouter_role(self): #n
         self.role = self.champ_nouveau_role.get()
         self.parent.ajouter_role(self.role)
         self.list_role=self.parent.retourner_roles_nom()
@@ -507,11 +507,11 @@ class Vue():
         pass
         #ajoute le role dont le nom est inscrit dans le champs_nouveau_role
 
-    def inscrire_modules_au_role(self):
+    def inscrire_modules_au_role(self): #n
         for i in self.listbox.curselection():
             self.parent.inscrire_module_role(self.listbox.get(i), self.comboBox_choix_du_role.get())
 
-    def ajouter_module_bd(self):
+    def ajouter_module_bd(self): #n
         for i in self.listemodules:
             self.parent.ajouter_module_bd(i)
 

@@ -32,7 +32,7 @@ class Dbclient():   # Base de données du locateur
     def fermerdb(self):
         self.conn.close()
 
-    def verifier_projet(self,nom_projet, nom_client):
+    def verifier_projet(self,nom_projet, nom_client): #n 
         sql_proj=("select * from 'projet' where Nomdeprojet=:nom_projet")
         self.curs.execute(sql_proj, {'nom_projet': nom_projet})
 
@@ -46,7 +46,7 @@ class Dbclient():   # Base de données du locateur
         return [info_projet,info_client]
 
 
-    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin):
+    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin): #n
         sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue') values (:nom_projet, (select idclient from client where nom=:nom_client), :responsable, :date_deb, :date_fin)")                         
         self.curs.execute(sql_nom, {
                                     'nom_projet':nom_projet,
@@ -121,7 +121,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.conn.close()
 
     ##
-    def verifier_usager(self,nom_org, courriel):
+    def verifier_usager(self,nom_org, courriel): #n
         sql_org=("select * from 'compagnie' where nomcompagnie=:nom_org")
         sql_user=("select * from 'membre' where courriel=:courriel")
         self.curs.execute(sql_org, {'nom_org': nom_org})
@@ -131,7 +131,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
         return [info_org,info_user]
 
-    def verifier_membre(self, id, role):
+    def verifier_membre(self, id, role): #n
         sql_user=("select * from 'membre' where identifiant=:id")
         self.curs.execute(sql_user, { 'id':id})
         info_user=self.curs.fetchall()
@@ -140,8 +140,10 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     'role': role})
                                     
         info_role=self.curs.fetchall()
+
+        return [info_user,info_role]
         
-    def retourner_role(self):
+    def retourner_role(self): #n
         sql_user=("select nom_role from 'tbl_role'")
         self.curs.execute(sql_user)
         info_user=self.curs.fetchall()
@@ -155,7 +157,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
         return [info_user,info_role]
 
-    def inscrire_usager(self,nom, courriel, telephone, mdp, nom_org, type_org):
+    def inscrire_usager(self,nom, courriel, telephone, mdp, nom_org, type_org): #n
         sql_org=("insert into 'compagnie' ('nomcompagnie', 'type_entreprise') values (:nom_org, :type_org)")
         sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'permission', 'titre', 'courriel', 'telephone') values ((select idcompagnie from 'compagnie' where nomcompagnie=:nom_org), :courriel, :mdp,  'admin', 'président', :courriel, :telephone)")
         self.curs.execute(sql_org, {'nom_org': nom_org,
@@ -167,7 +169,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.conn.commit()
         return "test"
 
-    def inscrire_module_role(self,nom_module, nom_role):
+    def inscrire_module_role(self,nom_module, nom_role): #n
         sql_module_role=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role), (select idmodule from 'modules' where nommodule=:nom_module))")                    
      
         self.curs.execute(sql_module_role, {'nom_role': nom_role,
@@ -176,14 +178,17 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         return "test"
 
     
-    def ajouter_module(self,nom_module):
-        sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
-        self.curs.execute(sql_module, {'nom_module': nom_module})    
-                     
-        self.conn.commit()
+    def ajouter_module(self,nom_module): #n
+        try:
+            sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
+            self.curs.execute(sql_module, {'nom_module': nom_module})    
+                        
+            self.conn.commit()
+        except:
+            print("erreur")
         return "test"
 
-    def inscrire_membre(self,nom, courriel, telephone, mdp, id_complet, id_emp, nom_admin, nom_role):
+    def inscrire_membre(self,nom, courriel, telephone, mdp, id_complet, id_emp, nom_admin, nom_role): #n
         sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'permission', 'titre', 'courriel', 'telephone') values ((select compagnie from 'membre' where identifiant=:nom_admin), :id_complet, :mdp,  'user', 'employe', :courriel, :telephone)")                         
         sql_role=("insert into 'Tbl_membre_role' ('membre', 'role') values (:id_emp, (select id_role from 'tbl_role' where nom_role=:nom_role))")                         
         self.curs.execute(sql_nom, {
@@ -199,7 +204,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         return "test"
 
 
-    def ajouter_role(self,role):
+    def ajouter_role(self,role): #n
         sql_nom=("insert into 'Tbl_role' ('nom_role') values (:nom_role)")                         
         self.curs.execute(sql_nom, {'nom_role':role})                       
         self.conn.commit()
@@ -320,7 +325,7 @@ def trouver_roles():
     else:
         return repr("pas ok")
 
-@app.route('/trouver_roles_nom', methods=["GET","POST"])
+@app.route('/trouver_roles_nom', methods=["GET","POST"]) #n
 def trouver_roles_nom():
     if request.method == "POST":
         db = Dbman()
