@@ -168,18 +168,18 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         return "test"
 
     def inscrire_module_role(self,nom_module, nom_role):
-        try:
-            sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
-            self.curs.execute(sql_module, {'nom_module': nom_module})    
-            self.conn.commit()
-        except:
-            print("Module existe déjà")
-
-            
         sql_module_role=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role), (select idmodule from 'modules' where nommodule=:nom_module))")                    
      
         self.curs.execute(sql_module_role, {'nom_role': nom_role,
                                         'nom_module': nom_module})                       
+        self.conn.commit()
+        return "test"
+
+    
+    def ajouter_module(self,nom_module):
+        sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
+        self.curs.execute(sql_module, {'nom_module': nom_module})    
+                     
         self.conn.commit()
         return "test"
 
@@ -344,7 +344,7 @@ def requeteserveur():
         return repr("pas ok")
 ##
 
-@app.route('/verifierusager', methods=["GET","POST"])
+@app.route('/verifierusager', methods=["GET","POST"]) #N
 def verifier_usager():
     if request.method=="POST":
         nom_org=request.form["nom_org"]
@@ -358,7 +358,7 @@ def verifier_usager():
     else:
         return repr("pas ok")
 
-@app.route('/verifiermembre', methods=["GET","POST"])
+@app.route('/verifiermembre', methods=["GET","POST"]) #N
 def verifier_membre():
     if request.method=="POST":
         id_emp=request.form["id"]
@@ -372,7 +372,7 @@ def verifier_membre():
     else:
         return repr("pas ok")
 
-@app.route('/verifierprojet', methods=["GET","POST"])
+@app.route('/verifierprojet', methods=["GET","POST"]) #N
 def verifier_projet():
     if request.method=="POST":
         nom_projet=request.form["nom_projet"]
@@ -386,7 +386,7 @@ def verifier_projet():
         return repr("pas ok")
 
 
-@app.route('/inscrireusager', methods=["GET","POST"])
+@app.route('/inscrireusager', methods=["GET","POST"]) #N
 def inscrire_usager():
     if request.method=="POST":
         nom=request.form["nom_user"]
@@ -405,7 +405,7 @@ def inscrire_usager():
     else:
         return repr("pas ok")
 
-@app.route('/inscriremodulemembre', methods=["GET","POST"])
+@app.route('/inscriremodulemembre', methods=["GET","POST"]) #N
 def inscrire_module_role():
     if request.method=="POST":
         nom_module=request.form["nom_module"]
@@ -420,7 +420,7 @@ def inscrire_module_role():
     else:
         return repr("pas ok")
 
-@app.route('/inscriremembre', methods=["GET","POST"])
+@app.route('/inscriremembre', methods=["GET","POST"]) #N
 def inscrire_membre():
     if request.method=="POST":
         nom=request.form["nom_user"]
@@ -441,7 +441,7 @@ def inscrire_membre():
     else:
         return repr("pas ok")
 
-@app.route('/ajouterprojet', methods=["GET","POST"])
+@app.route('/ajouterprojet', methods=["GET","POST"]) #N
 def ajouter_projet():
     if request.method=="POST":
         nom_proj=request.form["nom_projet"]
@@ -459,7 +459,22 @@ def ajouter_projet():
     else:
         return repr("pas ok")
 
-@app.route('/ajouterrole', methods=["GET","POST"])
+
+@app.route('/ajoutermodulebd', methods=["GET","POST"]) #N
+def ajouter_module():
+    if request.method=="POST":
+        nom_module=request.form["nom_module"]
+
+        db=Dbman()
+        usager=db.ajouter_module(nom_module)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/ajouterrole', methods=["GET","POST"]) #N
 def ajouter_role():
     if request.method=="POST":
         nom_role=request.form["nom_role"]

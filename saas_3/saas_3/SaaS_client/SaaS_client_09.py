@@ -432,6 +432,8 @@ class Vue():
             if not self.parent.verifier_membre(self.form):
                 self.parent.inscrire_membre(self.form)
 
+
+
 #
 #########################################################################
 #Sam
@@ -450,6 +452,7 @@ class Vue():
 
         self.label_choix_existant = Label(self.cadre_role, text="choisir un role existant : ", font=("Arial", 12))
         self.list_role=self.parent.retourner_roles_nom()
+
         self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=self.list_role)
         self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
         self.btn_inscrire_modules = Button(self.cadre_role, text="inscrire les modules", font=("Arial", 12), padx=10, pady=10, command=self.inscrire_modules_au_role)
@@ -459,13 +462,15 @@ class Vue():
 
 
         self.listbox = Listbox(self.cadre_role, font=("Arial", 16), selectmode="multiple")
-        listemodules=self.parent.trouvermodules()
+        self.listemodules=self.parent.trouvermodules()
     
         entete="modules disponibles"
-        for items in listemodules:
+        for items in self.listemodules:
             self.listbox.insert(END, items)
 
         #self.integretableau(listemodules,entete)
+
+        self.ajouter_module_bd()
 
         #self.tableau.bind('<Button 1>', self.inscrire_modules_au_role)
 
@@ -506,6 +511,9 @@ class Vue():
         for i in self.listbox.curselection():
             self.parent.inscrire_module_role(self.listbox.get(i), self.comboBox_choix_du_role.get())
 
+    def ajouter_module_bd(self):
+        for i in self.listemodules:
+            self.parent.ajouter_module_bd(i)
 
 ############################################
 
@@ -737,6 +745,15 @@ class Controleur:
                   "mdp":form[4],
                   "nom_org":form[6],
                   "type_org":form[7]}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        print(mondict)
+
+    
+    def ajouter_module_bd(self,nom_module):
+        url = self.urlserveur+"/ajoutermodulebd"
+        params = {"nom_module":nom_module}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
