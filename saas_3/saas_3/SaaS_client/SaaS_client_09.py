@@ -449,7 +449,7 @@ class Vue():
         self.btn_ajouter_role = Button(self.cadre_role, text="Ajouter", font=("Arial", 12), padx=10, pady=10, command=self.ajouter_role)
 
         self.label_choix_existant = Label(self.cadre_role, text="choisir un role existant : ", font=("Arial", 12))
-        self.list_role=self.parent.retourner_role()
+        self.list_role=self.parent.retourner_roles_nom()
         self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=self.list_role)
         self.tableau = ttk.Treeview(self.cadre_role, columns=('modules'))
         self.btn_inscrire_modules = Button(self.cadre_role, text="inscrire les modules", font=("Arial", 12), padx=10, pady=10, command=self.inscrire_modules_au_role)
@@ -496,7 +496,7 @@ class Vue():
     def ajouter_role(self):
         self.role = self.champ_nouveau_role.get()
         self.parent.ajouter_role(self.role)
-        self.list_role=self.parent.retourner_role()
+        self.list_role=self.parent.retourner_roles_nom()
         self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=self.list_role)        
         self.comboBox_choix_du_role.grid    (row=2, column=2)
         pass
@@ -771,6 +771,13 @@ class Controleur:
 
     def retourner_role(self):
         url = self.urlserveur+"/trouver_roles"
+        params = {}
+        reptext=self.appelserveur(url,params)
+        mondict=json.loads(reptext)         
+        return (mondict)
+
+    def retourner_roles_nom(self):
+        url = self.urlserveur+"/trouver_roles_nom"
         params = {}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         

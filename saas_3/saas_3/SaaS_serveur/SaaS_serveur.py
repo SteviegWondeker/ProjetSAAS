@@ -111,6 +111,11 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         info = self.curs.fetchall()
         return info
 
+    def trouver_roles_nom(self):
+        sql_role = ("select nom_role from 'Tbl_role'")
+        self.curs.execute(sql_role)
+        info = self.curs.fetchall()
+        return info
 
     def fermerdb(self):
         self.conn.close()
@@ -163,11 +168,14 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         return "test"
 
     def inscrire_module_role(self,nom_module, nom_role):
-        
-       # sql_module=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role, (select idmodule from 'modules' where nommodule=:nom_module))")                    
-       # self.curs.execute(sql_module, {'nom_role': nom_role,
-       #                                 'nom_module': nom_module})                       
-       # self.conn.commit()
+        sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
+        self.curs.execute(sql_module, {'nom_module': nom_module})    
+        self.conn.commit()
+        sql_module_role=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role), (select idmodule from 'modules' where nommodule=:nom_module))")                    
+     
+        self.curs.execute(sql_module_role, {'nom_role': nom_role,
+                                        'nom_module': nom_module})                       
+        self.conn.commit()
         return "test"
 
     def inscrire_membre(self,nom, courriel, telephone, mdp, id_complet, id_emp, nom_admin, nom_role):
@@ -300,6 +308,18 @@ def trouver_roles():
     if request.method == "POST":
         db = Dbman()
         roles = db.trouver_roles()
+
+        db.fermerdb()
+        return Response(json.dumps(roles), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/trouver_roles_nom', methods=["GET","POST"])
+def trouver_roles_nom():
+    if request.method == "POST":
+        db = Dbman()
+        roles = db.trouver_roles_nom()
 
         db.fermerdb()
         return Response(json.dumps(roles), mimetype='application/json')
