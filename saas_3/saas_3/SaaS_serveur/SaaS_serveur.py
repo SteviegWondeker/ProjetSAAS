@@ -168,9 +168,14 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         return "test"
 
     def inscrire_module_role(self,nom_module, nom_role):
-        sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
-        self.curs.execute(sql_module, {'nom_module': nom_module})    
-        self.conn.commit()
+        try:
+            sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
+            self.curs.execute(sql_module, {'nom_module': nom_module})    
+            self.conn.commit()
+        except:
+            print("Module existe déjà")
+
+            
         sql_module_role=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role), (select idmodule from 'modules' where nommodule=:nom_module))")                    
      
         self.curs.execute(sql_module_role, {'nom_role': nom_role,
