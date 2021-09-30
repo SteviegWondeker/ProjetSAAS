@@ -804,7 +804,7 @@ class Controleur:
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
-        if len(mondict[0])>0 or len(mondict[1])>0:
+        if len(mondict[0])>0 or len(mondict[1])==0:
             self.vue.avertirusager("Compte existe déjà","Reprendre?")
             return True
         else:
