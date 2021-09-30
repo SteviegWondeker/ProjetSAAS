@@ -45,6 +45,27 @@ class Dbclient():   # Base de données du locateur
 
         return [info_projet,info_client]
 
+    def verifier_client(self,courriel): #n 
+        sql_client=("select * from 'client' where courriel=:courriel")
+        self.curs.execute(sql_client, {'courriel':courriel})
+
+        info=self.curs.fetchall()
+
+        return info
+
+    def inscrire_client(self, nom_client, courriel, telephone, compagnie, adresse, rue,ville):
+        sql_client=("insert into 'client' ('nom', 'courriel', 'tel', 'compagnie', 'adresse', 'rue', 'ville') values (:nom_client, :courriel, :telephone, :compagnie, :adresse, :rue, :ville)")                         
+        self.curs.execute(sql_client, {
+                                    'nom_client':nom_client,
+                                    'courriel': courriel,
+                                    'telephone': telephone,
+                                    'compagnie': compagnie,
+                                    'adresse': adresse,
+                                    'rue': rue,
+                                    'ville': ville})                       
+        self.conn.commit()
+        return "test"
+
 
     def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin): #n
         sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue') values (:nom_projet, (select idclient from client where nom=:nom_client), :responsable, :date_deb, :date_fin)")                         
@@ -363,6 +384,8 @@ def verifier_usager():
     else:
         return repr("pas ok")
 
+
+
 @app.route('/verifiermembre', methods=["GET","POST"]) #N
 def verifier_membre():
     if request.method=="POST":
@@ -384,6 +407,18 @@ def verifier_projet():
         nom_client=request.form["nom_client"]
         db=Dbclient()
         usager=db.verifier_projet(nom_projet, nom_client)
+        #db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/verifierclient', methods=["GET","POST"]) #N
+def verifier_client():
+    if request.method=="POST":
+        courriel=request.form["courriel"]
+        db=Dbclient()
+        usager=db.verifier_client(courriel)
         #db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
         #return repr(usager)
@@ -418,6 +453,26 @@ def inscrire_module_role():
 
         db=Dbman()
         usager=db.inscrire_module_role(nom_module,nom_role)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/inscrireclient', methods=["GET","POST"]) #N
+def inscrire_client():
+    if request.method=="POST":
+        nom_client=request.form["nom_client"]
+        courriel=request.form["courriel"]
+        telephone=request.form["telephone"]
+        compagnie=request.form["compagnie"]
+        adresse=request.form["adresse"]
+        rue=request.form["rue"]
+        ville=request.form["ville"]
+
+        db=Dbclient()
+        usager=db.inscrire_client(nom_client, courriel, telephone, compagnie, adresse, rue,ville)
 
         db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')

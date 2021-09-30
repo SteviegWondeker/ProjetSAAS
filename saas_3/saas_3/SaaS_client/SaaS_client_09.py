@@ -37,6 +37,8 @@ class Vue():
 
         self.cadres["nouveau_projet"]=self.creer_cadre_projet()
 
+        self.cadres["client"]=self.creer_cadre_client()
+
         #self.cadres["principal"]=self.creercadreprincipal()
 
     def creercadrelogin(self):
@@ -77,12 +79,21 @@ class Vue():
 
         self.list_entry_membre = []
 
+
+        self.list_role=self.parent.retourner_roles_nom()
+
+        #self.combobox_role = ttk.Combobox(self.cadre_role, values=self.list_role)
+
         self.membre_lab_prenom = Label(self.cadre_inscrire_membre, text="Prénom:", font=("Arial", 14))
         self.membre_prenom = Entry(self.cadre_inscrire_membre, font=("Arial", 14), width=30)
         self.membre_lab_nom = Label(self.cadre_inscrire_membre, text="Nom:", font=("Arial", 14))
         self.membre_nom = Entry(self.cadre_inscrire_membre, font=("Arial", 14), width=30)
         self.membre_lab_role = Label(self.cadre_inscrire_membre, text="Rôle:", font=("Arial", 14))
-        self.membre_role = Entry(self.cadre_inscrire_membre, font=("Arial", 14), width=30)
+
+#        self.membre_role = Entry(self.cadre_inscrire_membre, font=("Arial", 14), width=30)
+
+        self.membre_role = ttk.Combobox(self.cadre_inscrire_membre, values=self.list_role)
+
         self.membre_lab_id = Label(self.cadre_inscrire_membre, text="#ID d'employé:", font=("Arial", 14))
         self.membre_id = Entry(self.cadre_inscrire_membre, font=("Arial", 14), width=30)
         self.membre_lab_courriel = Label(self.cadre_inscrire_membre, text="Courriel:", font=("Arial", 14))
@@ -103,6 +114,9 @@ class Vue():
         self.btn_inscrire_membre = Button(self.cadre_inscrire_membre, text="Inscrire le nouveau membre", font=("Arial", 12), padx=10, pady=10,
                                       command=self.inscrire_membre)
 
+        self.btn_annuler = Button(self.cadre_inscrire_membre, text="Annuler", font=("Arial", 12), padx=10, pady=10,
+                                command=self.retour_cadre_principal)
+
         self.membre_titre.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
         self.membre_lab_prenom.grid(row=20, column=10, sticky=E, padx=5, pady=5)
         self.membre_prenom.grid(row=20, column=20, padx=10, pady=5)
@@ -120,6 +134,8 @@ class Vue():
         self.membre_mdp.grid(row=80, column=20, padx=10, pady=5)
 
         self.btn_inscrire_membre.grid(row=100, column=20, sticky=E, padx=10, pady=10)
+
+        self.btn_annuler.grid(row=100, column=10, sticky=E, padx=10, pady=10)
 
         return self.cadre_inscrire_membre
 
@@ -158,6 +174,9 @@ class Vue():
 
         self.btn_ajouter_projet = Button(self.cadrepied, text="Ajouter un projet", font=("Arial", 12),
                                          padx=10, pady=10, command=self.form_inscrire_projet)
+
+        self.btn_ajouter_client = Button(self.cadrepied, text="Ajouter un client", font=("Arial", 12),
+                                         padx=10, pady=10, command=self.form_ajouter_client)
 
         #self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
         self.btn_gerer_role = Button(self.cadrepied, text="Définir les rôles", font=("Arial", 12),
@@ -246,8 +265,12 @@ class Vue():
     def form_inscrire_projet(self):
         self.changercadre("nouveau_projet")
 
+    
+    def form_ajouter_client(self):
+        self.changercadre("client")
+
     # Méthode à utiliser pour inscrire un membre dans la BD
-    def inscrire_membre(self):
+    def inscrire_membre(self): #n
         self.valider_membre()
         self.changercadre("principal")
         pass
@@ -264,6 +287,8 @@ class Vue():
 
 
         self.btn_ajouter_projet.grid(row=40, column=20, sticky=W, padx=10, pady=10)
+        
+        self.btn_ajouter_client.grid(row=40, column=10, sticky=W, padx=10, pady=10)
 
         self.btn_ajouter_membre.grid_remove()      # Enlever le bouton "Inscrire un membre" quand on change de cadre
         self.btn_gerer_role.grid_remove()         # Enlever le bouton "définir un role" quand on change de cadre
@@ -310,7 +335,7 @@ class Vue():
     def creation_compte(self):
         self.parent.creation_compte()
 
-    def creer_cadre_creation(self):
+    def creer_cadre_creation(self): #n
         self.root.title("Creation")
         self.cadre_creation=Frame(self.cadreapp,width=800,height=400)
 
@@ -379,19 +404,111 @@ class Vue():
 
         return self.cadre_creation
 
-    def create_label(self, champ, cadre):
+    def creer_cadre_client(self): #n
+        self.root.title("Creation")
+        self.cadre_client=Frame(self.cadreapp,width=800,height=400)
+
+        self.list_entry_client=[]
+        self.list_lab_client=[]
+        self.params=[]
+
+        self.signup_label=Label(self.cadre_client,text="Création client",font=("Arial",18),
+                              borderwidth=2,relief=GROOVE)
+
+        self.signup_lab_nom_org=self.create_label("Nom de l'organisation", self.cadre_client)
+        self.signup_nom_org=self.create_entry(self.cadre_client)
+        self.list_entry_client.append(self.signup_nom_org)
+        self.list_lab_client.append(self.signup_lab_nom_org)
+
+        self.signup_lab_mail=self.create_label("Courriel", self.cadre_client)
+        self.signup_mail=self.create_entry(self.cadre_client)
+        self.list_entry_client.append(self.signup_mail)
+        self.list_lab_client.append(self.signup_lab_mail)
+
+        self.signup_lab_tel=self.create_label("Télephone", self.cadre_client)
+        self.signup_tel=self.create_entry(self.cadre_client)
+        self.list_entry_client.append(self.signup_tel)
+        self.list_lab_client.append(self.signup_lab_tel)
+
+        self.signup_lab_comp=self.create_label("Compagnie", self.cadre_client)
+        self.signup_comp=self.create_entry(self.cadre_client)
+        self.list_entry_client.append(self.signup_comp)
+        self.list_lab_client.append(self.signup_lab_comp)
+
+        self.signup_lab_add=self.create_label("Adresse", self.cadre_client)
+        self.signup_add=self.create_entry(self.cadre_client)
+        self.list_entry_client.append(self.signup_add)
+        self.list_lab_client.append(self.signup_lab_add)
+
+        self.signup_lab_rue=self.create_label("Rue", self.cadre_client)
+        self.signup_rue=self.create_entry(self.cadre_client)
+        self.list_entry_client.append(self.signup_rue)
+        self.list_lab_client.append(self.signup_lab_rue)
+
+        self.signup_lab_ville=self.create_label("Ville", self.cadre_client)
+        self.signup_ville=self.create_entry(self.cadre_client)
+        self.list_entry_client.append(self.signup_ville)
+        self.list_lab_client.append(self.signup_lab_ville)
+
+
+        for i in range(len(self.list_entry_client)):
+            temp = 10*(i+1)
+            self.list_lab_client[i].grid(row=temp,column=10, sticky=E,padx=10,pady=5)
+            self.list_entry_client[i].grid(row=temp,column=20,sticky=E,padx=5,pady=5)
+
+        self.btn_annuler_signup=Button(self.cadre_client,text="Annuler",font=("Arial",12),padx=10,pady=10,command=self.retour_cadre_principal)
+        self.btn_valider_signup=Button(self.cadre_client,text="Valider",font=("Arial",12),padx=10,pady=10,command=self.valider_client)
+
+        self.btn_annuler_signup.grid(row=100,column=20,sticky=W,padx=10,pady=10)
+        self.btn_valider_signup.grid(row=100,column=20,padx=10,pady=10)
+
+        self.cadres["client"]=self.cadre_client
+
+        return self.cadre_client
+
+        if ((self.signup_mdp.get() != self.signup_mdpval.get()) and form_valide == True):
+            form_valide=False
+            self.avertirusager("Invalide","Mots de passe ne concordent pas, reprendre?")
+
+        if form_valide == True:
+            if not self.parent.verifier_usager(self.form):
+                self.parent.inscrire_usager(self.form)
+
+                self.avertirusager('Terminer', "Organisation et compte admin crées")
+                self.afficherlogin()
+
+    def valider_client(self): #n
+        form_valide = True
+
+        self.form=[]
+
+        for i in self.list_entry_client:
+            if not i.get():
+                self.avertirusager("Invalide","Des champs sont vides, reprendre?")
+                form_valide=False
+                break
+            else:
+                self.form.append(i.get())
+
+        if form_valide == True:
+            if not self.parent.verifier_client(self.form):
+                self.parent.inscrire_client(self.form)
+                self.retour_cadre_principal()
+                
+
+    def create_label(self, champ, cadre): #n
         label = Label(cadre, text=champ,font=("Arial",14))
         return label
 
-    def create_entry(self, cadre):
+    def create_entry(self, cadre): #n
         entry = Entry(cadre,font=("Arial",14),width=30)
         return entry
 
 
-    def annuler_signup(self):
+    def annuler_signup(self): #n
         self.afficherlogin()
 
-    def valider_signup(self):
+    def valider_signup(self): #n
         form_valide = True
 
         self.form=[]
@@ -415,7 +532,7 @@ class Vue():
                 self.avertirusager('Terminer', "Organisation et compte admin crées")
                 self.afficherlogin()
 
-    def valider_membre(self):
+    def valider_membre(self): #n
         form_valide = True
 
         self.form=[]
@@ -458,7 +575,7 @@ class Vue():
         self.btn_inscrire_modules = Button(self.cadre_role, text="inscrire les modules", font=("Arial", 12), padx=10, pady=10, command=self.inscrire_modules_au_role)
         
         self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.retour_cadre_principal)
-        self.btn_retour = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.retour)
+        self.btn_retour = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.retour_cadre_principal)
 
 
         self.listbox = Listbox(self.cadre_role, font=("Arial", 16), selectmode="multiple")
@@ -517,7 +634,7 @@ class Vue():
 
 ############################################
 
-    def creer_cadre_projet(self):
+    def creer_cadre_projet(self): #n
         self.root.title("Creation")
         self.cadre_projet=Frame(self.cadreapp,width=800,height=400)
 
@@ -568,14 +685,14 @@ class Vue():
 
         return self.cadre_projet
 
-    def ajouter_projet(self):
+    def ajouter_projet(self): #n
         if self.valider_projet():
             self.parent.ajouter_projet(self.form)
             self.retour_cadre_principal()
 
 
 
-    def valider_projet(self):
+    def valider_projet(self): #n
         self.form=[]
         for i in self.list_entry_projet:
             if not i.get():
@@ -675,25 +792,38 @@ class Controleur:
 ####
 
 
-    def creation_compte(self): 
+    def creation_compte(self):  #n
 
         self.vue.creer_cadre_creation()
         self.vue.changercadre("creation")
 
-    def verifier_membre(self,form):
+    def verifier_membre(self,form): #n
         url = self.urlserveur+"/verifiermembre"
         params = {"id":form[4],
                     "role":form[2]}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
-        if len(mondict[0])>0 or len(mondict[1])==0:
+        if len(mondict[0])>0 or len(mondict[1])>0:
             self.vue.avertirusager("Compte existe déjà","Reprendre?")
             return True
         else:
             return False
+    
+    
+    def verifier_client(self,form): #n
+        url = self.urlserveur+"/verifierclient"
+        params = {"courriel":form[1]}
+        reptext=self.appelserveur(url,params)
 
-    def verifier_usager(self,form):
+        mondict=json.loads(reptext)
+        if len(mondict)>0 :
+            self.vue.avertirusager("Client existe déjà","Reprendre?")
+            return True
+        else:
+            return False
+
+    def verifier_usager(self,form): #n
         url = self.urlserveur+"/verifierusager"
         params = {"courriel":form[2],
                   "nom_org":form[6]}
@@ -706,7 +836,7 @@ class Controleur:
         else:
             return False
 
-    def verifier_projet(self,form):
+    def verifier_projet(self,form): #n
         url = self.urlserveur+"/verifierprojet"
         params = {"nom_projet":form[0],
                 "nom_client":form[1]}
@@ -719,7 +849,7 @@ class Controleur:
         else:
             return False
 
-    def inscrire_membre(self,form):
+    def inscrire_membre(self,form): #n
         url = self.urlserveur+"/inscriremembre"
         identifiant_nom = form[0]+" "+form[1]
         identifiant_id = form[1]+form[3]
@@ -736,7 +866,7 @@ class Controleur:
         mondict=json.loads(reptext)
         print(mondict)
 
-    def inscrire_usager(self,form):
+    def inscrire_usager(self,form): #n
         url = self.urlserveur+"/inscrireusager"
         identifiant = form[0]+" "+form[1]
         params = {"nom_user":identifiant,
@@ -750,8 +880,22 @@ class Controleur:
         mondict=json.loads(reptext)
         print(mondict)
 
+    def inscrire_client(self,form): #n
+        url = self.urlserveur+"/inscrireclient"
+        params = {"nom_client":form[0],
+                  "courriel":form[1],
+                  "telephone":form[2],
+                  "compagnie":form[3],
+                  "adresse":form[4],
+                  "rue":form[5],
+                  "ville":form[6]}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        print(mondict)
+
     
-    def ajouter_module_bd(self,nom_module):
+    def ajouter_module_bd(self,nom_module): #n
         url = self.urlserveur+"/ajoutermodulebd"
         params = {"nom_module":nom_module}
         reptext=self.appelserveur(url,params)
@@ -759,7 +903,7 @@ class Controleur:
         mondict=json.loads(reptext)
         print(mondict)
 
-    def inscrire_module_role(self,nom_module, nom_role):
+    def inscrire_module_role(self,nom_module, nom_role): #n
         url = self.urlserveur+"/inscriremodulemembre"
         params = {"nom_module":nom_module,
                 "nom_role": nom_role}
@@ -768,7 +912,7 @@ class Controleur:
         mondict=json.loads(reptext)
         print(mondict)
 
-    def ajouter_projet(self,form):
+    def ajouter_projet(self,form): #n
         url = self.urlserveur+"/ajouterprojet"
         params = {"nom_projet":form[0],
                 "nom_client":form[1],
@@ -779,21 +923,21 @@ class Controleur:
         mondict=json.loads(reptext)         
         print(mondict)
 
-    def ajouter_role(self,role):
+    def ajouter_role(self,role): #n
         url = self.urlserveur+"/ajouterrole"
         params = {"nom_role":role}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
 
-    def retourner_role(self):
+    def retourner_role(self): #n
         url = self.urlserveur+"/trouver_roles"
         params = {}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
 
-    def retourner_roles_nom(self):
+    def retourner_roles_nom(self): #n
         url = self.urlserveur+"/trouver_roles_nom"
         params = {}
         reptext=self.appelserveur(url,params)
