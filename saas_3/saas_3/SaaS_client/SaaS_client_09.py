@@ -215,6 +215,7 @@ class Vue():
             fichier=self.tableau.item(i, "values")[0]
         self.parent.telechargermodule(fichier)
 
+
     def ecriretableau(self):
         for i in self.tableau.get_children():
             self.tableau.delete(i)
@@ -252,6 +253,7 @@ class Vue():
         self.integretableau(listemembres,entete)
         #self.cadrepied.pack()
         self.btn_ajouter_projet.grid_remove() 
+        self.btn_ajouter_client.grid_remove()
         self.btn_ajouter_membre.grid(row=40, column=20, sticky=W, padx=10, pady=10)
         self.btn_gerer_role.grid(row=40, column=40, sticky=W, padx=10, pady=10)
 
@@ -261,6 +263,7 @@ class Vue():
 
     def form_inscrire_role(self):
         self.changercadre("Rôles")
+    
 
     def form_inscrire_projet(self):
         self.changercadre("nouveau_projet")
@@ -282,12 +285,10 @@ class Vue():
 
     def gererprojets(self):
         listeprojets=self.parent.trouverprojets()
-        entete=["compagnie","projet","date de fin"]
-        self.integretableau(listeprojets,entete)
-
+        entete=["Nom du projet","date de début","date de fin"]
+        self.integretableau(listeprojets,entete)    
 
         self.btn_ajouter_projet.grid(row=40, column=20, sticky=W, padx=10, pady=10)
-        
         self.btn_ajouter_client.grid(row=40, column=10, sticky=W, padx=10, pady=10)
 
         self.btn_ajouter_membre.grid_remove()      # Enlever le bouton "Inscrire un membre" quand on change de cadre
@@ -298,7 +299,8 @@ class Vue():
         entete=["modules disponibles"]
         self.integretableau(listemodules,entete)
         self.btn_ajouter_projet.grid_remove() 
-        self.btn_ajouter_membre.grid_remove()  # Enlever le bouton "Inscrire une usager" quand on change de cadre
+        self.btn_ajouter_membre.grid_remove()
+        self.btn_ajouter_client.grid_remove()  # Enlever le bouton "Inscrire une usager" quand on change de cadre
         self.btn_gerer_role.grid_remove()  # Enlever le bouton "définir un role" quand on change de cadre
 
     def annulerlogin(self):
@@ -550,7 +552,6 @@ class Vue():
                 self.parent.inscrire_membre(self.form)
 
 
-
 #
 #########################################################################
 #Sam
@@ -576,7 +577,6 @@ class Vue():
         
         self.btn_annuler = Button(self.cadre_role, text="Annuler", font=("Arial", 12), padx=10, pady=10, command=self.retour_cadre_principal)
         self.btn_retour = Button(self.cadre_role, text="Valider", font=("Arial", 12), padx=10, pady=10, command=self.retour_cadre_principal)
-
 
         self.listbox = Listbox(self.cadre_role, font=("Arial", 16), selectmode="multiple")
         self.listemodules=self.parent.trouvermodules()
@@ -621,7 +621,9 @@ class Vue():
         self.list_role=self.parent.retourner_roles_nom()
         self.comboBox_choix_du_role = ttk.Combobox(self.cadre_role, values=self.list_role)        
         self.comboBox_choix_du_role.grid    (row=2, column=2)
-        pass
+
+        self.membre_role=ttk.Combobox(self.cadre_inscrire_membre, values=self.list_role)              
+        self.membre_role.grid(row=40, column=20, padx=10, pady=5)
         #ajoute le role dont le nom est inscrit dans le champs_nouveau_role
 
     def inscrire_modules_au_role(self): #n
@@ -731,6 +733,7 @@ class Controleur:
         reptext=self.appelserveur(leurl,params)
         rep=json.loads(reptext)
         fichier1=open("./SaaS_modules/"+fichier,"w")
+        #fichier1=open("txt.txt")
         fichier1.write(rep)
         fichier1.close()
         usager=json.dumps([self.modele.nom,self.modele.compagnie])
@@ -917,7 +920,8 @@ class Controleur:
                 "nom_client":form[1],
                 "responsable":form[2],
                 "date_deb":form[3],
-                "date_fin":form[4]}
+                "date_fin":form[4],
+                "nom_admin": self.vue.loginnom.get()}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)

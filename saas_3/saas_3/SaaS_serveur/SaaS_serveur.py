@@ -67,14 +67,19 @@ class Dbclient():   # Base de données du locateur
         return "test"
 
 
-    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin): #n
+    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_admin): #n
         sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue') values (:nom_projet, (select idclient from client where nom=:nom_client), :responsable, :date_deb, :date_fin)")                         
         self.curs.execute(sql_nom, {
-                                    'nom_projet':nom_projet,
-                                    'nom_client': nom_client,
-                                    'responsable': responsable,
-                                    'date_deb': date_deb,
-                                    'date_fin': date_fin})                       
+                                'nom_projet':nom_projet,
+                                'nom_client': nom_client,
+                                'responsable': responsable,
+                                'date_deb': date_deb,
+                                'date_fin': date_fin})          
+                                
+        sql_projet("insert into 'tbl_projet_compagnie' (nom_compagnie, id) values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from projet where nom_projet=:nom_projet))")
+        self.curs.execute(sql_nom, {
+                                'nom_admin':nom_admin,
+                                'nom_projet': nom_projet})     
         self.conn.commit()
         return "test"
 
@@ -503,9 +508,10 @@ def ajouter_projet():
         responsable=request.form["responsable"]
         date_deb=request.form["date_deb"]
         date_fin=request.form["date_fin"]
+        nom_admin=request.form["nom_admin"]
 
         db=Dbclient()
-        usager=db.ajouter_projet(nom_proj, nom_client, responsable, date_deb, date_fin)
+        usager=db.ajouter_projet(nom_proj, nom_client, responsable, date_deb, date_fin, nom_admin)
 
         db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
