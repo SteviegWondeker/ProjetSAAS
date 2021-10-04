@@ -799,12 +799,11 @@ class Controleur:
 
     def verifier_membre(self,form): #n
         url = self.urlserveur+"/verifiermembre"
-        params = {"id":form[4],
-                    "role":form[2]}
+        params = {"courriel":form[4]}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
-        if len(mondict[0])>0 or len(mondict[1])==0:
+        if len(mondict)>0:
             self.vue.avertirusager("Compte existe déjà","Reprendre?")
             return True
         else:

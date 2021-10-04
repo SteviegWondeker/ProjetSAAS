@@ -152,17 +152,12 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
         return [info_org,info_user]
 
-    def verifier_membre(self, id, role): #n
-        sql_user=("select * from 'membre' where identifiant=:id")
-        self.curs.execute(sql_user, { 'id':id})
+    def verifier_membre(self, courriel): #n
+        sql_user=("select * from 'membre' where courriel=:courriel")
+        self.curs.execute(sql_user, { 'courriel':courriel})
         info_user=self.curs.fetchall()
-        sql_role=("select * from 'TBL_role' where nom_role=:role")
-        self.curs.execute(sql_role, {
-                                    'role': role})
-                                    
-        info_role=self.curs.fetchall()
 
-        return [info_user,info_role]
+        return info_user
         
     def retourner_role(self): #n
         sql_user=("select nom_role from 'tbl_role'")
@@ -389,10 +384,9 @@ def verifier_usager():
 @app.route('/verifiermembre', methods=["GET","POST"]) #N
 def verifier_membre():
     if request.method=="POST":
-        id_emp=request.form["id"]
-        role_emp=request.form["role"]
+        courriel=request.form["courriel"]
         db=Dbman()
-        usager=db.verifier_membre(id_emp, role_emp)
+        usager=db.verifier_membre(courriel)
 
         #db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
