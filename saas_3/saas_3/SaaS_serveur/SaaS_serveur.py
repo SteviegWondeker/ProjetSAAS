@@ -75,11 +75,12 @@ class Dbclient():   # Base de données du locateur
                                 'responsable': responsable,
                                 'date_deb': date_deb,
                                 'date_fin': date_fin})          
-                                
-        sql_projet("insert into 'tbl_projet_compagnie' (nom_compagnie, id) values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from projet where nom_projet=:nom_projet))")
-        self.curs.execute(sql_nom, {
-                                'nom_admin':nom_admin,
-                                'nom_projet': nom_projet})     
+
+        self.conn.commit()                                
+        #sql_projet("insert into 'tbl_projet_compagnie' ('nom_compagnie', 'id') values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from 'projet' where nomdeprojet=:nom_projet))")
+        #self.curs.execute(sql_projet, {
+        #                        'nom_admin':nom_admin,
+        #                        'nom_projet': nom_projet})     
         self.conn.commit()
         return "test"
 

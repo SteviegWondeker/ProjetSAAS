@@ -72,11 +72,24 @@ class Vue():
         self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
         
         self.listbox.grid (row=3, column=1, columnspan='10')
-        self.listbox.insert(END, self.list_membre)
+
+        self.listemodules=self.parent.trouvermembres("Cineclub")
+
+        entete="modules disponibles"
+        for items in self.listemodules:
+            self.listbox.insert(END, items)
+
 
 class Modele():
     def __init__(self,parent):
         self.parent=parent
+        
+    def inscrireusager(self,dictinfo):
+        self.nom=dictinfo[0][0][2]
+        self.droit=dictinfo[0][0][4]
+        self.titre=dictinfo[0][0][5]
+        self.compagnie={"nom":dictinfo[1][0][0],
+                        "id":dictinfo[0][0][0]}
 
 class Controleur:
     def __init__(self):
