@@ -32,7 +32,7 @@ class Dbclient():   # Base de données du locateur
     def fermerdb(self):
         self.conn.close()
 
-    def verifier_projet(self,nom_projet, nom_client):
+    def verifier_projet(self,nom_projet, nom_client): #n 
         sql_proj=("select * from 'projet' where Nomdeprojet=:nom_projet")
         self.curs.execute(sql_proj, {'nom_projet': nom_projet})
 
@@ -45,15 +45,42 @@ class Dbclient():   # Base de données du locateur
 
         return [info_projet,info_client]
 
+    def verifier_client(self,courriel): #n 
+        sql_client=("select * from 'client' where courriel=:courriel")
+        self.curs.execute(sql_client, {'courriel':courriel})
 
-    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin):
+        info=self.curs.fetchall()
+
+        return info
+
+    def inscrire_client(self, nom_client, courriel, telephone, compagnie, adresse, rue,ville):
+        sql_client=("insert into 'client' ('nom', 'courriel', 'tel', 'compagnie', 'adresse', 'rue', 'ville') values (:nom_client, :courriel, :telephone, :compagnie, :adresse, :rue, :ville)")                         
+        self.curs.execute(sql_client, {
+                                    'nom_client':nom_client,
+                                    'courriel': courriel,
+                                    'telephone': telephone,
+                                    'compagnie': compagnie,
+                                    'adresse': adresse,
+                                    'rue': rue,
+                                    'ville': ville})                       
+        self.conn.commit()
+        return "test"
+
+
+    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_admin): #n
         sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue') values (:nom_projet, (select idclient from client where nom=:nom_client), :responsable, :date_deb, :date_fin)")                         
         self.curs.execute(sql_nom, {
-                                    'nom_projet':nom_projet,
-                                    'nom_client': nom_client,
-                                    'responsable': responsable,
-                                    'date_deb': date_deb,
-                                    'date_fin': date_fin})                       
+                                'nom_projet':nom_projet,
+                                'nom_client': nom_client,
+                                'responsable': responsable,
+                                'date_deb': date_deb,
+                                'date_fin': date_fin})          
+
+        self.conn.commit()                                
+        #sql_projet("insert into 'tbl_projet_compagnie' ('nom_compagnie', 'id') values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from 'projet' where nomdeprojet=:nom_projet))")
+        #self.curs.execute(sql_projet, {
+        #                        'nom_admin':nom_admin,
+        #                        'nom_projet': nom_projet})     
         self.conn.commit()
         return "test"
 
@@ -111,12 +138,17 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         info = self.curs.fetchall()
         return info
 
+    def trouver_roles_nom(self):
+        sql_role = ("select nom_role from 'Tbl_role'")
+        self.curs.execute(sql_role)
+        info = self.curs.fetchall()
+        return info
 
     def fermerdb(self):
         self.conn.close()
 
     ##
-    def verifier_usager(self,nom_org, courriel):
+    def verifier_usager(self,nom_org, courriel): #n
         sql_org=("select * from 'compagnie' where nomcompagnie=:nom_org")
         sql_user=("select * from 'membre' where courriel=:courriel")
         self.curs.execute(sql_org, {'nom_org': nom_org})
@@ -126,17 +158,14 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
         return [info_org,info_user]
 
-    def verifier_membre(self, id, role):
-        sql_user=("select * from 'membre' where identifiant=:id")
-        self.curs.execute(sql_user, { 'id':id})
+    def verifier_membre(self, courriel): #n
+        sql_user=("select * from 'membre' where courriel=:courriel")
+        self.curs.execute(sql_user, { 'courriel':courriel})
         info_user=self.curs.fetchall()
-        sql_role=("select * from 'TBL_role' where nom_role=:role")
-        self.curs.execute(sql_role, {
-                                    'role': role})
-                                    
-        info_role=self.curs.fetchall()
+
+        return info_user
         
-    def retourner_role(self):
+    def retourner_role(self): #n
         sql_user=("select nom_role from 'tbl_role'")
         self.curs.execute(sql_user)
         info_user=self.curs.fetchall()
@@ -150,7 +179,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
         return [info_user,info_role]
 
-    def inscrire_usager(self,nom, courriel, telephone, mdp, nom_org, type_org):
+    def inscrire_usager(self,nom, courriel, telephone, mdp, nom_org, type_org): #n
         sql_org=("insert into 'compagnie' ('nomcompagnie', 'type_entreprise') values (:nom_org, :type_org)")
         sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'permission', 'titre', 'courriel', 'telephone') values ((select idcompagnie from 'compagnie' where nomcompagnie=:nom_org), :courriel, :mdp,  'admin', 'président', :courriel, :telephone)")
         self.curs.execute(sql_org, {'nom_org': nom_org,
@@ -162,15 +191,26 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.conn.commit()
         return "test"
 
-    def inscrire_module_role(self,nom_module, nom_role):
-        
-       # sql_module=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role, (select idmodule from 'modules' where nommodule=:nom_module))")                    
-       # self.curs.execute(sql_module, {'nom_role': nom_role,
-       #                                 'nom_module': nom_module})                       
-       # self.conn.commit()
+    def inscrire_module_role(self,nom_module, nom_role): #n
+        sql_module_role=("insert into 'tbl_role_module' ('role', 'module') values ((select id_role from 'tbl_role' where nom_role=:nom_role), (select idmodule from 'modules' where nommodule=:nom_module))")                    
+     
+        self.curs.execute(sql_module_role, {'nom_role': nom_role,
+                                        'nom_module': nom_module})                       
+        self.conn.commit()
         return "test"
 
-    def inscrire_membre(self,nom, courriel, telephone, mdp, id_complet, id_emp, nom_admin, nom_role):
+    
+    def ajouter_module(self,nom_module): #n
+        try:
+            sql_module=("insert into 'modules' ('nommodule', 'version') values (:nom_module, 1)")
+            self.curs.execute(sql_module, {'nom_module': nom_module})    
+                        
+            self.conn.commit()
+        except:
+            print("erreur")
+        return "test"
+
+    def inscrire_membre(self,nom, courriel, telephone, mdp, id_complet, id_emp, nom_admin, nom_role): #n
         sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'permission', 'titre', 'courriel', 'telephone') values ((select compagnie from 'membre' where identifiant=:nom_admin), :id_complet, :mdp,  'user', 'employe', :courriel, :telephone)")                         
         sql_role=("insert into 'Tbl_membre_role' ('membre', 'role') values (:id_emp, (select id_role from 'tbl_role' where nom_role=:nom_role))")                         
         self.curs.execute(sql_nom, {
@@ -186,7 +226,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         return "test"
 
 
-    def ajouter_role(self,role):
+    def ajouter_role(self,role): #n
         sql_nom=("insert into 'Tbl_role' ('nom_role') values (:nom_role)")                         
         self.curs.execute(sql_nom, {'nom_role':role})                       
         self.conn.commit()
@@ -306,6 +346,18 @@ def trouver_roles():
         #return repr(usager)
     else:
         return repr("pas ok")
+
+@app.route('/trouver_roles_nom', methods=["GET","POST"]) #n
+def trouver_roles_nom():
+    if request.method == "POST":
+        db = Dbman()
+        roles = db.trouver_roles_nom()
+
+        db.fermerdb()
+        return Response(json.dumps(roles), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
     
 @app.route('/requeteserveur', methods=["GET","POST"])
 def requeteserveur():
@@ -319,7 +371,7 @@ def requeteserveur():
         return repr("pas ok")
 ##
 
-@app.route('/verifierusager', methods=["GET","POST"])
+@app.route('/verifierusager', methods=["GET","POST"]) #N
 def verifier_usager():
     if request.method=="POST":
         nom_org=request.form["nom_org"]
@@ -333,13 +385,14 @@ def verifier_usager():
     else:
         return repr("pas ok")
 
-@app.route('/verifiermembre', methods=["GET","POST"])
+
+
+@app.route('/verifiermembre', methods=["GET","POST"]) #N
 def verifier_membre():
     if request.method=="POST":
-        id_emp=request.form["id"]
-        role_emp=request.form["role"]
+        courriel=request.form["courriel"]
         db=Dbman()
-        usager=db.verifier_membre(id_emp, role_emp)
+        usager=db.verifier_membre(courriel)
 
         #db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
@@ -347,7 +400,7 @@ def verifier_membre():
     else:
         return repr("pas ok")
 
-@app.route('/verifierprojet', methods=["GET","POST"])
+@app.route('/verifierprojet', methods=["GET","POST"]) #N
 def verifier_projet():
     if request.method=="POST":
         nom_projet=request.form["nom_projet"]
@@ -360,8 +413,20 @@ def verifier_projet():
     else:
         return repr("pas ok")
 
+@app.route('/verifierclient', methods=["GET","POST"]) #N
+def verifier_client():
+    if request.method=="POST":
+        courriel=request.form["courriel"]
+        db=Dbclient()
+        usager=db.verifier_client(courriel)
+        #db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
 
-@app.route('/inscrireusager', methods=["GET","POST"])
+
+@app.route('/inscrireusager', methods=["GET","POST"]) #N
 def inscrire_usager():
     if request.method=="POST":
         nom=request.form["nom_user"]
@@ -380,7 +445,7 @@ def inscrire_usager():
     else:
         return repr("pas ok")
 
-@app.route('/inscriremodulemembre', methods=["GET","POST"])
+@app.route('/inscriremodulemembre', methods=["GET","POST"]) #N
 def inscrire_module_role():
     if request.method=="POST":
         nom_module=request.form["nom_module"]
@@ -395,7 +460,27 @@ def inscrire_module_role():
     else:
         return repr("pas ok")
 
-@app.route('/inscriremembre', methods=["GET","POST"])
+@app.route('/inscrireclient', methods=["GET","POST"]) #N
+def inscrire_client():
+    if request.method=="POST":
+        nom_client=request.form["nom_client"]
+        courriel=request.form["courriel"]
+        telephone=request.form["telephone"]
+        compagnie=request.form["compagnie"]
+        adresse=request.form["adresse"]
+        rue=request.form["rue"]
+        ville=request.form["ville"]
+
+        db=Dbclient()
+        usager=db.inscrire_client(nom_client, courriel, telephone, compagnie, adresse, rue,ville)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/inscriremembre', methods=["GET","POST"]) #N
 def inscrire_membre():
     if request.method=="POST":
         nom=request.form["nom_user"]
@@ -416,7 +501,7 @@ def inscrire_membre():
     else:
         return repr("pas ok")
 
-@app.route('/ajouterprojet', methods=["GET","POST"])
+@app.route('/ajouterprojet', methods=["GET","POST"]) #N
 def ajouter_projet():
     if request.method=="POST":
         nom_proj=request.form["nom_projet"]
@@ -424,9 +509,10 @@ def ajouter_projet():
         responsable=request.form["responsable"]
         date_deb=request.form["date_deb"]
         date_fin=request.form["date_fin"]
+        nom_admin=request.form["nom_admin"]
 
         db=Dbclient()
-        usager=db.ajouter_projet(nom_proj, nom_client, responsable, date_deb, date_fin)
+        usager=db.ajouter_projet(nom_proj, nom_client, responsable, date_deb, date_fin, nom_admin)
 
         db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
@@ -434,7 +520,22 @@ def ajouter_projet():
     else:
         return repr("pas ok")
 
-@app.route('/ajouterrole', methods=["GET","POST"])
+
+@app.route('/ajoutermodulebd', methods=["GET","POST"]) #N
+def ajouter_module():
+    if request.method=="POST":
+        nom_module=request.form["nom_module"]
+
+        db=Dbman()
+        usager=db.ajouter_module(nom_module)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/ajouterrole', methods=["GET","POST"]) #N
 def ajouter_role():
     if request.method=="POST":
         nom_role=request.form["nom_role"]
