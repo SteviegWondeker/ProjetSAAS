@@ -845,7 +845,7 @@ class Controleur:
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
-        if len(mondict[0])>0 or len(mondict[1])==0:
+        if len(mondict[0])>0 or len(mondict[1])>0:
             self.vue.avertirusager("Erreur c'est produite", " Verifiez vos informations, reprendre?")
             return True
         else:
@@ -921,7 +921,7 @@ class Controleur:
                 "responsable":form[2],
                 "date_deb":form[3],
                 "date_fin":form[4],
-                "nom_admin": self.vue.loginnom.get()}
+                "nom_compagnie": self.modele.compagnie["nom"]}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)

@@ -53,6 +53,12 @@ class Dbclient():   # Base de données du locateur
 
         return info
 
+    def trouver_projet_par_compagnie(self):
+        sqlnom=("select Nomdeprojet from 'projet' where")
+        self.curs.execute(sqlnom)
+        info=self.curs.fetchall()
+        return info
+
     def inscrire_client(self, nom_client, courriel, telephone, compagnie, adresse, rue,ville):
         sql_client=("insert into 'client' ('nom', 'courriel', 'tel', 'compagnie', 'adresse', 'rue', 'ville') values (:nom_client, :courriel, :telephone, :compagnie, :adresse, :rue, :ville)")                         
         self.curs.execute(sql_client, {
@@ -67,14 +73,15 @@ class Dbclient():   # Base de données du locateur
         return "test"
 
 
-    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_admin): #n
-        sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue') values (:nom_projet, (select idclient from client where nom=:nom_client), :responsable, :date_deb, :date_fin)")                         
+    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_compagnie): #n
+        sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue', 'compagnie') values (:nom_projet, (select idclient from client where nom=:nom_client), :responsable, :date_deb, :date_fin, :nom_compagnie)")                         
         self.curs.execute(sql_nom, {
                                 'nom_projet':nom_projet,
                                 'nom_client': nom_client,
                                 'responsable': responsable,
                                 'date_deb': date_deb,
-                                'date_fin': date_fin})          
+                                'date_fin': date_fin,
+                                'nom_compagnie':nom_compagnie})          
 
         self.conn.commit()                                
         #sql_projet("insert into 'tbl_projet_compagnie' ('nom_compagnie', 'id') values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from 'projet' where nomdeprojet=:nom_projet))")
@@ -175,10 +182,6 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     
         info_role=self.curs.fetchall()
         
-
-
-        return [info_user,info_role]
-
     def inscrire_usager(self,nom, courriel, telephone, mdp, nom_org, type_org): #n
         sql_org=("insert into 'compagnie' ('nomcompagnie', 'type_entreprise') values (:nom_org, :type_org)")
         sql_nom=("insert into 'membre' ('compagnie', 'identifiant', 'mdp', 'permission', 'titre', 'courriel', 'telephone') values ((select idcompagnie from 'compagnie' where nomcompagnie=:nom_org), :courriel, :mdp,  'admin', 'président', :courriel, :telephone)")
@@ -324,6 +327,18 @@ def trouver_membres_par_compagnie():
 
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')
+
+@app.route('/trouver_projet_par_compagnie', methods=["GET","POST"]) #N
+def trouver_projet_par_compagnie():
+    if request.method=="POST":
+        id_comp=request.form["id"]
+        db=Dbclient()
+        projets=db.trouver_projet_par_compagnie(id_comp)
+        db.fermerdb()
+        return Response(json.dumps(projets), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
 
 @app.route('/trouver_permissions_par_membre', methods=["GET","POST"])        # Alex
 def trouver_permissions_par_membre():
@@ -509,10 +524,10 @@ def ajouter_projet():
         responsable=request.form["responsable"]
         date_deb=request.form["date_deb"]
         date_fin=request.form["date_fin"]
-        nom_admin=request.form["nom_admin"]
+        nom_compagnie=request.form["nom_compagnie"]
 
         db=Dbclient()
-        usager=db.ajouter_projet(nom_proj, nom_client, responsable, date_deb, date_fin, nom_admin)
+        usager=db.ajouter_projet(nom_proj, nom_client, responsable, date_deb, date_fin, nom_compagnie)
 
         db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')

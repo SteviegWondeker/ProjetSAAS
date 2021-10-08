@@ -10,6 +10,7 @@ from tkinter import ttk
 import sys
 from subprocess import Popen
 
+
 class Vue():
     def __init__(self,parent):
         self.parent=parent
@@ -39,7 +40,7 @@ class Vue():
         self.list_membre= None
 
         self.label_nom_projet = Label(self.cadre_gestion, text="Nom du projet", font=("Arial", 12))
-        self.list_nom_projet = ttk.Combobox(self.cadre_gestion, values=self.parent.trouverprojets())
+        self.list_nom_projet = ttk.Combobox(self.cadre_gestion, values=0)
 
         self.label_choix_existant = Label(self.cadre_gestion, text="choisir un role existant : ", font=("Arial", 12))
 
@@ -83,13 +84,14 @@ class Vue():
 class Modele():
     def __init__(self,parent):
         self.parent=parent
-        
+        print(sys.argv)
+        self.usager=sys.argv[2].split()
+        self.inscrireusager(self.usager)
+
     def inscrireusager(self,dictinfo):
-        self.nom=dictinfo[0][0][2]
-        self.droit=dictinfo[0][0][4]
-        self.titre=dictinfo[0][0][5]
-        self.compagnie={"nom":dictinfo[1][0][0],
-                        "id":dictinfo[0][0][0]}
+        self.nom=dictinfo[0]
+        self.compagnie={"nom":dictinfo[2],
+                        "id":dictinfo[4]}
 
 class Controleur:
     def __init__(self):
@@ -100,9 +102,10 @@ class Controleur:
         self.vue.root.mainloop()
 
 
-    def trouverprojets(self):
-        url = self.urlserveur+"/trouverprojets"
-        params = {}
+    def trouver_projets_par_compagnie(self):
+        url = self.urlserveur+"/trouver_projet_par_compagnie"
+        params ={"id": self.modele.compagnie["id"]}
+        #params = {self.modele.usager[1]}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
