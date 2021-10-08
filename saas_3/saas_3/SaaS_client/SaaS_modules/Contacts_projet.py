@@ -13,6 +13,7 @@ class Vue():
     def __init__(self,parent):
         self.parent=parent
         self.root=Tk()
+        self.root.minsize(width=600, height=400)
         self.cadreapp=Frame(self.root)
         #self.canevas=Canvas(self.cadreapp,width=800,height=600)
         #self.canevas.create_text(400,300,anchor=CENTER,text="Bienvenue a SaaS PROJET")
@@ -21,7 +22,7 @@ class Vue():
 
         self.cadre_contacts=Frame(self.cadreapp)
         # Titre
-        self.compagnie_label = Label(self.cadre_contacts, text="Nom de compagnie",font=("Arial",18),
+        self.compagnie_label = Label(self.cadre_contacts, text=self.parent.modele.usager[2],font=("Arial",18),
                               borderwidth=2, relief=GROOVE)
 
         # Frame d'entête -> Contacts - Nom du projet
@@ -82,12 +83,12 @@ class Vue():
         self.contacts_details_frame = Frame(self.contacts_frame)
         self.btn_new_contact = Button(self.contacts_details_frame, text="Ajouter un contact")
         self.btn_edit_contact = Button(self.contacts_details_frame, text="Éditer un contact")
-        self.btn_new_contact.pack(padx=5, pady=5, anchor=NW)
-        self.btn_edit_contact.pack(padx=5, pady=5, anchor=NW)
+        self.btn_new_contact.pack(anchor=NW, padx=5, pady=5)
+        self.btn_edit_contact.pack(anchor=NW, padx=5, pady=5)
         self.details_label = LabelFrame(self.contacts_details_frame, text="Détails", font=("Arial", 12))
         self.text_temp = Label(self.details_label, text="Blablabla")
         self.text_temp.pack()
-        self.details_label.pack(anchor=NW)
+        self.details_label.pack(anchor=NW, padx=5, pady=5)
 
         # Packing des frames
         self.compagnie_label.pack()
@@ -100,8 +101,8 @@ class Vue():
         self.recherche_frame.pack(side=RIGHT, anchor=N)
         self.tag_recherche_frame.pack(expand=1, fill=BOTH)
 
-        self.tableau_frame.pack(side=LEFT, anchor=W)
-        self.contacts_details_frame.pack(fill=BOTH, expand=1, side=RIGHT, anchor=NE)
+        self.tableau_frame.pack(side=LEFT, anchor=N)
+        self.contacts_details_frame.pack(side=LEFT, anchor=N)
         self.contacts_frame.pack(expand=1, fill=BOTH)
 
         self.cadre_contacts.pack(fill=BOTH, expand=1, padx=20, pady=20)
@@ -112,8 +113,16 @@ class Vue():
     def afficher_details(self, evt):
         pass
 
+class Modele():
+    def __init__(self,parent):
+        self.parent=parent
+        self.usager=sys.argv[2].split()
+        self.usager = [s.strip("[],\"") for s in self.usager]
+        print(self.usager)
+
 class Controleur():
     def __init__(self):
+        self.modele=Modele(self)
         self.vue=Vue(self)
         self.vue.root.mainloop()
 
