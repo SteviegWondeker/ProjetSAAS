@@ -24,7 +24,7 @@ class Vue():
 
     def creercadres(self):
         self.cadres["principal"]=self.creercadreprincipal(self.parent.modele.usager)
-        self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
+        #self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
