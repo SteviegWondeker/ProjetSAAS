@@ -15,7 +15,7 @@ class Vue():
         self.root=Tk()
         self.cadreapp=Frame(self.root)
         self.canevas=Canvas(self.cadreapp,width=800,height=600)
-        self.canevas.create_text(400,100,anchor=CENTER,text="Bienvenue a SaaS COMMANDE")
+        self.canevas.create_text(400,100,anchor=CENTER,text="Bienvenue a SaaS Communiqué Presse")
         self.canevas.pack()
         self.listeclients=Listbox(self.canevas,width=50,height=10)
         self.canevas.create_window(400,300,anchor=CENTER,window=self.listeclients)
