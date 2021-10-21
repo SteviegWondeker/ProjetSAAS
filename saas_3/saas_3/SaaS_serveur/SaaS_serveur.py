@@ -91,6 +91,20 @@ class Dbclient():   # Base de données du locateur
         self.conn.commit()
         return "test"
 
+    def inscrire_contact(self, prenom, nom, courriel, ville, adresse, telephone, details, notes, tag):
+        sql_nom=("insert into 'contacts_projets' ('prenom', 'nom', 'courriel', 'ville', 'adresse', 'telephone', 'details', 'notes') values (:prenom, :nom, :courriel, :ville, :adresse, :telephone, :details, :notes)")
+        self.curs.execute(sql_nom, {
+                                'prenom':prenom,
+                                'nom': nom,
+                                'courriel': courriel,
+                                'ville': ville,
+                                'adresse': adresse,
+                                'telephone':telephone,
+                                'details':details,
+                                'notes':notes})          
+
+        self.conn.commit()  
+
     def ajouter_role():
         pass
 
@@ -291,6 +305,26 @@ def trouverprojets():
         projets=db.trouverprojets()
         #db=Dbman()
         #projets=db.trouvermembres()
+        db.fermerdb()
+        return Response(json.dumps(projets), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/inscrire_contact', methods=["GET","POST"])
+def inscrire_contact():
+    if request.method=="POST":
+        db=Dbclient()
+        prenom = request.form["prenom"]
+        nom = request.form["nom"]
+        courriel = request.form["courriel"]
+        ville = request.form["ville"]
+        adresse = request.form["adresse"]
+        telephone = request.form["telephone"]
+        details = request.form["details"]
+        notes = request.form["notes"]
+        tag = None      ### À RAJOUTER UN ID DE TAG EVENTUELLEMENT!!!
+        projets=db.inscrire_contact(prenom, nom, courriel, ville, adresse, telephone, details, notes, tag)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
         #return repr(usager)

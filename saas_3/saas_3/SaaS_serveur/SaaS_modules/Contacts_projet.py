@@ -98,7 +98,7 @@ class Vue():
 
             # Frame Contacts détails
         self.contacts_details_frame = Frame(self.contacts_frame)
-        self.btn_new_contact = Button(self.contacts_details_frame, text="Ajouter un contact", command= self.inscrire_contact)
+        self.btn_new_contact = Button(self.contacts_details_frame, text="Ajouter un contact", command= self.ajouter_contact)
         self.btn_edit_contact = Button(self.contacts_details_frame, text="Éditer un contact")
         self.btn_new_contact.pack(anchor=NW, padx=5, pady=5)
         self.btn_edit_contact.pack(anchor=NW, padx=5, pady=5)
@@ -129,13 +129,13 @@ class Vue():
     def creer_cadre_nouveau_contact(self):
         self.cadre_inscrire_contact = Frame(self.cadreapp, width=800, height=400)
 
-        self.contact_titre = Label(self.cadre_inscrire_contact, text="Ajout d'un nouveau membre à votre compagnie", font=("Arial", 18),
+        self.contact_titre = Label(self.cadre_inscrire_contact, text="Ajout d'un nouveau contact à votre projet", font=("Arial", 18),
                                 borderwidth=2, relief=GROOVE)
 
         self.list_entry_contact = []
 
 
-        self.list_role=self.parent.retourner_roles_nom()
+        self.list_tags=self.parent.retourner_roles_nom()
 
         #self.combobox_role = ttk.Combobox(self.cadre_role, values=self.list_role)
 
@@ -143,28 +143,34 @@ class Vue():
         self.contact_prenom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_nom = Label(self.cadre_inscrire_contact, text="Nom:", font=("Arial", 14))
         self.contact_nom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_role = Label(self.cadre_inscrire_contact, text="Rôle:", font=("Arial", 14))
+        self.contact_lab_tags = Label(self.cadre_inscrire_contact, text="Expertise:", font=("Arial", 14))
 
 #        self.membre_role = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
 
-        self.contact_role = ttk.Combobox(self.cadre_inscrire_contact, values=self.list_role)
+        self.contact_tags = ttk.Combobox(self.cadre_inscrire_contact, values=self.list_tags)
 
-        self.contact_lab_id = Label(self.cadre_inscrire_contact, text="#ID d'employé:", font=("Arial", 14))
-        self.contact_id = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_ville = Label(self.cadre_inscrire_contact, text="Ville:", font=("Arial", 14))
+        self.contact_ville = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_adresse = Label(self.cadre_inscrire_contact, text="Adresse:", font=("Arial", 14))
+        self.contact_adresse = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_courriel = Label(self.cadre_inscrire_contact, text="Courriel:", font=("Arial", 14))
         self.contact_courriel = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_telephone = Label(self.cadre_inscrire_contact, text="# téléphone:", font=("Arial", 14))
+        self.contact_lab_telephone = Label(self.cadre_inscrire_contact, text="Téléphone:", font=("Arial", 14))
         self.contact_telephone = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_mdp = Label(self.cadre_inscrire_contact, text="Mot de passe (par défaut):", font=("Arial", 14))
-        self.contact_mdp = Label(self.cadre_inscrire_contact, text="AAAaaa111", font=("Arial", 14), width=30)
+        self.contact_lab_details = Label(self.cadre_inscrire_contact, text="Détails:", font=("Arial", 14))
+        self.contact_details = Text(self.cadre_inscrire_contact, font=("Arial", 14), width=30, height=5)
+        self.contact_lab_note = Label(self.cadre_inscrire_contact, text="Notes importantes:", font=("Arial", 14))
+        self.contact_note = Text(self.cadre_inscrire_contact, font=("Arial", 14), width=30, height=2)
 
                 
-        self.list_entry_contact.append(self.contact_prenom)
+        """ self.list_entry_contact.append(self.contact_prenom)
         self.list_entry_contact.append(self.contact_nom)
-        self.list_entry_contact.append(self.contact_id)
         self.list_entry_contact.append(self.contact_courriel)
+        self.list_entry_contact.append(self.contact_ville)
+        self.list_entry_contact.append(self.contact_adresse)
         self.list_entry_contact.append(self.contact_telephone)
-        self.list_entry_contact.append(self.contact_mdp)
+        self.list_entry_contact.append(self.contact_details)
+        self.list_entry_contact.append(self.contact_note) """
 
         self.btn_inscrire_contact = Button(self.cadre_inscrire_contact, text="Inscrire le nouveau contact", font=("Arial", 12), padx=10, pady=10,
                                       command=self.inscrire_contact)
@@ -177,52 +183,65 @@ class Vue():
         self.contact_prenom.grid(row=20, column=20, padx=10, pady=5)
         self.contact_lab_nom.grid(row=30, column=10, sticky=E, padx=5, pady=5)
         self.contact_nom.grid(row=30, column=20, padx=10, pady=5)
-        self.contact_lab_role.grid(row=40, column=10, sticky=E, padx=5, pady=5)
-        self.contact_role.grid(row=40, column=20, padx=10, pady=5)
-        self.contact_lab_id.grid(row=50, column=10, sticky=E, padx=5, pady=5)
-        self.contact_id.grid(row=50, column=20, padx=10, pady=5)
-        self.contact_lab_courriel.grid(row=60, column=10, sticky=E, padx=5, pady=5)
-        self.contact_courriel.grid(row=60, column=20, padx=10, pady=5)
-        self.contact_lab_telephone.grid(row=70, column=10, sticky=E, padx=5, pady=5)
-        self.contact_telephone.grid(row=70, column=20, padx=10, pady=5)
-        self.contact_lab_mdp.grid(row=80, column=10, sticky=E, padx=5, pady=5)
-        self.contact_mdp.grid(row=80, column=20, padx=10, pady=5)
+        self.contact_lab_tags.grid(row=40, column=10, sticky=E, padx=5, pady=5)
+        self.contact_tags.grid(row=40, column=20, padx=10, pady=5)
+        self.contact_lab_courriel.grid(row=50, column=10, sticky=E, padx=5, pady=5)
+        self.contact_courriel.grid(row=50, column=20, padx=10, pady=5)
+        self.contact_lab_ville.grid(row=60, column=10, sticky=E, padx=5, pady=5)
+        self.contact_ville.grid(row=60, column=20, padx=10, pady=5)
+        self.contact_lab_adresse.grid(row=70, column=10, sticky=E, padx=5, pady=5)
+        self.contact_adresse.grid(row=70, column=20, padx=10, pady=5)
+        self.contact_lab_telephone.grid(row=80, column=10, sticky=E, padx=5, pady=5)
+        self.contact_telephone.grid(row=80, column=20, padx=10, pady=5)
+        self.contact_lab_details.grid(row=90, column=10, sticky=NE, padx=5, pady=5)
+        self.contact_details.grid(row=90, column=20, padx=10, pady=5)
+        self.contact_lab_note.grid(row=100, column=10, sticky=NE, padx=5, pady=5)
+        self.contact_note.grid(row=100, column=20, padx=10, pady=5)
 
-        self.btn_inscrire_contact.grid(row=100, column=20, sticky=E, padx=10, pady=10)
+        self.btn_inscrire_contact.grid(row=110, column=20, sticky=E, padx=10, pady=10)
 
-        self.btn_annuler.grid(row=100, column=10, sticky=E, padx=10, pady=10)
+        self.btn_annuler.grid(row=110, column=10, sticky=E, padx=10, pady=10)
 
         return self.cadre_inscrire_contact
-
-    def valider_contact(self):
-        form_valide = True
-
-        self.form=[]
-
-        for i in self.list_entry_contact:
-            if not i.get():
-                self.avertirusager("Invalide","Des champs sont vides, reprendre?")
-                form_valide=False
-                break
-            else:
-                self.form.append(i.get())
-
-        if form_valide == True:
-            if not self.parent.verifier_contact(self.form):
-                self.parent.inscrire_contact(self.form)
 
     def inscrire_contact(self):
         self.valider_contact()
         self.changercadre("principal")
 
+    def valider_contact(self): #n
+        form_valide = True
+
+        self.form=[]
+
+ 
+        self.form.append(self.contact_prenom.get())
+        self.form.append(self.contact_nom.get())
+        self.form.append(self.contact_courriel.get())
+        self.form.append(self.contact_ville.get())
+        self.form.append(self.contact_adresse.get())
+        self.form.append(self.contact_telephone.get())
+        self.form.append(self.contact_details.get("1.0",END))
+        self.form.append(self.contact_note.get("1.0",END))
+
+        if form_valide == True:
+            self.parent.inscrire_contact(self.form)
+
     def retour_cadre_principal(self):
         self.changercadre("principal")
+
+    def ajouter_contact(self):
+        self.changercadre("nouveau_contact")
 
     def recherche_contacts(self):
         pass
 
     def afficher_details(self, evt):
         pass
+
+    def avertirusager(self,titre,message):
+        rep=messagebox.askyesno(titre,message)
+        if not rep:
+            self.root.destroy()
 
 class Modele():
     def __init__(self,parent):
@@ -257,18 +276,20 @@ class Controleur():
         mondict=json.loads(reptext)         
         return (mondict)
 
-    def inscrire_contact(self,form):
-        url = self.urlserveur+"/inscrirecontact"
+    def inscrire_contact(self,form):        # On va devoir éventuellement ajouter l'ID du projet!
+        url = self.urlserveur+"/inscrire_contact"
         identifiant_nom = form[0]+" "+form[1]
-        identifiant_id = form[1]+form[3]
-        params = {"nom_user":identifiant_nom,
-                    "nom_role": form[2],
-                    "id_complet":identifiant_id,
-                    "id":form[3],
-                  "courriel":form[4],
+        params = {"prenom":form[0],
+                    "nom":form[1],
+                  "courriel":form[2],
+                    "ville":form[3],
+                    "adresse":form[4],
                   "telephone":form[5],
-                  "mdp":"AAAaaa111",
-                  "nom_admin":self.vue.loginnom.get()}
+                  "details":form[6],
+                  "notes":form[7],
+                  "tag":self.vue.contact_tags.get()}
+        print(params)
+        pass
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
