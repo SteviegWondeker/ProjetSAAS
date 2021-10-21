@@ -20,11 +20,11 @@ class Vue():
         self.cadreapp.pack()
         self.cadreactif=None
         self.creercadres()
-        self.changercadre("Gestion")
+        self.changercadre("Communiqué")
 
 
     def creercadres(self):
-        self.cadres["Gestion"]=self.creer_cadre_gestion()
+        self.cadres["Communiqué"]=self.creer_cadre_communique()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
@@ -33,25 +33,27 @@ class Vue():
         self.cadreactif=cadre
         self.cadreactif.pack()
 
-    def creer_cadre_gestion(self):
-        self.root.title("Gestion")
-        self.cadre_gestion = Frame(self.cadreapp)
+    def creer_cadre_communique(self):
+        self.root.title("Communique")
+        self.cadre_communique = Frame(self.cadreapp)
         
         self.list_membre= None
 
-        self.label_nom_projet = Label(self.cadre_gestion, text="Nom du projet", font=("Arial", 12))
-        self.list_nom_projet = ttk.Combobox(self.cadre_gestion, values=0)
+        self.label_nom_compagnie = Label(self.cadre_communique, text="Nom de votre compagnie", font=("Arial", 12))
+        self.list_nom_compagnie = ttk.Combobox(self.cadre_communique, values=0)
 
-        self.label_choix_existant = Label(self.cadre_gestion, text="choisir un role existant : ", font=("Arial", 12))
+        # self.label_choix_existant = Label(self.cadre_communique, text="choisir un role existant : ", font=("Arial", 12))
 
-        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_gestion)
-        self.tableau = ttk.Treeview(self.cadre_gestion, columns=('modules'))
-        self.btn_inscrire_modules = Button(self.cadre_gestion, text="Rafrachir", font=("Arial", 12), padx=10, pady=10, command=self.refresh)
+        # self.comboBox_choix_du_role = ttk.Combobox(self.cadre_communique)
+
         
-        self.btn_annuler = Button(self.cadre_gestion, text="Annuler", font=("Arial", 12), padx=10, pady=10)
-        self.btn_retour = Button(self.cadre_gestion, text="Valider", font=("Arial", 12), padx=10, pady=10)
+        self.tableau = ttk.Treeview(self.cadre_communique, columns=('modules'))
+        self.btn_inscrire_modules = Button(self.cadre_communique, text="Rafrachir", font=("Arial", 12), padx=10, pady=10, command=self.refresh)
+        
+        self.btn_annuler = Button(self.cadre_communique, text="Annuler", font=("Arial", 12), padx=10, pady=10)
+        self.btn_retour = Button(self.cadre_communique, text="Valider", font=("Arial", 12), padx=10, pady=10)
 
-        self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
+        self.listbox = Listbox(self.cadre_communique, font=("Arial", 16), selectmode="multiple")
 
 
 
@@ -66,11 +68,11 @@ class Vue():
         self.btn_annuler.grid               (row=5, column=1)
         self.btn_retour.grid                (row=5, column=2, sticky='w')
         
-        return self.cadre_gestion
+        return self.cadre_communique
 
     def refresh(self):
         self.list_membre= self.list_nom_projet.get()
-        self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
+        self.listbox = Listbox(self.cadre_communique, font=("Arial", 16), selectmode="multiple")
         
         self.listbox.grid (row=3, column=1, columnspan='10')
 
