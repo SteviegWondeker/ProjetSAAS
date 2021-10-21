@@ -24,7 +24,7 @@ class Vue():
 
     def creercadres(self):
         self.cadres["principal"]=self.creercadreprincipal(self.parent.modele.usager)
-        #self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
+        self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
@@ -36,9 +36,10 @@ class Vue():
 
     def creercadreprincipal(self, usager):
         self.usager=usager
+        print(self.usager)
         self.cadre_contacts=Frame(self.cadreapp)
         # Titre
-        self.compagnie_label = Label(self.cadre_contacts, text=self.usager[1],font=("Arial",18),
+        self.compagnie_label = Label(self.cadre_contacts, text=self.usager[2],font=("Arial",18),    # ATTENTION!!! Usager n'est pas le même si on roule le module depuis le fichier client ou depuis VS Code
                               borderwidth=2, relief=GROOVE)
 
         # Frame d'entête -> Contacts - Nom du projet
@@ -97,7 +98,7 @@ class Vue():
 
             # Frame Contacts détails
         self.contacts_details_frame = Frame(self.contacts_frame)
-        self.btn_new_contact = Button(self.contacts_details_frame, text="Ajouter un contact")
+        self.btn_new_contact = Button(self.contacts_details_frame, text="Ajouter un contact", command= self.inscrire_contact)
         self.btn_edit_contact = Button(self.contacts_details_frame, text="Éditer un contact")
         self.btn_new_contact.pack(anchor=NW, padx=5, pady=5)
         self.btn_edit_contact.pack(anchor=NW, padx=5, pady=5)
@@ -158,12 +159,12 @@ class Vue():
         self.contact_mdp = Label(self.cadre_inscrire_contact, text="AAAaaa111", font=("Arial", 14), width=30)
 
                 
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
+        self.list_entry_contact.append(self.contact_prenom)
+        self.list_entry_contact.append(self.contact_nom)
+        self.list_entry_contact.append(self.contact_id)
+        self.list_entry_contact.append(self.contact_courriel)
+        self.list_entry_contact.append(self.contact_telephone)
+        self.list_entry_contact.append(self.contact_mdp)
 
         self.btn_inscrire_contact = Button(self.cadre_inscrire_contact, text="Inscrire le nouveau contact", font=("Arial", 12), padx=10, pady=10,
                                       command=self.inscrire_contact)
@@ -193,6 +194,30 @@ class Vue():
 
         return self.cadre_inscrire_contact
 
+    def valider_contact(self):
+        form_valide = True
+
+        self.form=[]
+
+        for i in self.list_entry_contact:
+            if not i.get():
+                self.avertirusager("Invalide","Des champs sont vides, reprendre?")
+                form_valide=False
+                break
+            else:
+                self.form.append(i.get())
+
+        if form_valide == True:
+            if not self.parent.verifier_contact(self.form):
+                self.parent.inscrire_contact(self.form)
+
+    def inscrire_contact(self):
+        self.valider_contact()
+        self.changercadre("principal")
+
+    def retour_cadre_principal(self):
+        self.changercadre("principal")
+
     def recherche_contacts(self):
         pass
 
@@ -211,9 +236,55 @@ class Modele():
 
 class Controleur():
     def __init__(self):
+        self.urlserveur="http://127.0.0.1:5000"
         self.modele=Modele(self)
         self.vue=Vue(self)
         self.vue.root.mainloop()
+
+    # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
+    def appelserveur(self,url,params):
+        query_string = urllib.parse.urlencode( params )
+        data = query_string.encode( "ascii" )
+        url = url + "?" + query_string
+        rep=urllib.request.urlopen(url, data)
+        reptext=rep.read()
+        return reptext
+
+    def retourner_roles_nom(self):
+        url = self.urlserveur+"/trouver_roles_nom"
+        params = {}
+        reptext=self.appelserveur(url,params)
+        mondict=json.loads(reptext)         
+        return (mondict)
+
+    def inscrire_contact(self,form):
+        url = self.urlserveur+"/inscrirecontact"
+        identifiant_nom = form[0]+" "+form[1]
+        identifiant_id = form[1]+form[3]
+        params = {"nom_user":identifiant_nom,
+                    "nom_role": form[2],
+                    "id_complet":identifiant_id,
+                    "id":form[3],
+                  "courriel":form[4],
+                  "telephone":form[5],
+                  "mdp":"AAAaaa111",
+                  "nom_admin":self.vue.loginnom.get()}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        print(mondict)
+
+    def verifier_contact(self,form):
+        url = self.urlserveur+"/verifiercontact"
+        params = {"courriel":form[4]}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        if len(mondict)>0:
+            self.vue.avertirusager("Compte existe déjà","Reprendre?")
+            return True
+        else:
+            return False
 
 if __name__ == '__main__':
     c=Controleur()
