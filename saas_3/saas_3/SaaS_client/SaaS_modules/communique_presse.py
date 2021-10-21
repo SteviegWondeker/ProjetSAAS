@@ -19,8 +19,8 @@ class Vue():
         self.canevas = Canvas(self.cadreapp,width=800,heigh=600)
         self.canevas.create_text(400,100,anchor= CENTER,text="Bienvenu a SaaS Communiqué Presse")
         self.canevas.pack()
-        self.canevas.create_window(400,300,anchor=CENTER)
-        self.canevas.create_window(400,500,anchor=CENTER)
+        self.canevas.create_window(400,300,anchor=CENTER,text="section1")
+        self.canevas.create_window(400,500,anchor=CENTER,text="section2")
         self.cadreapp.pack()
 
 class Modele():
