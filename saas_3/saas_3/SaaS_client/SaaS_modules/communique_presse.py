@@ -15,7 +15,9 @@ class Vue():
     def __init__(self,parent):
         self.parent=parent
         self.root=Tk()
+        self.root.minsize(width=600, height=400)
         self.cadreapp=Frame(self.root)
+        self.cadreapp.pack(expand=1, fill=BOTH)
         self.cadres={}
         self.cadreapp.pack()
         self.cadreactif=None
@@ -24,7 +26,7 @@ class Vue():
 
 
     def creercadres(self):
-        self.cadres[""]=self.creer_cadre_communique()
+        self.cadres["Communiqué"]=self.creer_cadre_communique()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
@@ -33,14 +35,14 @@ class Vue():
         self.cadreactif=cadre
         self.cadreactif.pack()
 
-    def creer_cadre_gestion(self):
+    def creer_cadre_communique(self):
         self.root.title("Communiqué")
         self.cadre_communique = Frame(self.cadreapp)
         
         self.list_membre= None
 
-        # self.label_nom_compagnie = Label(self.cadre_ge, text="Nom de la compagnie", font=("Arial", 12))
-        # self.list_nom_compagnie = ttk.Combobox(self.cadre_communique, values=0)
+        self.label_nom_compagnie = Label(self.cadre_ge, text="Nom de la compagnie", font=("Arial", 12))
+        self.list_nom_compagnie = ttk.Combobox(self.cadre_communique, values=0)
 
         self.label_choix_compagnie  = Label(self.cadre_communique, text="choisir une compagnie  : ", font=("Arial", 12))
 
@@ -84,9 +86,15 @@ class Vue():
 class Modele():
     def __init__(self,parent):
         self.parent=parent
-        print(sys.argv)
-        self.usager=sys.argv[2].split()
-        self.inscrireusager(self.usager)
+           if len(sys.argv) > 1:
+            self.usager=sys.argv[2].split()
+            self.usager = [s.strip("[],\"") for s in self.usager]
+        else:
+            self.usager = ["jmd", "Cineclub", "1"]
+        print(self.usager)
+        # print(sys.argv)
+        # self.usager=sys.argv[2].split()
+        # self.inscrireusager(self.usager)
 
     def inscrireusager(self,dictinfo):
         self.nom=dictinfo[0]
@@ -102,32 +110,32 @@ class Controleur:
         self.vue.root.mainloop()
 
 
-    def trouver_projets_par_compagnie(self):
-        url = self.urlserveur+"/trouver_projet_par_compagnie"
-        params ={"id": self.modele.compagnie["id"]}
-        #params = {self.modele.usager[1]}
-        reptext=self.appelserveur(url,params)
+    # def trouver_projets_par_compagnie(self):
+    #     url = self.urlserveur+"/trouver_projet_par_compagnie"
+    #     params ={"id": self.modele.compagnie["id"]}
+    #     #params = {self.modele.usager[1]}
+    #     reptext=self.appelserveur(url,params)
 
-        mondict=json.loads(reptext)
-        return mondict
+    #     mondict=json.loads(reptext)
+    #     return mondict
 
-    def trouvermembres(self, comp):
-        url = self.urlserveur+"/trouver_membres_par_compagnie"
-        params = {"comp": comp}
-        reptext=self.appelserveur(url, params)
+    # def trouvermembres(self, comp):
+    #     url = self.urlserveur+"/trouver_membres_par_compagnie"
+    #     params = {"comp": comp}
+    #     reptext=self.appelserveur(url, params)
 
-        mondict=json.loads(reptext)
-        return mondict
+    #     mondict=json.loads(reptext)
+    #     return mondict
 
 
-    # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
-    def appelserveur(self,url,params):
-        query_string = urllib.parse.urlencode( params )
-        data = query_string.encode( "ascii" )
-        url = url + "?" + query_string
-        rep=urllib.request.urlopen(url, data)
-        reptext=rep.read()
-        return reptext
+    # # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
+    # def appelserveur(self,url,params):
+    #     query_string = urllib.parse.urlencode( params )
+    #     data = query_string.encode( "ascii" )
+    #     url = url + "?" + query_string
+    #     rep=urllib.request.urlopen(url, data)
+    #     reptext=rep.read()
+    #     return reptext
 
 if __name__ == '__main__':
     c=Controleur()
