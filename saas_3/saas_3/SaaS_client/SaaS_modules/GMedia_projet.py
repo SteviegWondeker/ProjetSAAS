@@ -9,6 +9,7 @@ class Vue():
         self.widgetsdesaisie={}
         self.cadregestion()
         
+        
     def cadregestion(self):
         self.cadreinfo=Frame(self.root)
         self.cadreoperateurs=Frame(self.root)

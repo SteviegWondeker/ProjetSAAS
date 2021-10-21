@@ -22,6 +22,8 @@ class Dbclient():   # Base de données du locateur
         self.curs.execute(sqlnom)
         info=self.curs.fetchall()
         return info
+
+    #def trouver_projet_infos(self):
     
     def trouverclients(self):
         sqlnom=("select compagnie, nom, courriel from 'client'")
@@ -282,7 +284,15 @@ def identifierusager():
     else:
         return repr("pas ok")
 
-
+@app.route('/trouver_projet_infos', methods=["GET","POST"])
+def trouver_projet_infos():
+    if request.method=="POST":
+        db=Dbclient()
+        projets=db.trouver_projet_infos()
+        db.fermerdb()
+        return Response(json.dumps(projets), mimetype='application/json')
+    else:
+        return repr("pas ok")
 
 @app.route('/trouverprojets', methods=["GET","POST"])
 def trouverprojets():

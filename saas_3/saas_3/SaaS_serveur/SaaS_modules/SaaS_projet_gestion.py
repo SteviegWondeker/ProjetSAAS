@@ -22,6 +22,49 @@ class Vue():
         self.creercadres()
         self.changercadre("Gestion")
 
+    def creertableau(self):
+        f = Frame(self.cadre_gestion)
+        f.pack(side=TOP, fill=BOTH, expand=Y)
+
+        self.tableau = ttk.Treeview(show = 'headings')
+
+        self.tableau.bind("<Double-1>",self.selectionner_projet(self.tableau.get_children))
+
+        ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
+        xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
+        self.tableau['yscroll'] = ysb.set
+        self.tableau['xscroll'] = xsb.set
+
+        # add tableau and scrollbars to frame
+        self.tableau.grid(in_=f, row=0, column=0, sticky=NSEW)
+        ysb.grid(in_=f, row=0, column=1, sticky=NS)
+        xsb.grid(in_=f, row=1, column=0, sticky=EW)
+
+        # set frame resize priorities
+        f.rowconfigure(0, weight=1)
+        f.columnconfigure(0, weight=1)
+    
+    def ecriretableau(self):
+        for i in self.tableau.get_children():
+            self.tableau.delete(i)
+        for item in self.data:
+            self.tableau.insert('', 'end', values=item)
+
+    def integretableau(self,listemembre,entete):
+        self.data=listemembre
+        self.colonnestableau = entete
+
+        self.tableau.config(columns=self.colonnestableau)
+        n=1
+        for i in self.colonnestableau:
+            no="#"+str(n)
+            self.tableau.heading(no, text=i)
+            n+=1
+
+        self.ecriretableau()
+
+    def form_modifier_projet(self):
+        self.changercadre("modifier_projet")
 
     def creercadres(self):
         self.cadres["Gestion"]=self.creer_cadre_gestion()
@@ -36,36 +79,27 @@ class Vue():
     def creer_cadre_gestion(self):
         self.root.title("Gestion")
         self.cadre_gestion = Frame(self.cadreapp)
-        
-        self.list_membre= None
 
-        self.label_nom_projet = Label(self.cadre_gestion, text="Nom du projet", font=("Arial", 12))
-        self.list_nom_projet = ttk.Combobox(self.cadre_gestion, values=0)
+        self.creertableau()
+        listeprojets=self.parent.trouverprojets()
+        entete=["Nom du projet","date de début","date de fin"]
+        self.integretableau(listeprojets,entete)
 
-        self.label_choix_existant = Label(self.cadre_gestion, text="choisir un role existant : ", font=("Arial", 12))
+        self.btn_modifier_projet = Button(self.cadre_gestion,text="Modifier projet", font=("Arial", 12),
+                                         padx=10, pady=10, command=self.form_modifier_projet)
 
-        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_gestion)
-        self.tableau = ttk.Treeview(self.cadre_gestion, columns=('modules'))
-        self.btn_inscrire_modules = Button(self.cadre_gestion, text="Rafrachir", font=("Arial", 12), padx=10, pady=10, command=self.refresh)
-        
-        self.btn_annuler = Button(self.cadre_gestion, text="Annuler", font=("Arial", 12), padx=10, pady=10)
-        self.btn_retour = Button(self.cadre_gestion, text="Valider", font=("Arial", 12), padx=10, pady=10)
+        self.btn_supprimer_projet = Button(self.cadre_gestion,text="Supprimer projet", font=("Arial", 12),
+                                         padx=20, pady=10, command=self.supprimer_projet)
 
-        self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
+        infos_generals=["Nom du projet","Date de début","Date de fin","Responsable","Budget"]
+        info_tâche=["Nom de tâche","Description","Deadline","Responsable"]
 
+        self.creertableau()
+        self.integretableau(self.afficher_infos_projet(self.selection),infos_generals)
 
+        self.btn_modifier_projet.pack()
+        self.btn_supprimer_projet.pack()
 
-        self.label_nom_projet.grid        (row=1, column=1, sticky='w')
-        self.list_nom_projet.grid        (row=1, column=2, sticky='w')
-
-        self.label_choix_existant.grid      (row=2, column=1)
-        self.comboBox_choix_du_role.grid    (row=2, column=2)
-        self.btn_inscrire_modules.grid      (row=2, column=3)
-        self.listbox.grid (row=3, column=1, columnspan='10')
-        
-        self.btn_annuler.grid               (row=5, column=1)
-        self.btn_retour.grid                (row=5, column=2, sticky='w')
-        
         return self.cadre_gestion
 
     def refresh(self):
@@ -79,6 +113,19 @@ class Vue():
         entete="modules disponibles"
         for items in self.listemodules:
             self.listbox.insert(END, items)
+
+    def supprimer_projet(self):
+        rep=messagebox.askyesno("Supression","Voulez-vous confirmer la supression du projet ?")
+        if not rep:
+            self.root.destroy()
+    
+    def afficher_infos_projet(self,projet):
+        infos=self.parent.trouver_projet_infos
+    
+    def selectionner_projet(self,projet):
+        self.selection = projet
+        print(self.selection)
+
 
 
 class Modele():
@@ -118,7 +165,22 @@ class Controleur:
 
         mondict=json.loads(reptext)
         return mondict
+    
+    def trouver_projet_infos(self, comp):
+        url = self.urlserveur+"/trouver_projet_infos"
+        params = {"comp": comp}
+        reptext=self.appelserveur(url, params)
 
+        mondict=json.loads(reptext)
+        return mondict
+
+    def trouverprojets(self):
+        url = self.urlserveur+"/trouverprojets"
+        params = {}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        return mondict
 
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
     def appelserveur(self,url,params):
