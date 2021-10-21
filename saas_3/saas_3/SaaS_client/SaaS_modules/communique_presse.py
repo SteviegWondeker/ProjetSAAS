@@ -15,127 +15,53 @@ class Vue():
     def __init__(self,parent):
         self.parent=parent
         self.root=Tk()
-        self.root.minsize(width=600, height=400)
         self.cadreapp=Frame(self.root)
-        self.cadreapp.pack(expand=1, fill=BOTH)
-        self.cadres={}
-        self.cadreapp.pack()
-        self.cadreactif=None
-        self.creercadres()
-        self.changercadre("Communiqué")
-
-
-    def creercadres(self):
-        self.cadres["Communiqué"]=self.creer_cadre_communique()
-
-    def changercadre(self,nomcadre):
-        cadre=self.cadres[nomcadre]
-        if self.cadreactif:
-            self.cadreactif.pack_forget()
-        self.cadreactif=cadre
-        self.cadreactif.pack()
-
-    def creer_cadre_communique(self):
-        self.root.title("Communiqué")
-        self.cadre_communique = Frame(self.cadreapp)
+        self.canevas = Canvas(self.cadreapp,width=800,heigh=600)
+        self.canevas.create_text(400,100,anchor= CENTER,text="Bienvenu a SaaS Communiqué Presse")
+        self.canevas.pack()
         
-        self.list_membre= None
-
-        self.label_nom_compagnie = Label(self.cadre_ge, text="Nom de la compagnie", font=("Arial", 12))
-        self.list_nom_compagnie = ttk.Combobox(self.cadre_communique, values=0)
-
-        self.label_choix_compagnie  = Label(self.cadre_communique, text="choisir une compagnie  : ", font=("Arial", 12))
-
-        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_gestion)
-        self.tableau = ttk.Treeview(self.cadre_gestion, columns=('modules'))
-        self.btn_inscrire_modules = Button(self.cadre_gestion, text="Rafrachir", font=("Arial", 12), padx=10, pady=10, command=self.refresh)
-        
-        self.btn_annuler = Button(self.cadre_gestion, text="Annuler", font=("Arial", 12), padx=10, pady=10)
-        self.btn_retour = Button(self.cadre_gestion, text="Valider", font=("Arial", 12), padx=10, pady=10)
-
-        self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
 
 
 
-        self.label_nom_projet.grid        (row=1, column=1, sticky='w')
-        self.list_nom_projet.grid        (row=1, column=2, sticky='w')
-
-        self.label_choix_existant.grid      (row=2, column=1)
-        self.comboBox_choix_du_role.grid    (row=2, column=2)
-        self.btn_inscrire_modules.grid      (row=2, column=3)
-        self.listbox.grid (row=3, column=1, columnspan='10')
-        
-        self.btn_annuler.grid               (row=5, column=1)
-        self.btn_retour.grid                (row=5, column=2, sticky='w')
-        
-        return self.cadre_gestion
-
-    def refresh(self):
-        self.list_membre= self.list_nom_projet.get()
-        self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
-        
-        self.listbox.grid (row=3, column=1, columnspan='10')
-
-        self.listemodules=self.parent.trouvermembres("Cineclub")
-
-        entete="modules disponibles"
-        for items in self.listemodules:
-            self.listbox.insert(END, items)
 
 
 class Modele():
-    def __init__(self,parent):
+     def __init__(self,parent):
         self.parent=parent
-           if len(sys.argv) > 1:
-            self.usager=sys.argv[2].split()
-            self.usager = [s.strip("[],\"") for s in self.usager]
-        else:
-            self.usager = ["jmd", "Cineclub", "1"]
-        print(self.usager)
-        # print(sys.argv)
-        # self.usager=sys.argv[2].split()
-        # self.inscrireusager(self.usager)
+        self.nom = nom
+        self.compagnie = compagnie
 
-    def inscrireusager(self,dictinfo):
-        self.nom=dictinfo[0]
-        self.compagnie={"nom":dictinfo[2],
-                        "id":dictinfo[4]}
 
 class Controleur:
     def __init__(self):
-        self.urlserveur="http://127.0.0.1:5000"
-        #self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
-        self.modele=Modele(self)
         self.vue=Vue(self)
+        print(sys.argv)
+        self.urlserveur=sys.argv[1]
+        usager=json.loads(sys.args[2])
+        self.modele=Modele(self,usager[0],usager[1])
         self.vue.root.mainloop()
 
+ 
+    def requeteserveur(self,fonc):
+        leurl=self.urlserveur+"/requeteserveur"
+        params = {"fonction":fonc}
+        reptext=self.appelserveur(leurl,params)
+        rep=json.loads(reptext)
+        return rep
 
-    # def trouver_projets_par_compagnie(self):
-    #     url = self.urlserveur+"/trouver_projet_par_compagnie"
-    #     params ={"id": self.modele.compagnie["id"]}
-    #     #params = {self.modele.usager[1]}
-    #     reptext=self.appelserveur(url,params)
-
-    #     mondict=json.loads(reptext)
-    #     return mondict
-
-    # def trouvermembres(self, comp):
-    #     url = self.urlserveur+"/trouver_membres_par_compagnie"
-    #     params = {"comp": comp}
-    #     reptext=self.appelserveur(url, params)
-
-    #     mondict=json.loads(reptext)
-    #     return mondict
+# fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
+    def appelserveur(self,url,params):
+        query_string = urllib.parse.urlencode( params )
+        data = query_string.encode( "ascii" )
+        url = url + "?" + query_string 
+        rep=urllib.request.urlopen(url , data)
+        reptext=rep.read()
+        return reptext
 
 
-    # # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
-    # def appelserveur(self,url,params):
-    #     query_string = urllib.parse.urlencode( params )
-    #     data = query_string.encode( "ascii" )
-    #     url = url + "?" + query_string
-    #     rep=urllib.request.urlopen(url, data)
-    #     reptext=rep.read()
-    #     return reptext
+
+
+
 
 if __name__ == '__main__':
     c=Controleur()
