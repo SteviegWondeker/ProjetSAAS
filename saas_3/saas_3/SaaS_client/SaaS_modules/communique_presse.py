@@ -19,11 +19,11 @@ class Vue():
         self.cadres={}
         self.cadreactif=None
         self.creercadres()
-        self.changercadre("principal")
+        self.changercadre("communique")
 
 
     def creercadres(self):
-        self.cadres["principal"]=self.creercadreprincipal(self.parent.modele.usager)
+        self.cadres["communique"]=self.creercadreprincipal(self.parent.modele.usager)
         #self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
 
     def changercadre(self,nomcadre):
@@ -36,28 +36,30 @@ class Vue():
 
     def creercadreprincipal(self, usager):
         self.usager=usager
-        self.cadre_contacts=Frame(self.cadreapp)
+        self.cadre_communique=Frame(self.cadreapp)
         # Titre
-        self.compagnie_label = Label(self.cadre_contacts, text=self.usager[1],font=("Arial",18),
+        self.compagnie_label = Label(self.cadre_communique, text=self.usager[1],font=("Arial",18),
                               borderwidth=2, relief=GROOVE)
 
         # Frame d'entête -> Contacts - Nom du projet
-        self.entete = Frame(self.cadre_contacts)
-        self.nom_module_label = Label(self.entete, text="Contact - ",font=("Arial",18),
+        self.entete = Frame(self.cadre_communique)
+        self.nom_module_label = Label(self.entete, text="Nom de la compagnie ",font=("Arial",18),
                               borderwidth=2)
-        self.nom_projet_label = Label(self.entete, text="Nom du Projet",font=("Arial",16),
-                              borderwidth=2)
+        # self.nom_projet_label = Label(self.entete, text="Nom du Projet",font=("Arial",16),
+        #                       borderwidth=2)
 
-        self.tag_recherche_frame = Frame(self.cadre_contacts)
+        self.tag_recherche_frame = Frame(self.cadre_communique)
         # Section Tags
         self.tag_frame = LabelFrame(self.tag_recherche_frame, text="Tags", font=("Arial", 16))
-        self.tag1 = Checkbutton(self.tag_frame, text="Tag1")
-        self.tag2 = Checkbutton(self.tag_frame, text="Tag2")
-        self.tag3 = Checkbutton(self.tag_frame, text="Tag3")
-        self.tag4 = Checkbutton(self.tag_frame, text="Tag4")
-        self.tag5 = Checkbutton(self.tag_frame, text="Tag5")
-        self.tag6 = Checkbutton(self.tag_frame, text="Tag6")
-        self.ajout_tag_btn = Button(self.tag_frame, text="Ajouter un tag")
+        self.canevas=Canvas(self.cadreapp,width=800,height=600)
+        self.compagnie_label = Listbox(self.canevas,wisth=50,height=10)
+        # self.tag1 = Checkbutton(self.tag_frame, text="Tag1")
+        # self.tag2 = Checkbutton(self.tag_frame, text="Tag2")
+        # self.tag3 = Checkbutton(self.tag_frame, text="Tag3")
+        # self.tag4 = Checkbutton(self.tag_frame, text="Tag4")
+        # self.tag5 = Checkbutton(self.tag_frame, text="Tag5")
+        # self.tag6 = Checkbutton(self.tag_frame, text="Tag6")
+        self.ajout_nom_btn = Button(self.canevas, text="Ajouter nom")
         
         self.tag1.grid(row=0, column=0)
         self.tag2.grid(row=0, column=1)
@@ -76,7 +78,7 @@ class Vue():
         self.btn_search.pack(padx=20, pady = 10, anchor=E)
 
         # Section Contacts
-        self.contacts_frame = Frame(self.cadre_contacts)
+        self.contacts_frame = Frame(self.cadre_communique)
             # Tableau Contacts
         self.tableau_frame = Frame(self.contacts_frame)
         self.tableau = Frame(self.tableau_frame)
@@ -121,9 +123,9 @@ class Vue():
         self.contacts_details_frame.pack(side=LEFT, anchor=N)
         self.contacts_frame.pack(expand=1, fill=BOTH)
 
-        self.cadre_contacts.pack(fill=BOTH, expand=1, padx=20, pady=20)
+        self.cadre_communique.pack(fill=BOTH, expand=1, padx=20, pady=20)
 
-        return self.cadre_contacts
+        return self.cadre_communique
 
     def creer_cadre_nouveau_contact(self):
         self.cadre_inscrire_contact = Frame(self.cadreapp, width=800, height=400)

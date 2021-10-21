@@ -1,30 +1,30 @@
 ## -*- Encoding: UTF-8 -*-
 import urllib.request
-import urllib.parse 
-import json 
+import urllib.parse
+import json
 
 from tkinter import *
 from tkinter.simpledialog import *
 from tkinter import ttk
 
 import sys
+from subprocess import Popen
+
 
 class Vue():
     def __init__(self,parent):
         self.parent=parent
         self.root=Tk()
-        self.root.minsize(width=600, height=400)
         self.cadreapp=Frame(self.root)
-        self.cadreapp.pack(expand=1, fill=BOTH)
         self.cadres={}
+        self.cadreapp.pack()
         self.cadreactif=None
         self.creercadres()
-        self.changercadre("communique")
+        self.changercadre("Gestion")
 
 
     def creercadres(self):
-        self.cadres["communique"]=self.creercadreprincipal(self.parent.modele.usager)
-        #self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
+        self.cadres["Gestion"]=self.creer_cadre_gestion()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
@@ -33,189 +33,101 @@ class Vue():
         self.cadreactif=cadre
         self.cadreactif.pack()
 
-
-    def creercadreprincipal(self, usager):
-        self.usager=usager
-        self.cadre_communique=Frame(self.cadreapp)
-        # Titre
-        self.compagnie_label = Label(self.cadre_communique, text=self.usager[1],font=("Arial",18),
-                              borderwidth=2, relief=GROOVE)
-
-        # Frame d'entête -> Contacts - Nom du projet
-        self.entete = Frame(self.cadre_communique)
-        self.nom_module_label = Label(self.entete, text="Nom de la compagnie ",font=("Arial",18),
-                              borderwidth=2)
-        # self.nom_projet_label = Label(self.entete, text="Nom du Projet",font=("Arial",16),
-        #                       borderwidth=2)
-
-        self.tag_recherche_frame = Frame(self.cadre_communique)
-        # Section Tags
-        self.tag_frame = LabelFrame(self.tag_recherche_frame, text="Tags", font=("Arial", 16))
-        self.canevas=Canvas(self.cadreapp,width=800,height=600)
-        self.compagnie_label = Listbox(self.canevas,wisth=50,height=10)
-        # self.tag1 = Checkbutton(self.tag_frame, text="Tag1")
-        # self.tag2 = Checkbutton(self.tag_frame, text="Tag2")
-        # self.tag3 = Checkbutton(self.tag_frame, text="Tag3")
-        # self.tag4 = Checkbutton(self.tag_frame, text="Tag4")
-        # self.tag5 = Checkbutton(self.tag_frame, text="Tag5")
-        # self.tag6 = Checkbutton(self.tag_frame, text="Tag6")
-        self.ajout_nom_btn = Button(self.canevas, text="Ajouter nom")
+    def creer_cadre_gestion(self):
+        self.root.title("Gestion")
+        self.cadre_gestion = Frame(self.cadreapp)
         
-        self.tag1.grid(row=0, column=0)
-        self.tag2.grid(row=0, column=1)
-        self.tag3.grid(row=0, column=2)
-        self.tag4.grid(row=1, column=0)
-        self.tag5.grid(row=1, column=1)
-        self.tag6.grid(row=1, column=2)
-        self.ajout_tag_btn.grid(row=2, column=0)
+        self.list_membre= None
 
-        # Section Recherche
-        self.recherche_frame = LabelFrame(self.tag_recherche_frame, text="Recherche", font=("Arial", 16))
-        self.search_box = Entry(self.recherche_frame, width=15, font=("Arial", 14))
-        self.btn_search = Button(self.recherche_frame, text="Rechercher", command=self.recherche_contacts)
+        self.label_nom_projet = Label(self.cadre_gestion, text="Nom du projet", font=("Arial", 12))
+        self.list_nom_projet = ttk.Combobox(self.cadre_gestion, values=0)
 
-        self.search_box.pack(padx=20)
-        self.btn_search.pack(padx=20, pady = 10, anchor=E)
+        self.label_choix_existant = Label(self.cadre_gestion, text="choisir un role existant : ", font=("Arial", 12))
 
-        # Section Contacts
-        self.contacts_frame = Frame(self.cadre_communique)
-            # Tableau Contacts
-        self.tableau_frame = Frame(self.contacts_frame)
-        self.tableau = Frame(self.tableau_frame)
-        self.tableau = ttk.Treeview(show = 'headings')
-        self.tableau.bind("<Button-1>",self.afficher_details)
+        self.comboBox_choix_du_role = ttk.Combobox(self.cadre_gestion)
+        self.tableau = ttk.Treeview(self.cadre_gestion, columns=('modules'))
+        self.btn_inscrire_modules = Button(self.cadre_gestion, text="Rafrachir", font=("Arial", 12), padx=10, pady=10, command=self.refresh)
+        
+        self.btn_annuler = Button(self.cadre_gestion, text="Annuler", font=("Arial", 12), padx=10, pady=10)
+        self.btn_retour = Button(self.cadre_gestion, text="Valider", font=("Arial", 12), padx=10, pady=10)
 
-        ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
-        xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
-        self.tableau['yscroll'] = ysb.set
-        self.tableau['xscroll'] = xsb.set
-
-        self.tableau.grid(in_=self.tableau_frame, row=0, column=0, sticky=NSEW)
-        ysb.grid(in_=self.tableau_frame, row=0, column=1, sticky=NS)
-        xsb.grid(in_=self.tableau_frame, row=1, column=0, sticky=EW)
-
-        self.tableau.rowconfigure(0, weight=1)
-        self.tableau.columnconfigure(0, weight=1)
-
-            # Frame Contacts détails
-        self.contacts_details_frame = Frame(self.contacts_frame)
-        self.btn_new_contact = Button(self.contacts_details_frame, text="Ajouter un contact")
-        self.btn_edit_contact = Button(self.contacts_details_frame, text="Éditer un contact")
-        self.btn_new_contact.pack(anchor=NW, padx=5, pady=5)
-        self.btn_edit_contact.pack(anchor=NW, padx=5, pady=5)
-        self.details_label = LabelFrame(self.contacts_details_frame, text="Détails", font=("Arial", 12))
-        self.text_temp = Label(self.details_label, text="Blablabla")
-        self.text_temp.pack()
-        self.details_label.pack(anchor=NW, padx=5, pady=5)
-
-        # Packing des frames
-        self.compagnie_label.pack()
-
-        self.nom_module_label.grid(row=0, column=0)
-        self.nom_projet_label.grid(row=0, column=1)
-        self.entete.pack(fill=BOTH)
-
-        self.tag_frame.pack(side=LEFT, anchor=N)
-        self.recherche_frame.pack(side=RIGHT, anchor=N)
-        self.tag_recherche_frame.pack(expand=1, fill=BOTH)
-
-        self.tableau_frame.pack(side=LEFT, anchor=N)
-        self.contacts_details_frame.pack(side=LEFT, anchor=N)
-        self.contacts_frame.pack(expand=1, fill=BOTH)
-
-        self.cadre_communique.pack(fill=BOTH, expand=1, padx=20, pady=20)
-
-        return self.cadre_communique
-
-    def creer_cadre_nouveau_contact(self):
-        self.cadre_inscrire_contact = Frame(self.cadreapp, width=800, height=400)
-
-        self.contact_titre = Label(self.cadre_inscrire_contact, text="Ajout d'un nouveau membre à votre compagnie", font=("Arial", 18),
-                                borderwidth=2, relief=GROOVE)
-
-        self.list_entry_contact = []
+        self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
 
 
-        self.list_role=self.parent.retourner_roles_nom()
 
-        #self.combobox_role = ttk.Combobox(self.cadre_role, values=self.list_role)
+        self.label_nom_projet.grid        (row=1, column=1, sticky='w')
+        self.list_nom_projet.grid        (row=1, column=2, sticky='w')
 
-        self.contact_lab_prenom = Label(self.cadre_inscrire_contact, text="Prénom:", font=("Arial", 14))
-        self.contact_prenom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_nom = Label(self.cadre_inscrire_contact, text="Nom:", font=("Arial", 14))
-        self.contact_nom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_role = Label(self.cadre_inscrire_contact, text="Rôle:", font=("Arial", 14))
+        self.label_choix_existant.grid      (row=2, column=1)
+        self.comboBox_choix_du_role.grid    (row=2, column=2)
+        self.btn_inscrire_modules.grid      (row=2, column=3)
+        self.listbox.grid (row=3, column=1, columnspan='10')
+        
+        self.btn_annuler.grid               (row=5, column=1)
+        self.btn_retour.grid                (row=5, column=2, sticky='w')
+        
+        return self.cadre_gestion
 
-#        self.membre_role = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+    def refresh(self):
+        self.list_membre= self.list_nom_projet.get()
+        self.listbox = Listbox(self.cadre_gestion, font=("Arial", 16), selectmode="multiple")
+        
+        self.listbox.grid (row=3, column=1, columnspan='10')
 
-        self.contact_role = ttk.Combobox(self.cadre_inscrire_contact, values=self.list_role)
+        self.listemodules=self.parent.trouvermembres("Cineclub")
 
-        self.contact_lab_id = Label(self.cadre_inscrire_contact, text="#ID d'employé:", font=("Arial", 14))
-        self.contact_id = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_courriel = Label(self.cadre_inscrire_contact, text="Courriel:", font=("Arial", 14))
-        self.contact_courriel = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_telephone = Label(self.cadre_inscrire_contact, text="# téléphone:", font=("Arial", 14))
-        self.contact_telephone = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_mdp = Label(self.cadre_inscrire_contact, text="Mot de passe (par défaut):", font=("Arial", 14))
-        self.contact_mdp = Label(self.cadre_inscrire_contact, text="AAAaaa111", font=("Arial", 14), width=30)
+        entete="modules disponibles"
+        for items in self.listemodules:
+            self.listbox.insert(END, items)
 
-                
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-        self.list_entry_contact.append(self.membre_contact)
-
-        self.btn_inscrire_contact = Button(self.cadre_inscrire_contact, text="Inscrire le nouveau contact", font=("Arial", 12), padx=10, pady=10,
-                                      command=self.inscrire_contact)
-
-        self.btn_annuler = Button(self.cadre_inscrire_contact, text="Annuler", font=("Arial", 12), padx=10, pady=10,
-                                command=self.retour_cadre_principal)
-
-        self.contact_titre.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
-        self.contact_lab_prenom.grid(row=20, column=10, sticky=E, padx=5, pady=5)
-        self.contact_prenom.grid(row=20, column=20, padx=10, pady=5)
-        self.contact_lab_nom.grid(row=30, column=10, sticky=E, padx=5, pady=5)
-        self.contact_nom.grid(row=30, column=20, padx=10, pady=5)
-        self.contact_lab_role.grid(row=40, column=10, sticky=E, padx=5, pady=5)
-        self.contact_role.grid(row=40, column=20, padx=10, pady=5)
-        self.contact_lab_id.grid(row=50, column=10, sticky=E, padx=5, pady=5)
-        self.contact_id.grid(row=50, column=20, padx=10, pady=5)
-        self.contact_lab_courriel.grid(row=60, column=10, sticky=E, padx=5, pady=5)
-        self.contact_courriel.grid(row=60, column=20, padx=10, pady=5)
-        self.contact_lab_telephone.grid(row=70, column=10, sticky=E, padx=5, pady=5)
-        self.contact_telephone.grid(row=70, column=20, padx=10, pady=5)
-        self.contact_lab_mdp.grid(row=80, column=10, sticky=E, padx=5, pady=5)
-        self.contact_mdp.grid(row=80, column=20, padx=10, pady=5)
-
-        self.btn_inscrire_contact.grid(row=100, column=20, sticky=E, padx=10, pady=10)
-
-        self.btn_annuler.grid(row=100, column=10, sticky=E, padx=10, pady=10)
-
-        return self.cadre_inscrire_contact
-
-    def recherche_contacts(self):
-        pass
-
-    def afficher_details(self, evt):
-        pass
 
 class Modele():
     def __init__(self,parent):
         self.parent=parent
-        if len(sys.argv) > 1:
-            self.usager=sys.argv[2].split()
-            self.usager = [s.strip("[],\"") for s in self.usager]
-        else:
-            self.usager = ["jmd", "Cineclub", "1"]
-        print(self.usager)
+        print(sys.argv)
+        self.usager=sys.argv[2].split()
+        self.inscrireusager(self.usager)
 
-class Controleur():
+    def inscrireusager(self,dictinfo):
+        self.nom=dictinfo[0]
+        self.compagnie={"nom":dictinfo[2],
+                        "id":dictinfo[4]}
+
+class Controleur:
     def __init__(self):
+        self.urlserveur="http://127.0.0.1:5000"
+        #self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
         self.modele=Modele(self)
         self.vue=Vue(self)
         self.vue.root.mainloop()
+
+
+    def trouver_projets_par_compagnie(self):
+        url = self.urlserveur+"/trouver_projet_par_compagnie"
+        params ={"id": self.modele.compagnie["id"]}
+        #params = {self.modele.usager[1]}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        return mondict
+
+    def trouvermembres(self, comp):
+        url = self.urlserveur+"/trouver_membres_par_compagnie"
+        params = {"comp": comp}
+        reptext=self.appelserveur(url, params)
+
+        mondict=json.loads(reptext)
+        return mondict
+
+
+    # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
+    def appelserveur(self,url,params):
+        query_string = urllib.parse.urlencode( params )
+        data = query_string.encode( "ascii" )
+        url = url + "?" + query_string
+        rep=urllib.request.urlopen(url, data)
+        reptext=rep.read()
+        return reptext
 
 if __name__ == '__main__':
     c=Controleur()
