@@ -92,7 +92,19 @@ class Dbclient():   # Base de données du locateur
         return "test"
 
     def inscrire_contact(self, prenom, nom, courriel, ville, adresse, telephone, details, notes, tag):
-        sql_nom=("insert into 'contacts_projets' ('prenom', 'nom', 'courriel', 'ville', 'adresse', 'telephone', 'details', 'notes') values (:prenom, :nom, :courriel, :ville, :adresse, :telephone, :details, :notes)")
+        print("TAGTAGTAGTAGTAGT")
+        print(tag)
+        if tag not None:
+            sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
+            self.curs.execute(sql_tag_id, {'tag': tag})
+            tag_id = self.curs.fetchall()
+            if not tag_id:
+                sql_tag_insert = ("insert into 'contacts_expertises' ('expertise') values (:tag)")
+                self.curs.execute(sql_tag_insert, {'tag': tag})
+                tag_id = ""
+        else:
+            tag_id = ""
+        sql_nom=("insert into 'contacts_projets' ('prenom', 'nom', 'courriel', 'ville', 'adresse', 'telephone', 'details', 'notes', 'expertise') values (:prenom, :nom, :courriel, :ville, :adresse, :telephone, :details, :notes, :tag_id)")
         self.curs.execute(sql_nom, {
                                 'prenom':prenom,
                                 'nom': nom,
@@ -101,7 +113,8 @@ class Dbclient():   # Base de données du locateur
                                 'adresse': adresse,
                                 'telephone':telephone,
                                 'details':details,
-                                'notes':notes})          
+                                'notes':notes,
+                                'tag_id':tag_id})          
 
         self.conn.commit()  
 
@@ -323,7 +336,7 @@ def inscrire_contact():
         telephone = request.form["telephone"]
         details = request.form["details"]
         notes = request.form["notes"]
-        tag = None      ### À RAJOUTER UN ID DE TAG EVENTUELLEMENT!!!
+        tag = request.form["tag"]
         projets=db.inscrire_contact(prenom, nom, courriel, ville, adresse, telephone, details, notes, tag)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')

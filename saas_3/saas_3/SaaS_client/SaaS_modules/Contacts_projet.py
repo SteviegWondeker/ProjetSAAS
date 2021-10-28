@@ -134,8 +134,8 @@ class Vue():
 
         self.list_entry_contact = []
 
-
         self.list_tags=self.parent.retourner_roles_nom()
+        self.list_tags.append("Ajouter un tag")
 
         #self.combobox_role = ttk.Combobox(self.cadre_role, values=self.list_role)
 
@@ -144,17 +144,21 @@ class Vue():
         self.contact_lab_nom = Label(self.cadre_inscrire_contact, text="Nom:", font=("Arial", 14))
         self.contact_nom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_tags = Label(self.cadre_inscrire_contact, text="Expertise:", font=("Arial", 14))
+        self.contact_ajout_tag = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=20)
 
 #        self.membre_role = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
 
-        self.contact_tags = ttk.Combobox(self.cadre_inscrire_contact, values=self.list_tags)
+        self.value_inside = StringVar(self.cadre_inscrire_contact)
+        self.value_inside.set("Option")
+        self.contact_tags = ttk.OptionMenu(self.cadre_inscrire_contact, self.value_inside, "Choisir une option", *self.list_tags, command=self.selection_tag)
+        #ttk.Combobox(self.cadre_inscrire_contact, values=self.list_tags)
 
+        self.contact_lab_courriel = Label(self.cadre_inscrire_contact, text="Courriel:", font=("Arial", 14))
+        self.contact_courriel = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_ville = Label(self.cadre_inscrire_contact, text="Ville:", font=("Arial", 14))
         self.contact_ville = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_adresse = Label(self.cadre_inscrire_contact, text="Adresse:", font=("Arial", 14))
         self.contact_adresse = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_courriel = Label(self.cadre_inscrire_contact, text="Courriel:", font=("Arial", 14))
-        self.contact_courriel = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_telephone = Label(self.cadre_inscrire_contact, text="Téléphone:", font=("Arial", 14))
         self.contact_telephone = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_details = Label(self.cadre_inscrire_contact, text="Détails:", font=("Arial", 14))
@@ -204,6 +208,15 @@ class Vue():
 
         return self.cadre_inscrire_contact
 
+    def selection_tag(self, evt):
+        if self.value_inside.get() == "Ajouter un tag":
+            self.contact_tags.grid(row=40, column=20, sticky=W, padx=10, pady=5)
+            self.contact_ajout_tag.grid(row=40, column=20, sticky=E, padx=10, pady=5)
+
+        else:
+            self.contact_tags.grid(row=40, column=20, padx=10, pady=5)
+            self.contact_ajout_tag.forget()
+
     def inscrire_contact(self):
         self.valider_contact()
         self.changercadre("principal")
@@ -213,7 +226,6 @@ class Vue():
 
         self.form=[]
 
- 
         self.form.append(self.contact_prenom.get())
         self.form.append(self.contact_nom.get())
         self.form.append(self.contact_courriel.get())
@@ -222,6 +234,15 @@ class Vue():
         self.form.append(self.contact_telephone.get())
         self.form.append(self.contact_details.get("1.0",END))
         self.form.append(self.contact_note.get("1.0",END))
+        if self.value_inside.get() == "Choisir une option":  # Aucune option sélectionnée
+            self.form.append(None)
+        elif self.value_inside.get() == "Ajouter un tag":
+            if self.contact_ajout_tag.get() == "":        # Champ vide
+                self.form.append(None)
+            else:
+                self.form.append(self.contact_ajout_tag.get())  # Ajout d'un NOUVEAU tag
+        else:
+            self.form.append(self.value_inside.get())       # Ajout d'un tag existant
 
         if form_valide == True:
             self.parent.inscrire_contact(self.form)
@@ -250,7 +271,7 @@ class Modele():
             self.usager=sys.argv[2].split()
             self.usager = [s.strip("[],\"") for s in self.usager]
         else:
-            self.usager = ["jmd", "Cineclub", "1"]
+            self.usager = ['jmd', '{"nom":', 'Cineclub', 'id":', '1}']
         print(self.usager)
 
 class Controleur():
@@ -287,7 +308,7 @@ class Controleur():
                   "telephone":form[5],
                   "details":form[6],
                   "notes":form[7],
-                  "tag":self.vue.contact_tags.get()}
+                  "tag":form[8]}
         print(params)
         pass
         reptext=self.appelserveur(url,params)
