@@ -134,7 +134,7 @@ class Vue():
 
         self.list_entry_contact = []
 
-        self.list_tags=self.parent.retourner_roles_nom()
+        self.list_tags=self.parent.retourner_expertises()
         self.list_tags.append("Ajouter un tag")
 
         #self.combobox_role = ttk.Combobox(self.cadre_role, values=self.list_role)
@@ -149,7 +149,7 @@ class Vue():
 #        self.membre_role = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
 
         self.value_inside = StringVar(self.cadre_inscrire_contact)
-        self.value_inside.set("Option")
+        #self.value_inside.set("Option")
         self.contact_tags = ttk.OptionMenu(self.cadre_inscrire_contact, self.value_inside, "Choisir une option", *self.list_tags, command=self.selection_tag)
         #ttk.Combobox(self.cadre_inscrire_contact, values=self.list_tags)
 
@@ -235,14 +235,19 @@ class Vue():
         self.form.append(self.contact_details.get("1.0",END))
         self.form.append(self.contact_note.get("1.0",END))
         if self.value_inside.get() == "Choisir une option":  # Aucune option sélectionnée
-            self.form.append(None)
+            self.form.append("")
         elif self.value_inside.get() == "Ajouter un tag":
             if self.contact_ajout_tag.get() == "":        # Champ vide
-                self.form.append(None)
+                self.form.append("")
             else:
                 self.form.append(self.contact_ajout_tag.get())  # Ajout d'un NOUVEAU tag
         else:
-            self.form.append(self.value_inside.get())       # Ajout d'un tag existant
+            self.tag = self.value_inside.get()
+            self.tag = self.tag.replace("(", "")
+            self.tag = self.tag.replace(")", "")
+            self.tag = self.tag.replace("\'", "")
+            self.tag = self.tag.replace(",", "")
+            self.form.append(self.tag)       # Ajout d'un tag existant
 
         if form_valide == True:
             self.parent.inscrire_contact(self.form)
@@ -290,8 +295,8 @@ class Controleur():
         reptext=rep.read()
         return reptext
 
-    def retourner_roles_nom(self):
-        url = self.urlserveur+"/trouver_roles_nom"
+    def retourner_expertises(self):
+        url = self.urlserveur+"/trouver_expertises"
         params = {}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         

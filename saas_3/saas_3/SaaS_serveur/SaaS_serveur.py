@@ -13,7 +13,7 @@ app.secret_key="qwerasdf1234"
 
 class Dbclient():   # Base de données du locateur
     def __init__(self):
-        nomdb=os.getcwd()+"/SaaS_clients/"+"GestMedia_client.sqlite"
+        nomdb=os.getcwd()+"/SaaS_clients/"+"InkInc_client.sqlite"
         self.conn = sqlite3.connect(nomdb)
         self.curs = self.conn.cursor()
 
@@ -94,10 +94,12 @@ class Dbclient():   # Base de données du locateur
     def inscrire_contact(self, prenom, nom, courriel, ville, adresse, telephone, details, notes, tag):
         print("TAGTAGTAGTAGTAGT")
         print(tag)
-        if tag not None:
+        if tag != "":
             sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
             self.curs.execute(sql_tag_id, {'tag': tag})
             tag_id = self.curs.fetchall()
+            print("IDIDIDIDIDIDIDID")
+            print(tag_id)
             if not tag_id:
                 sql_tag_insert = ("insert into 'contacts_expertises' ('expertise') values (:tag)")
                 self.curs.execute(sql_tag_insert, {'tag': tag})
@@ -117,6 +119,13 @@ class Dbclient():   # Base de données du locateur
                                 'tag_id':tag_id})          
 
         self.conn.commit()  
+
+    def trouver_expertises(self):
+        sql_expertises = ("select expertise from 'contacts_expertises'")
+        self.curs.execute(sql_expertises)
+        info = self.curs.fetchall()
+        return info
+        #return ["Allo"]
 
     def ajouter_role():
         pass
@@ -417,6 +426,18 @@ def trouver_roles_nom():
 
         db.fermerdb()
         return Response(json.dumps(roles), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/trouver_expertises', methods=["GET","POST"])
+def trouver_expertises():
+    if request.method == "POST":
+        db = Dbclient()
+        expertises = db.trouver_expertises()
+
+        db.fermerdb()
+        return Response(json.dumps(expertises), mimetype='application/json')
         #return repr(usager)
     else:
         return repr("pas ok")
