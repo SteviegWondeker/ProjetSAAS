@@ -97,7 +97,7 @@ class Dbclient():   # Base de données du locateur
         if tag != "":
             sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
             self.curs.execute(sql_tag_id, {'tag': tag})
-            tag_id = self.curs.fetchall()
+            tag_id = self.curs.fetchall()[0][0]
             print("IDIDIDIDIDIDIDID")
             print(tag_id)
             if not tag_id:
@@ -116,7 +116,7 @@ class Dbclient():   # Base de données du locateur
                                 'telephone':telephone,
                                 'details':details,
                                 'notes':notes,
-                                'tag_id':tag_id})          
+                                'tag_id':tag_id})
 
         self.conn.commit()  
 
@@ -125,7 +125,18 @@ class Dbclient():   # Base de données du locateur
         self.curs.execute(sql_expertises)
         info = self.curs.fetchall()
         return info
-        #return ["Allo"]
+
+        ##############################################################################################################
+        ##############################################################################################################
+        ##############################################################################################################
+    def trouver_contacts_par_projet(self, comp):        # Alex
+        sqlnom = ("select identifiant, permission,titre from 'membre' INNER JOIN 'compagnie' ON membre.compagnie=compagnie.idcompagnie WHERE compagnie.nomcompagnie=:comp")
+        self.curs.execute(sqlnom, {'comp': comp})
+        info = self.curs.fetchall()
+        return info
+        ##############################################################################################################
+        ##############################################################################################################
+        ##############################################################################################################
 
     def ajouter_role():
         pass
@@ -383,6 +394,16 @@ def trouver_membres_par_compagnie():
 
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')
+
+@app.route('/trouver_contacts_par_projet', methods=["GET","POST"])        # Alex
+def trouver_contacts_par_projet():
+    if request.method=="POST":
+        db=Dbclient()
+        comp = request.form["comp"]
+        contacts=db.trouver_contacts_par_projet(comp)
+
+        db.fermerdb()
+        return Response(json.dumps(contacts), mimetype='application/json')
 
 @app.route('/trouver_projet_par_compagnie', methods=["GET","POST"]) #N
 def trouver_projet_par_compagnie():

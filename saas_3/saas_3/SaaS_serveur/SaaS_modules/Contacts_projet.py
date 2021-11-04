@@ -39,7 +39,7 @@ class Vue():
         print(self.usager)
         self.cadre_contacts=Frame(self.cadreapp)
         # Titre
-        self.compagnie_label = Label(self.cadre_contacts, text=self.usager[2],font=("Arial",18),    # ATTENTION!!! Usager n'est pas le même si on roule le module depuis le fichier client ou depuis VS Code
+        self.compagnie_label = Label(self.cadre_contacts, text=self.parent.modele.usager_compagnie["nom"],font=("Arial",18),    # ATTENTION!!! Usager n'est pas le même si on roule le module depuis le fichier client ou depuis VS Code
                               borderwidth=2, relief=GROOVE)
 
         # Frame d'entête -> Contacts - Nom du projet
@@ -83,6 +83,8 @@ class Vue():
         self.tableau = Frame(self.tableau_frame)
         self.tableau = ttk.Treeview(show = 'headings')
         self.tableau.bind("<Button-1>",self.afficher_details)
+            # Remplissage tableau
+        self.gerer_contacts_projet()
 
         ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
         xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
@@ -125,6 +127,13 @@ class Vue():
         self.cadre_contacts.pack(fill=BOTH, expand=1, padx=20, pady=20)
 
         return self.cadre_contacts
+
+    def gerer_contacts_projet(self):
+        liste_contacts=self.parent.trouver_contacts_par_projet()
+        print("ID COMPAGNIE ID COMPAGNIE")
+        print(self.parent.modele.usager_compagnie["id"])
+        #entete=["identifiant","permission","titre"]
+        #self.integretableau(listemembres,entete)
 
     def creer_cadre_nouveau_contact(self):
         self.cadre_inscrire_contact = Frame(self.cadreapp, width=800, height=400)
@@ -273,8 +282,13 @@ class Modele():
     def __init__(self,parent):
         self.parent=parent
         if len(sys.argv) > 1:
-            self.usager=sys.argv[2].split()
-            self.usager = [s.strip("[],\"") for s in self.usager]
+            #self.usager=sys.argv[2].split()
+            self.usager=json.loads(sys.argv[2])[0]
+            self.usager_compagnie=json.loads(sys.argv[2])[1]
+            print("USAGER USAGER USAGER")
+            print(self.usager)
+            print(self.usager_compagnie["nom"])
+            #self.usager = [s.strip("[],\"") for s in self.usager]
         else:
             self.usager = ['jmd', '{"nom":', 'Cineclub', 'id":', '1}']
         print(self.usager)
@@ -301,6 +315,14 @@ class Controleur():
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
+
+    def trouver_contacts_par_projet(self):
+        url = self.urlserveur+"/trouver_contacts_par_projet"
+        params = {"comp": self.modele.compagnie["id"]}
+        reptext=self.appelserveur(url, params)
+
+        mondict=json.loads(reptext)
+        return mondict
 
     def inscrire_contact(self,form):        # On va devoir éventuellement ajouter l'ID du projet!
         url = self.urlserveur+"/inscrire_contact"
