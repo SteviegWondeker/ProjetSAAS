@@ -132,8 +132,27 @@ class Vue():
         liste_contacts=self.parent.trouver_contacts_par_projet()
         print("ID COMPAGNIE ID COMPAGNIE")
         print(self.parent.modele.usager_compagnie["id"])
-        #entete=["identifiant","permission","titre"]
-        #self.integretableau(listemembres,entete)
+        entete=["Prénom","Nom","Expertise", "Courriel", "Ville", "Adresse", "Téléphone", "Notes", "Détails"]
+        self.integretableau(liste_contacts,entete)
+
+    def integretableau(self,liste_contacts,entete):
+        self.data=liste_contacts
+        self.colonnestableau = entete
+
+        self.tableau.config(columns=self.colonnestableau)
+        n=1
+        for i in self.colonnestableau:
+            no="#"+str(n)
+            self.tableau.heading(no, text=i)
+            n+=1
+
+        self.ecriretableau()
+
+    def ecriretableau(self):
+        for i in self.tableau.get_children():
+            self.tableau.delete(i)
+        for item in self.data:
+            self.tableau.insert('', 'end', values=item)
 
     def creer_cadre_nouveau_contact(self):
         self.cadre_inscrire_contact = Frame(self.cadreapp, width=800, height=400)
@@ -290,7 +309,12 @@ class Modele():
             print(self.usager_compagnie["nom"])
             #self.usager = [s.strip("[],\"") for s in self.usager]
         else:
-            self.usager = ['jmd', '{"nom":', 'Cineclub', 'id":', '1}']
+            self.data_temp = ['jmd', '{"nom": Cineclub', 'id:1}']
+            self.usager="jmd"
+            self.usager_compagnie={}
+            self.usager_compagnie["nom"] = "Cinéclub"
+            self.usager_compagnie["id"] = 1
+
         print(self.usager)
 
 class Controleur():
@@ -318,7 +342,7 @@ class Controleur():
 
     def trouver_contacts_par_projet(self):
         url = self.urlserveur+"/trouver_contacts_par_projet"
-        params = {"comp": self.modele.compagnie["id"]}
+        params = {"comp": self.modele.usager_compagnie["id"]}
         reptext=self.appelserveur(url, params)
 
         mondict=json.loads(reptext)

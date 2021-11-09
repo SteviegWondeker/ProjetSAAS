@@ -130,7 +130,9 @@ class Dbclient():   # Base de données du locateur
         ##############################################################################################################
         ##############################################################################################################
     def trouver_contacts_par_projet(self, comp):        # Alex
-        sqlnom = ("select identifiant, permission,titre from 'membre' INNER JOIN 'compagnie' ON membre.compagnie=compagnie.idcompagnie WHERE compagnie.nomcompagnie=:comp")
+        #sqlnom = ("select prenom, nom, contacts_expertises.expertise, courriel, ville, adresse, telephone, details, notes from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.expertise WHERE compagnie.nomcompagnie=:comp")
+        # Va devoir ajouter le critère "compagnie"
+        sqlnom = ("select prenom, nom, contacts_expertises.expertise, courriel, ville, adresse, telephone, notes, details from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.expertise")
         self.curs.execute(sqlnom, {'comp': comp})
         info = self.curs.fetchall()
         return info
