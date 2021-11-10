@@ -79,10 +79,10 @@ class Vue():
         # Section Contacts
         self.contacts_frame = Frame(self.cadre_contacts)
             # Tableau Contacts
-        self.tableau_frame = Frame(self.contacts_frame)
+        self.tableau_frame = Frame(self.contacts_frame, width=500, height=300)
         self.tableau = Frame(self.tableau_frame)
         self.tableau = ttk.Treeview(show = 'headings')
-        self.tableau.bind("<Button-1>",self.afficher_details)
+        self.tableau.bind("<ButtonRelease-1>",self.afficher_details)
             # Remplissage tableau
         self.gerer_contacts_projet()
 
@@ -104,9 +104,11 @@ class Vue():
         self.btn_edit_contact = Button(self.contacts_details_frame, text="Éditer un contact")
         self.btn_new_contact.pack(anchor=NW, padx=5, pady=5)
         self.btn_edit_contact.pack(anchor=NW, padx=5, pady=5)
-        self.details_label = LabelFrame(self.contacts_details_frame, text="Détails", font=("Arial", 12))
-        self.text_temp = Label(self.details_label, text="Blablabla")
-        self.text_temp.pack()
+        self.details_txt = StringVar()
+        self.details_txt.set("")
+        self.details_label = LabelFrame(self.contacts_details_frame, font=("Arial", 12))
+        self.text_box = Label(self.details_label, textvariable=self.details_txt)
+        self.text_box.pack()
         self.details_label.pack(anchor=NW, padx=5, pady=5)
 
         # Packing des frames
@@ -134,6 +136,8 @@ class Vue():
         print(self.parent.modele.usager_compagnie["id"])
         entete=["Prénom","Nom","Expertise", "Courriel", "Ville", "Adresse", "Téléphone", "Notes", "Détails"]
         self.integretableau(liste_contacts,entete)
+        for i in range(len(entete)):
+            self.tableau.column('#' + str(i), width=50, stretch=0)
 
     def integretableau(self,liste_contacts,entete):
         self.data=liste_contacts
@@ -290,6 +294,8 @@ class Vue():
         pass
 
     def afficher_details(self, evt):
+        curItem = self.tableau.focus()
+        self.details_txt.set(self.tableau.item(curItem)["values"][8])
         pass
 
     def avertirusager(self,titre,message):
@@ -310,8 +316,10 @@ class Modele():
             #self.usager = [s.strip("[],\"") for s in self.usager]
         else:
             self.data_temp = ['jmd', '{"nom": Cineclub', 'id:1}']
-            self.usager=json.loads(data_temp[2])[0]
-            self.usager_compagnie=json.loads(data_temp[2])[1]
+            self.usager="jmd"
+            self.usager_compagnie={}
+            self.usager_compagnie["nom"] = "Cinéclub"
+            self.usager_compagnie["id"] = 1
 
         print(self.usager)
 
@@ -357,7 +365,9 @@ class Controleur():
                   "telephone":form[5],
                   "details":form[6],
                   "notes":form[7],
-                  "tag":form[8]}
+                  "tag":form[8],
+                  "comp":self.modele.usager_compagnie["id"],
+                  "projet":1}
         print(params)
         pass
         reptext=self.appelserveur(url,params)
