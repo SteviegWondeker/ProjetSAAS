@@ -2,8 +2,8 @@ Nom de compagnie : Ink inc.
 
 Membres :
 Alex Bouchard
-Samuel Desjardins
-Norman Tao
+Gabriel Kirouac
+Hiba Ikbal
 
 ORIENTATION
 Ce logiciel servira à faire de la gestion d'entreprise et de projets médiatiques.

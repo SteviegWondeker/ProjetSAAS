@@ -2,8 +2,8 @@ Nom de compagnie : Ink inc.
 
 Membres :
 Alex Bouchard
-Samuel Desjardins
-Norman Tao
+Gabriel Kirouac	
+Hiba Ikbal
 
 ROADMAP
 Nous avons seulement listé pour l'instant nos prévisions de modules pour le projet.
@@ -16,3 +16,34 @@ Pour l'instant, nous avons concentré notre attention sur tout ce qui concerne l
 -Maquettes
 -Modèles de données
 -Sprint 2
+
+---------------------------------------------------------------------------------
+
+Le changement de compagnie s'est bien passé, nous avons eu à revoir quelques manières de faire mais nous avons tout
+de même eu le temps de créer de nouveaux modules.
+
+2me Sprint :
+
+-Ajout du module de moficiation de projet:
+	-Permet d'afficher les informations sur un projet
+	-Permet de modifier ces informations à même le module.
+	-La supression de projet va être remis au prochain sprint.
+
+-Ajout du module de Communiqué de presse:
+	-Permet de créer un communiqué de presse avec des champs à remplir.
+	-Reste à faire le lien avec la base de donnée et les autres modules.
+
+-Ajout du module de Contact:
+	-Permet d'ajouter des contacts
+	-Un contact contient les informations suivantes : Prénom/Nom, Expertise, Courriel, Ville,
+	Adresses, Téléphone, Notes (pour une note particulière), Détails (pour plus d'informations
+	générales sur le contact)
+	-Affiche tous les contacts dans un tableau
+	-Lorsqu'on sélectionne un contact, les informations sous la colonne Détails sont affichés dans
+	un encadré prévu à cet effet.
+	À COMPLÉTER
+	-Intégrer l'utilisation des checkboxes Tags pour filtrer le tableau selon l'Expertise
+	sélectionnée
+	-Rendre fonctionnelle la barre de recherche
+	-Revoir les sections de UI pour qu'elles restent fixe, et que les données se formattent par
+	elles-mêmes.
