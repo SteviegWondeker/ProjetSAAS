@@ -80,7 +80,7 @@ class Vue():
         self.contacts_frame = Frame(self.cadre_contacts)
             # Tableau Contacts
         self.tableau_frame = Frame(self.contacts_frame, width=500, height=300)
-        self.tableau = Frame(self.tableau_frame)
+        #self.tableau = Frame(self.tableau_frame)
         self.tableau = ttk.Treeview(show = 'headings')
         self.tableau.bind("<ButtonRelease-1>",self.afficher_details)
             # Remplissage tableau
@@ -88,8 +88,8 @@ class Vue():
 
         ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
         xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
-        self.tableau['yscroll'] = ysb.set
-        self.tableau['xscroll'] = xsb.set
+        self.tableau.configure(yscrollcommand=ysb.set)
+        self.tableau.configure(xscrollcommand=xsb.set)
 
         self.tableau.grid(in_=self.tableau_frame, row=0, column=0, sticky=NSEW)
         ysb.grid(in_=self.tableau_frame, row=0, column=1, sticky=NS)
