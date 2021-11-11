@@ -23,6 +23,14 @@ class Dbclient():   # Base de données du locateur
         info=self.curs.fetchall()
         return info
     
+    def trouver_projet_infos(self,nom_projet):
+        sqlnom=("select idprojet, Nomdeprojet, client, chargedeprojet, datedelancement, datedefinprevue, compagnie from 'projet' WHERE Nomdeprojet=:nom_projet")
+        self.curs.execute(sqlnom, {'nom_projet': nom_projet})
+        
+        info=self.curs.fetchall()
+        return info
+
+    
     def trouverclients(self):
         sqlnom=("select compagnie, nom, courriel from 'client'")
         self.curs.execute(sqlnom)
@@ -73,10 +81,30 @@ class Dbclient():   # Base de données du locateur
         return "test"
 
 
-    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_compagnie): #n
+    def ajouter_projet(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_compagnie):
         sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue', 'compagnie') values (:nom_projet, (select idclient from client where nom=:nom_client), :responsable, :date_deb, :date_fin, :nom_compagnie)")                         
+                              
         self.curs.execute(sql_nom, {
                                 'nom_projet':nom_projet,
+                                'nom_client': nom_client,
+                                'responsable': responsable,
+                                'date_deb': date_deb,
+                                'date_fin': date_fin,
+                                'nom_compagnie':nom_compagnie})          
+
+        self.conn.commit()                                
+        #sql_projet("insert into 'tbl_projet_compagnie' ('nom_compagnie', 'id') values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from 'projet' where nomdeprojet=:nom_projet))")
+        #self.curs.execute(sql_projet, {
+        #                        'nom_admin':nom_admin,
+        #                        'nom_projet': nom_projet})     
+        self.conn.commit()
+        return "test"
+    
+    def envoyer_modifs(self,idprojet,nom_projet, nom_client, responsable, date_deb, date_fin, nom_compagnie): 
+        sql_nom=("update 'projet' set 'Nomdeprojet'=:nom_projet, 'client'=(select idclient from client where nom=:nom_client), 'chargedeprojet'=:responsable, 'datedelancement'=:date_deb, 'datedefinprevue'=:date_fin, 'compagnie'=:nom_compagnie where idprojet=:idprojet")               
+        self.curs.execute(sql_nom, {
+                                'idprojet': idprojet,
+                                'nom_projet': nom_projet,
                                 'nom_client': nom_client,
                                 'responsable': responsable,
                                 'date_deb': date_deb,
@@ -297,7 +325,6 @@ def identifierusager():
         return repr("pas ok")
 
 
-
 @app.route('/trouverprojets', methods=["GET","POST"])
 def trouverprojets():
     if request.method=="POST":
@@ -327,6 +354,19 @@ def inscrire_contact():
         projets=db.inscrire_contact(prenom, nom, courriel, ville, adresse, telephone, details, notes, tag)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/trouver_projet_infos', methods=["GET","POST"])
+def trouver_projet_infos():
+    if request.method=="POST":
+        db=Dbclient()
+        projet = request.form["projet"]
+        infos=db.trouver_projet_infos(projet)
+       
+        db.fermerdb()
+        return Response(json.dumps(infos), mimetype='application/json')
         #return repr(usager)
     else:
         return repr("pas ok")
@@ -428,7 +468,7 @@ def verifier_usager():
         db=Dbman()
         usager=db.verifier_usager(nom_org, courriel)
 
-        #db.fermerdb()
+        db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
         #return repr(usager)
     else:
@@ -443,7 +483,7 @@ def verifier_membre():
         db=Dbman()
         usager=db.verifier_membre(courriel)
 
-        #db.fermerdb()
+        db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
         #return repr(usager)
     else:
@@ -456,7 +496,7 @@ def verifier_projet():
         nom_client=request.form["nom_client"]
         db=Dbclient()
         usager=db.verifier_projet(nom_projet, nom_client)
-        #db.fermerdb()
+        db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
         #return repr(usager)
     else:
@@ -468,7 +508,7 @@ def verifier_client():
         courriel=request.form["courriel"]
         db=Dbclient()
         usager=db.verifier_client(courriel)
-        #db.fermerdb()
+        db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
         #return repr(usager)
     else:
@@ -562,6 +602,26 @@ def ajouter_projet():
 
         db=Dbclient()
         usager=db.ajouter_projet(nom_proj, nom_client, responsable, date_deb, date_fin, nom_compagnie)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/envoyer_modifs', methods=["GET","POST"]) #N
+def envoyer_modifs():
+    if request.method=="POST":
+        idprojet=request.form["idprojet"]
+        nom_proj=request.form["nom_projet"]
+        nom_client=request.form["nom_client"]
+        responsable=request.form["responsable"]
+        date_deb=request.form["date_deb"]
+        date_fin=request.form["date_fin"]
+        nom_compagnie=request.form["nom_compagnie"]
+
+        db=Dbclient()
+        usager=db.envoyer_modifs(idprojet, nom_proj, nom_client, responsable, date_deb, date_fin, nom_compagnie)
 
         db.fermerdb()
         return Response(json.dumps(usager), mimetype='application/json')
