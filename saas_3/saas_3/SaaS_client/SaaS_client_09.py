@@ -417,7 +417,7 @@ class Vue():
         self.signup_label=Label(self.cadre_client,text="Création client",font=("Arial",18),
                               borderwidth=2,relief=GROOVE)
 
-        self.signup_lab_nom_org=self.create_label("Nom de l'organisation", self.cadre_client)
+        self.signup_lab_nom_org=self.create_label("Nom du client", self.cadre_client)
         self.signup_nom_org=self.create_entry(self.cadre_client)
         self.list_entry_client.append(self.signup_nom_org)
         self.list_lab_client.append(self.signup_lab_nom_org)
@@ -652,7 +652,7 @@ class Vue():
         self.list_entry_projet.append(self.projet_nom)
         self.list_lab_projet.append(self.projet_lab_nom)
 
-        self.projet_lab_org=self.create_label("Nom de l'organisation client", self.cadre_projet)
+        self.projet_lab_org=self.create_label("Nom de la compagnie cliente", self.cadre_projet)
         self.projet_org=self.create_entry(self.cadre_projet)
         self.list_entry_projet.append(self.projet_org)
         self.list_lab_projet.append(self.projet_lab_org)
