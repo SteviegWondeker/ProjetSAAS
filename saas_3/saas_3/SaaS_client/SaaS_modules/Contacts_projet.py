@@ -24,7 +24,7 @@ class Vue():
 
     def creercadres(self):
         self.cadres["principal"]=self.creercadreprincipal(self.parent.modele.usager)
-        self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
+        #self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
@@ -39,7 +39,7 @@ class Vue():
         print(self.usager)
         self.cadre_contacts=Frame(self.cadreapp)
         # Titre
-        self.compagnie_label = Label(self.cadre_contacts, text=self.usager[2],font=("Arial",18),    # ATTENTION!!! Usager n'est pas le même si on roule le module depuis le fichier client ou depuis VS Code
+        self.compagnie_label = Label(self.cadre_contacts, text=self.parent.modele.usager_compagnie["nom"],font=("Arial",18),    # ATTENTION!!! Usager n'est pas le même si on roule le module depuis le fichier client ou depuis VS Code
                               borderwidth=2, relief=GROOVE)
 
         # Frame d'entête -> Contacts - Nom du projet
@@ -79,10 +79,12 @@ class Vue():
         # Section Contacts
         self.contacts_frame = Frame(self.cadre_contacts)
             # Tableau Contacts
-        self.tableau_frame = Frame(self.contacts_frame)
+        self.tableau_frame = Frame(self.contacts_frame, width=500, height=300)
         self.tableau = Frame(self.tableau_frame)
         self.tableau = ttk.Treeview(show = 'headings')
-        self.tableau.bind("<Button-1>",self.afficher_details)
+        self.tableau.bind("<ButtonRelease-1>",self.afficher_details)
+            # Remplissage tableau
+        self.gerer_contacts_projet()
 
         ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
         xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
@@ -102,9 +104,11 @@ class Vue():
         self.btn_edit_contact = Button(self.contacts_details_frame, text="Éditer un contact")
         self.btn_new_contact.pack(anchor=NW, padx=5, pady=5)
         self.btn_edit_contact.pack(anchor=NW, padx=5, pady=5)
-        self.details_label = LabelFrame(self.contacts_details_frame, text="Détails", font=("Arial", 12))
-        self.text_temp = Label(self.details_label, text="Blablabla")
-        self.text_temp.pack()
+        self.details_txt = StringVar()
+        self.details_txt.set("")
+        self.details_label = LabelFrame(self.contacts_details_frame, font=("Arial", 12))
+        self.text_box = Label(self.details_label, textvariable=self.details_txt)
+        self.text_box.pack()
         self.details_label.pack(anchor=NW, padx=5, pady=5)
 
         # Packing des frames
@@ -126,6 +130,34 @@ class Vue():
 
         return self.cadre_contacts
 
+    def gerer_contacts_projet(self):
+        liste_contacts=self.parent.trouver_contacts_par_projet()
+        print("ID COMPAGNIE ID COMPAGNIE")
+        print(self.parent.modele.usager_compagnie["id"])
+        entete=["Prénom","Nom","Expertise", "Courriel", "Ville", "Adresse", "Téléphone", "Notes", "Détails"]
+        self.integretableau(liste_contacts,entete)
+        for i in range(len(entete)):
+            self.tableau.column('#' + str(i), width=50, stretch=0)
+
+    def integretableau(self,liste_contacts,entete):
+        self.data=liste_contacts
+        self.colonnestableau = entete
+
+        self.tableau.config(columns=self.colonnestableau)
+        n=1
+        for i in self.colonnestableau:
+            no="#"+str(n)
+            self.tableau.heading(no, text=i)
+            n+=1
+
+        self.ecriretableau()
+
+    def ecriretableau(self):
+        for i in self.tableau.get_children():
+            self.tableau.delete(i)
+        for item in self.data:
+            self.tableau.insert('', 'end', values=item)
+
     def creer_cadre_nouveau_contact(self):
         self.cadre_inscrire_contact = Frame(self.cadreapp, width=800, height=400)
 
@@ -134,8 +166,8 @@ class Vue():
 
         self.list_entry_contact = []
 
-
-        self.list_tags=self.parent.retourner_roles_nom()
+        self.list_tags=self.parent.retourner_expertises()
+        self.list_tags.append("Ajouter un tag")
 
         #self.combobox_role = ttk.Combobox(self.cadre_role, values=self.list_role)
 
@@ -144,17 +176,21 @@ class Vue():
         self.contact_lab_nom = Label(self.cadre_inscrire_contact, text="Nom:", font=("Arial", 14))
         self.contact_nom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_tags = Label(self.cadre_inscrire_contact, text="Expertise:", font=("Arial", 14))
+        self.contact_ajout_tag = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=20)
 
 #        self.membre_role = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
 
-        self.contact_tags = ttk.Combobox(self.cadre_inscrire_contact, values=self.list_tags)
+        self.value_inside = StringVar(self.cadre_inscrire_contact)
+        #self.value_inside.set("Option")
+        self.contact_tags = ttk.OptionMenu(self.cadre_inscrire_contact, self.value_inside, "Choisir une option", *self.list_tags, command=self.selection_tag)
+        #ttk.Combobox(self.cadre_inscrire_contact, values=self.list_tags)
 
+        self.contact_lab_courriel = Label(self.cadre_inscrire_contact, text="Courriel:", font=("Arial", 14))
+        self.contact_courriel = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_ville = Label(self.cadre_inscrire_contact, text="Ville:", font=("Arial", 14))
         self.contact_ville = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_adresse = Label(self.cadre_inscrire_contact, text="Adresse:", font=("Arial", 14))
         self.contact_adresse = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
-        self.contact_lab_courriel = Label(self.cadre_inscrire_contact, text="Courriel:", font=("Arial", 14))
-        self.contact_courriel = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_telephone = Label(self.cadre_inscrire_contact, text="Téléphone:", font=("Arial", 14))
         self.contact_telephone = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
         self.contact_lab_details = Label(self.cadre_inscrire_contact, text="Détails:", font=("Arial", 14))
@@ -204,6 +240,15 @@ class Vue():
 
         return self.cadre_inscrire_contact
 
+    def selection_tag(self, evt):
+        if self.value_inside.get() == "Ajouter un tag":
+            self.contact_tags.grid(row=40, column=20, sticky=W, padx=10, pady=5)
+            self.contact_ajout_tag.grid(row=40, column=20, sticky=E, padx=10, pady=5)
+
+        else:
+            self.contact_tags.grid(row=40, column=20, padx=10, pady=5)
+            self.contact_ajout_tag.forget()
+
     def inscrire_contact(self):
         self.valider_contact()
         self.changercadre("principal")
@@ -213,7 +258,6 @@ class Vue():
 
         self.form=[]
 
- 
         self.form.append(self.contact_prenom.get())
         self.form.append(self.contact_nom.get())
         self.form.append(self.contact_courriel.get())
@@ -222,6 +266,20 @@ class Vue():
         self.form.append(self.contact_telephone.get())
         self.form.append(self.contact_details.get("1.0",END))
         self.form.append(self.contact_note.get("1.0",END))
+        if self.value_inside.get() == "Choisir une option":  # Aucune option sélectionnée
+            self.form.append("")
+        elif self.value_inside.get() == "Ajouter un tag":
+            if self.contact_ajout_tag.get() == "":        # Champ vide
+                self.form.append("")
+            else:
+                self.form.append(self.contact_ajout_tag.get())  # Ajout d'un NOUVEAU tag
+        else:
+            self.tag = self.value_inside.get()
+            self.tag = self.tag.replace("(", "")
+            self.tag = self.tag.replace(")", "")
+            self.tag = self.tag.replace("\'", "")
+            self.tag = self.tag.replace(",", "")
+            self.form.append(self.tag)       # Ajout d'un tag existant
 
         if form_valide == True:
             self.parent.inscrire_contact(self.form)
@@ -236,6 +294,8 @@ class Vue():
         pass
 
     def afficher_details(self, evt):
+        curItem = self.tableau.focus()
+        self.details_txt.set(self.tableau.item(curItem)["values"][8])
         pass
 
     def avertirusager(self,titre,message):
@@ -247,10 +307,20 @@ class Modele():
     def __init__(self,parent):
         self.parent=parent
         if len(sys.argv) > 1:
-            self.usager=sys.argv[2].split()
-            self.usager = [s.strip("[],\"") for s in self.usager]
+            #self.usager=sys.argv[2].split()
+            self.usager=json.loads(sys.argv[2])[0]
+            self.usager_compagnie=json.loads(sys.argv[2])[1]
+            print("USAGER USAGER USAGER")
+            print(self.usager)
+            print(self.usager_compagnie["nom"])
+            #self.usager = [s.strip("[],\"") for s in self.usager]
         else:
-            self.usager = ["jmd", "Cineclub", "1"]
+            self.data_temp = ['jmd', '{"nom": Cineclub', 'id:1}']
+            self.usager="jmd"
+            self.usager_compagnie={}
+            self.usager_compagnie["nom"] = "Cinéclub"
+            self.usager_compagnie["id"] = 1
+
         print(self.usager)
 
 class Controleur():
@@ -269,12 +339,20 @@ class Controleur():
         reptext=rep.read()
         return reptext
 
-    def retourner_roles_nom(self):
-        url = self.urlserveur+"/trouver_roles_nom"
+    def retourner_expertises(self):
+        url = self.urlserveur+"/trouver_expertises"
         params = {}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
+
+    def trouver_contacts_par_projet(self):
+        url = self.urlserveur+"/trouver_contacts_par_projet"
+        params = {"comp": self.modele.usager_compagnie["id"]}
+        reptext=self.appelserveur(url, params)
+
+        mondict=json.loads(reptext)
+        return mondict
 
     def inscrire_contact(self,form):        # On va devoir éventuellement ajouter l'ID du projet!
         url = self.urlserveur+"/inscrire_contact"
@@ -287,7 +365,9 @@ class Controleur():
                   "telephone":form[5],
                   "details":form[6],
                   "notes":form[7],
-                  "tag":self.vue.contact_tags.get()}
+                  "tag":form[8],
+                  "comp":self.modele.usager_compagnie["id"],
+                  "projet":1}
         print(params)
         pass
         reptext=self.appelserveur(url,params)

@@ -13,7 +13,7 @@ app.secret_key="qwerasdf1234"
 
 class Dbclient():   # Base de données du locateur
     def __init__(self):
-        nomdb=os.getcwd()+"/SaaS_clients/"+"GestMedia_client.sqlite"
+        nomdb=os.getcwd()+"/SaaS_clients/"+"InkInc_client.sqlite"
         self.conn = sqlite3.connect(nomdb)
         self.curs = self.conn.cursor()
 
@@ -119,8 +119,23 @@ class Dbclient():   # Base de données du locateur
         self.conn.commit()
         return "test"
 
-    def inscrire_contact(self, prenom, nom, courriel, ville, adresse, telephone, details, notes, tag):
-        sql_nom=("insert into 'contacts_projets' ('prenom', 'nom', 'courriel', 'ville', 'adresse', 'telephone', 'details', 'notes') values (:prenom, :nom, :courriel, :ville, :adresse, :telephone, :details, :notes)")
+    def inscrire_contact(self, prenom, nom, courriel, ville, adresse, telephone, details, notes, tag, comp, projet):
+        if tag != "":
+            sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
+            self.curs.execute(sql_tag_id, {'tag': tag})
+            tag_id=self.curs.fetchall()
+            print("TAG ID 1")
+            print(tag_id)
+            if not tag_id:
+                sql_tag_insert = ("insert into 'contacts_expertises' ('expertise') values (:tag)")
+                self.curs.execute(sql_tag_insert, {'tag': tag})
+                self.conn.commit()
+            self.curs.execute(sql_tag_id, {'tag': tag})
+            
+            tag_id=self.curs.fetchall()[0][0]
+        else:
+            tag_id = ""
+        sql_nom=("insert into 'contacts_projets' ('prenom', 'nom', 'courriel', 'ville', 'adresse', 'telephone', 'details', 'notes', 'expertise', 'compagnie', 'projet') values (:prenom, :nom, :courriel, :ville, :adresse, :telephone, :details, :notes, :tag_id, :comp, :projet)")
         self.curs.execute(sql_nom, {
                                 'prenom':prenom,
                                 'nom': nom,
@@ -129,9 +144,32 @@ class Dbclient():   # Base de données du locateur
                                 'adresse': adresse,
                                 'telephone':telephone,
                                 'details':details,
-                                'notes':notes})          
+                                'notes':notes,
+                                'tag_id':tag_id,
+                                'comp':comp,
+                                'projet':projet})
 
         self.conn.commit()  
+
+    def trouver_expertises(self):
+        sql_expertises = ("select expertise from 'contacts_expertises'")
+        self.curs.execute(sql_expertises)
+        info = self.curs.fetchall()
+        return info
+
+        ##############################################################################################################
+        ##############################################################################################################
+        ##############################################################################################################
+    def trouver_contacts_par_projet(self, comp):        # Alex
+        # Va devoir ajouter le critère "compagnie"
+        sqlnom = ("select prenom, nom, contacts_expertises.expertise, courriel, ville, adresse, telephone, notes, details from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise")
+        #self.curs.execute(sqlnom, {'comp': comp})
+        self.curs.execute(sqlnom)
+        info = self.curs.fetchall()
+        return info
+        ##############################################################################################################
+        ##############################################################################################################
+        ##############################################################################################################
 
     def ajouter_role():
         pass
@@ -350,8 +388,10 @@ def inscrire_contact():
         telephone = request.form["telephone"]
         details = request.form["details"]
         notes = request.form["notes"]
-        tag = None      ### À RAJOUTER UN ID DE TAG EVENTUELLEMENT!!!
-        projets=db.inscrire_contact(prenom, nom, courriel, ville, adresse, telephone, details, notes, tag)
+        tag = request.form["tag"]
+        projet = request.form["projet"]
+        comp = request.form["comp"]
+        projets=db.inscrire_contact(prenom, nom, courriel, ville, adresse, telephone, details, notes, tag, comp, projet)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
         #return repr(usager)
@@ -402,6 +442,16 @@ def trouver_membres_par_compagnie():
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')
 
+@app.route('/trouver_contacts_par_projet', methods=["GET","POST"])        # Alex
+def trouver_contacts_par_projet():
+    if request.method=="POST":
+        db=Dbclient()
+        comp = request.form["comp"]
+        contacts=db.trouver_contacts_par_projet(comp)
+
+        db.fermerdb()
+        return Response(json.dumps(contacts), mimetype='application/json')
+
 @app.route('/trouver_projet_par_compagnie', methods=["GET","POST"]) #N
 def trouver_projet_par_compagnie():
     if request.method=="POST":
@@ -444,6 +494,18 @@ def trouver_roles_nom():
 
         db.fermerdb()
         return Response(json.dumps(roles), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/trouver_expertises', methods=["GET","POST"])
+def trouver_expertises():
+    if request.method == "POST":
+        db = Dbclient()
+        expertises = db.trouver_expertises()
+
+        db.fermerdb()
+        return Response(json.dumps(expertises), mimetype='application/json')
         #return repr(usager)
     else:
         return repr("pas ok")
