@@ -84,11 +84,18 @@ class Cadre_Communique(Frame):
       
 
 
+class Modele():
+    def __init__(self,parent):
+        self.parent=parent
+    def printMessage():
+        print("Wow this actually worked!")
 
-def printMessage():
-    print("Wow this actually worked!")
-
-
+class Controleur():
+    def __init__(self):
+        self.modele=Modele(self)
+        self.vue=Vue(self)
+        self.vue.root.mainloop()
+        
 if __name__ == '__main__':
  root = Tk()
  root.title("COMMUNIQUÉ DE PRESSE ")
