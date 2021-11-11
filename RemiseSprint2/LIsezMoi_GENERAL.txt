@@ -1,0 +1,35 @@
+Nom de compagnie : Ink inc.
+
+Membres :
+Alex Bouchard
+Gabriel Kirouac
+Hiba Ikbal
+
+ORIENTATION
+Ce logiciel servira à faire de la gestion d'entreprise et de projets médiatiques.
+D'une part, nous prévoyons avoir des modules de gestion de contacts, de tâches/deadlines, etc.
+D'autre part, nous prévoyons avoir des modules de création de communiqués de presse, de gestion de contenu de multimédia, etc.
+
+ORGANISATION DES MODULES
+Essentiellement, les modules qu'on veut ajouter sont séparés en deux catégories :
+-Projet
+-Compagnie
+
+Les modules de Projets sont propres à chaque projets.
+Les modules de Compagnie sont propres à la compagnie entière.
+Ainsi, quand on crée par exemple un nouveau contact relié à un projet, ce contact est automatiquement ajouté
+	à la liste de contacts de la compagnie.
+Inversement, dès la création d'un projet, on peut associer des contacts déjà existants dans la compagnie au
+	nouveau projet créé.
+Finalement, les modules propres aux projets pourront contenir des informations pertinentes auxdits projets sans
+	affecter la base de donnée plus générale, puisqu'on ne veut pas garder trop d'informations qui ne seraient
+	pas pertinentes à garder à un plus haut niveau.
+
+FACTURATION
+Nous n'avons pas encore fait beaucoup de recherche à ce propos, mais nous prévoyons essentiellement facturer selon
+	un prix de base pour le loigiciel au complet, auquel on ajout un montant par tranches d'utilisateurs qui
+	utiliseront des modules, et ce pour chaque module.
+Exemple : Si 10 utilisateurs et moins sont inscrit à un module particulier, ce module coûtera au client X$/mois
+	Si entre 11 et 25 utilisateurs sont inscrit à ce même module, il coûtera au client Y$/mois.
+Bref : Plus un client inscrit des usagers, et plus il utilise de modules, plus il sera chargé cher.
+
