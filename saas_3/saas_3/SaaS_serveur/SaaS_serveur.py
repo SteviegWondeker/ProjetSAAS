@@ -119,6 +119,12 @@ class Dbclient():   # Base de données du locateur
         self.conn.commit()
         return "test"
 
+    def envoyer_supression(self,nom_projet): 
+        sql_nom=("DELETE from projet where Nomdeprojet=:nom_projet")               
+        self.curs.execute(sql_nom, {'nom_projet': nom_projet})          
+        self.conn.commit()                                
+        return "test"
+
     def inscrire_contact(self, prenom, nom, courriel, ville, adresse, telephone, details, notes, tag, comp, projet):
         if tag != "":
             sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
@@ -691,6 +697,17 @@ def envoyer_modifs():
     else:
         return repr("pas ok")
 
+@app.route('/envoyer_supression', methods=["GET","POST"]) #N
+def envoyer_supression():
+    if request.method=="POST":
+        nom_proj=request.form["nom_projet"]
+        db=Dbclient()
+        usager=db.envoyer_supression(nom_proj)
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
 
 @app.route('/ajoutermodulebd', methods=["GET","POST"]) #N
 def ajouter_module():

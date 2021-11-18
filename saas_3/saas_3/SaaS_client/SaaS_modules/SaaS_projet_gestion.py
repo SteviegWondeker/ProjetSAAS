@@ -265,9 +265,19 @@ class Vue():
             self.listbox.insert(END, items)
 
     def supprimer_projet(self):
-        rep=messagebox.askyesno("Supression","Voulez-vous confirmer la supression du projet ?")
-        if not rep:
-            self.root.destroy()
+        if(self.selection!=None):
+            rep=messagebox.askyesno("Supression","Voulez-vous confirmer la supression du projet ?")
+            if not rep:
+                self.root.destroy()
+            else:
+                self.parent.envoyer_supression(self.selection)
+                self.cadres["Gestion"]=self.creer_cadre_gestion()
+                self.tbi_crée=FALSE
+                self.changercadre("Gestion")
+        else:
+            show_method = getattr(messagebox, 'show{}'.format('warning'))
+            show_method('ERREUR', 'Veuillez choisir un projet)')
+
     
     def afficher_infos_projet(self,projet):
         infos=self.parent.trouver_projet_infos(projet)
@@ -304,6 +314,13 @@ class Controleur:
                 "date_deb":form[4],
                 "date_fin":form[5],
                 "nom_compagnie": form[6]}
+        reptext=self.appelserveur(url,params)
+        mondict=json.loads(reptext)         
+        print(mondict)
+
+    def envoyer_supression(self,selection): #n
+        url = self.urlserveur+"/envoyer_supression"
+        params = {"nom_projet":selection}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
