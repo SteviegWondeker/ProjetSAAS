@@ -157,19 +157,31 @@ class Dbclient():   # Base de données du locateur
         info = self.curs.fetchall()
         return info
 
-        ##############################################################################################################
-        ##############################################################################################################
-        ##############################################################################################################
     def trouver_contacts_par_projet(self, comp):        # Alex
         # Va devoir ajouter le critère "compagnie"
-        sqlnom = ("select prenom, nom, contacts_expertises.expertise, courriel, ville, adresse, telephone, notes, details from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise")
+        sqlnom = ("select prenom, nom, contacts_expertises.expertise from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise")  #, courriel, ville, adresse, telephone, notes, details
         #self.curs.execute(sqlnom, {'comp': comp})
         self.curs.execute(sqlnom)
         info = self.curs.fetchall()
         return info
-        ##############################################################################################################
-        ##############################################################################################################
-        ##############################################################################################################
+
+    def get_contact_details(self, prenom, nom, expertise):        # Alex
+        sqldetails = ("select prenom, nom, contacts_expertises.expertise, courriel, ville, adresse, telephone, notes, details, idcontacts from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise WHERE prenom = :prenom AND nom = :nom AND contacts_expertises.expertise = :expertise")
+        self.curs.execute(sqldetails, {'prenom': prenom, "nom": nom, "expertise": expertise})
+        info = self.curs.fetchall()
+        print(info)
+        return info
+
+######################################################################################
+######################################################################################
+######################################################################################
+    def supprimer_contact(self, idcontacts):
+        sqlrequete = ("DELETE FROM 'contacts_projets' WHERE idcontacts = :idcontacts;")
+        self.curs.execute(sqlrequete, {'idcontacts': idcontacts})
+        self.conn.commit() 
+        ######################################################################################
+        ######################################################################################
+        ######################################################################################
 
     def ajouter_role():
         pass
@@ -398,6 +410,15 @@ def inscrire_contact():
     else:
         return repr("pas ok")
 
+@app.route('/supprimer_contact', methods=["GET","POST"])
+def supprimer_contact():
+    if request.method=="POST":
+        db=Dbclient()
+        idcontacts = request.form["idcontacts"]
+        projets=db.supprimer_contact(idcontacts)
+        db.fermerdb()
+        return Response(json.dumps(projets), mimetype='application/json')
+
 @app.route('/trouver_projet_infos', methods=["GET","POST"])
 def trouver_projet_infos():
     if request.method=="POST":
@@ -448,6 +469,18 @@ def trouver_contacts_par_projet():
         db=Dbclient()
         comp = request.form["comp"]
         contacts=db.trouver_contacts_par_projet(comp)
+
+        db.fermerdb()
+        return Response(json.dumps(contacts), mimetype='application/json')
+
+@app.route('/get_contact_details', methods=["GET","POST"])        # Alex
+def get_contact_details():
+    if request.method=="POST":
+        db=Dbclient()
+        prenom = request.form["prenom"]
+        nom = request.form["nom"]
+        expertise = request.form["expertise"]
+        contacts=db.get_contact_details(prenom, nom, expertise)
 
         db.fermerdb()
         return Response(json.dumps(contacts), mimetype='application/json')
