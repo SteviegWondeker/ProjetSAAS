@@ -18,6 +18,7 @@ class Vue():
         self.cadreapp.pack(expand=1, fill=BOTH)
         self.cadres={}
         self.cadreactif=None
+        self.tag_list = []
         self.creercadres()
         self.changercadre("principal")
         self.contact_select=None
@@ -141,16 +142,35 @@ class Vue():
         return self.cadre_contacts
 
     def ajout_tag(self):
+        self.radio_var = StringVar()
+        tag = Radiobutton(self.tag_frame, text="Aucun filtre", variable=self.radio_var, value="Aucun filtre", command=self.filtrer_contacts, tristatevalue=0)
+        tag.grid(row=0, column=0, sticky=W)
         for count, value in enumerate(self.parent.retourner_expertises()):
-            tag = Checkbutton(self.tag_frame, text=value)
-            tag.grid(row=int(count/3), column=int((count % 3)), sticky=W)
+            tag = Radiobutton(self.tag_frame, text=value, variable=self.radio_var, value=value, command=self.filtrer_contacts, tristatevalue=0)
+            tag.grid(row=int(count/3)+1, column=int((count % 3)), sticky=W)
+            #self.tag_list.append(tag)
+
+    def filtrer_contacts(self):
+        data_temp = []
+        entete=["Prénom","Nom","Expertise"]
+
+        if self.radio_var.get() != "Aucun filtre":
+            for e in self.liste_contacts:
+                    if e[2] == self.radio_var.get():
+                        data_temp.append(e)
+        else:
+            data_temp = self.liste_contacts
+        self.integretableau(data_temp, entete)
+        for i in range(len(entete)):
+            self.tableau.column('#' + str(i), width=60, stretch=0)
+        self.inscrire_transaction(True, "Contacts")
 
     def gerer_contacts_projet(self):
-        liste_contacts=self.parent.trouver_contacts_par_projet()
+        self.liste_contacts=self.parent.trouver_contacts_par_projet()
         print("ID COMPAGNIE ID COMPAGNIE")
         print(self.parent.modele.usager_compagnie["id"])
         entete=["Prénom","Nom","Expertise"]  #, "Courriel", "Ville", "Adresse", "Téléphone", "Notes", "Détails"
-        self.integretableau(liste_contacts,entete)
+        self.integretableau(self.liste_contacts,entete)
         for i in range(len(entete)):
             self.tableau.column('#' + str(i), width=60, stretch=0)
 
@@ -335,6 +355,13 @@ class Vue():
         rep=messagebox.askyesno(titre,message)
         if not rep:
             self.root.destroy()
+
+    def inscrire_transaction(self, lecture, module):
+        print(f'Transaction en lecture : {lecture}')
+        print(f'Usager : {self.parent.modele.usager}')
+        print(f'Compagnie : {self.parent.modele.usager_compagnie["id"]}')
+        print(f'Module : {module}')
+
 
 class Modele():
     def __init__(self,parent):

@@ -18,10 +18,10 @@ class Vue():
         self.cadreapp.pack(expand=1, fill=BOTH)
         self.cadres={}
         self.cadreactif=None
+        self.tag_list = []
         self.creercadres()
         self.changercadre("principal")
         self.contact_select=None
-        self.tag_list = []
 
 
     def creercadres(self):
@@ -55,21 +55,6 @@ class Vue():
         # Section Tags
         self.tag_frame = LabelFrame(self.tag_recherche_frame, text="Expertises", font=("Arial", 16))
         self.ajout_tag()
-        #self.tag1 = Checkbutton(self.tag_frame, text="Tag1")
-        #self.tag2 = Checkbutton(self.tag_frame, text="Tag2")
-        #self.tag3 = Checkbutton(self.tag_frame, text="Tag3")
-        #self.tag4 = Checkbutton(self.tag_frame, text="Tag4")
-        #self.tag5 = Checkbutton(self.tag_frame, text="Tag5")
-        #self.tag6 = Checkbutton(self.tag_frame, text="Tag6")
-        #self.ajout_tag_btn = Button(self.tag_frame, text="Ajouter un tag")
-        
-        #self.tag1.grid(row=0, column=0)
-        #self.tag2.grid(row=0, column=1)
-        #self.tag3.grid(row=0, column=2)
-        #self.tag4.grid(row=1, column=0)
-        #self.tag5.grid(row=1, column=1)
-        #self.tag6.grid(row=1, column=2)
-        #self.ajout_tag_btn.grid(row=2, column=0)
 
         # Section Recherche
         self.recherche_frame = LabelFrame(self.tag_recherche_frame, text="Recherche", font=("Arial", 16))
@@ -142,17 +127,35 @@ class Vue():
         return self.cadre_contacts
 
     def ajout_tag(self):
+        self.radio_var = StringVar()
+        tag = Radiobutton(self.tag_frame, text="Aucun filtre", variable=self.radio_var, value="Aucun filtre", command=self.filtrer_contacts, tristatevalue=0)
+        tag.grid(row=0, column=0, sticky=W)
         for count, value in enumerate(self.parent.retourner_expertises()):
-            tag = Checkbutton(self.tag_frame, text=value)
-            tag.grid(row=int(count/3), column=int((count % 3)), sticky=W)
-            self.tag_list.append(tag)
+            tag = Radiobutton(self.tag_frame, text=value, variable=self.radio_var, value=value, command=self.filtrer_contacts, tristatevalue=0)
+            tag.grid(row=int(count/3)+1, column=int((count % 3)), sticky=W)
+            #self.tag_list.append(tag)
+
+    def filtrer_contacts(self):
+        data_temp = []
+        entete=["Prénom","Nom","Expertise"]
+
+        if self.radio_var.get() != "Aucun filtre":
+            for e in self.liste_contacts:
+                    if e[2] == self.radio_var.get():
+                        data_temp.append(e)
+        else:
+            data_temp = self.liste_contacts
+        self.integretableau(data_temp, entete)
+        for i in range(len(entete)):
+            self.tableau.column('#' + str(i), width=60, stretch=0)
+        self.inscrire_transaction(True, "Contacts")
 
     def gerer_contacts_projet(self):
-        liste_contacts=self.parent.trouver_contacts_par_projet()
+        self.liste_contacts=self.parent.trouver_contacts_par_projet()
         print("ID COMPAGNIE ID COMPAGNIE")
         print(self.parent.modele.usager_compagnie["id"])
         entete=["Prénom","Nom","Expertise"]  #, "Courriel", "Ville", "Adresse", "Téléphone", "Notes", "Détails"
-        self.integretableau(liste_contacts,entete)
+        self.integretableau(self.liste_contacts,entete)
         for i in range(len(entete)):
             self.tableau.column('#' + str(i), width=60, stretch=0)
 
@@ -214,16 +217,6 @@ class Vue():
         self.contact_details = Text(self.cadre_inscrire_contact, font=("Arial", 14), width=30, height=5)
         self.contact_lab_note = Label(self.cadre_inscrire_contact, text="Notes importantes:", font=("Arial", 14))
         self.contact_note = Text(self.cadre_inscrire_contact, font=("Arial", 14), width=30, height=2)
-
-                
-        """ self.list_entry_contact.append(self.contact_prenom)
-        self.list_entry_contact.append(self.contact_nom)
-        self.list_entry_contact.append(self.contact_courriel)
-        self.list_entry_contact.append(self.contact_ville)
-        self.list_entry_contact.append(self.contact_adresse)
-        self.list_entry_contact.append(self.contact_telephone)
-        self.list_entry_contact.append(self.contact_details)
-        self.list_entry_contact.append(self.contact_note) """
 
         self.btn_inscrire_contact = Button(self.cadre_inscrire_contact, text="Inscrire le nouveau contact", font=("Arial", 12), padx=10, pady=10,
                                       command=self.inscrire_contact)
@@ -337,6 +330,19 @@ class Vue():
         rep=messagebox.askyesno(titre,message)
         if not rep:
             self.root.destroy()
+
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
+    def inscrire_transaction(self, lecture, module):
+        print(f'Transaction en lecture : {lecture}')
+        print(f'Usager : {self.parent.modele.usager}')
+        print(f'Compagnie : {self.parent.modele.usager_compagnie["id"]}')
+        print(f'Module : {module}')
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
+
 
 class Modele():
     def __init__(self,parent):
