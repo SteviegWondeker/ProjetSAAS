@@ -25,6 +25,7 @@ class Vue():
         self.tbi_crée=FALSE
         self.data_infos=None
 
+
     
 
     def creertableau(self):
@@ -142,7 +143,7 @@ class Vue():
     def creer_tableau_infos(self):
         if(self.tbi_crée is FALSE):
             self.f = Frame(self.cadre_gestion)
-            self.f.pack(side=TOP, fill=X)
+            self.f.pack(fill=X)
 
         self.tableau_infos = ttk.Treeview(show = 'headings')
         
@@ -175,6 +176,10 @@ class Vue():
                 self.tableau_infos.insert('', 'end', values=item)
 
         self.tbi_crée=TRUE
+    
+    def choisirTriage(self):
+         self.data_infos=self.afficher_infos_projet_avec_triage(self.selection,self.choixTriage)
+        
 
     def creer_cadre_mp(self):
         self.root.title("modifier_projet")
@@ -228,12 +233,27 @@ class Vue():
         return self.cadre_mp
 
 
-    def creer_cadre_gestion(self):
+    def creer_cadre_gestion(self,triage=None):
         self.root.title("Gestion")
         self.cadre_gestion = Frame(self.cadreapp)
 
+        self.cblabel = Label(self.cadre_gestion,text="Trier selon :",font=('Times', 16))
+        self.choixTriage=""
+        self.cb=ttk.Combobox(self.cadre_gestion, textvariable=self.choixTriage, values=[
+                                "Ordre alphabétique", 
+                                "Date début",
+                                "Date fin",
+                                "Client",
+                                "Responsable"])
+        self.cblabel.pack()
+        self.cb.pack()
+        self.cb.bind('<<ComboboxSelected>>', self.choisirTriage)
+
         self.creertableau()
-        listeprojets=self.parent.trouverprojets()
+        if(triage==None):
+            listeprojets=self.parent.trouverprojets()
+        else:
+            listeprojets=self.parent.trouverprojetsAvecTriage(triage)
         entete=["Nom du projet","date de début","date de fin"]
         self.integretableau(listeprojets,entete)
 
@@ -246,11 +266,20 @@ class Vue():
         self.btn_afficher_infos = Button(self.cadre_gestion,text="Afficher Infos", font=("Arial", 12),
                                          padx=20, pady=10, command=self.creer_tableau_infos)
 
+     
+        
+
+
         self.btn_afficher_infos.pack()
         self.btn_modifier_projet.pack()
         self.btn_supprimer_projet.pack()
 
         return self.cadre_gestion
+
+    def choisirTriage(self,event):
+        self.cadres["Gestion"]=self.creer_cadre_gestion(self.cb.get())
+        self.tbi_crée=FALSE
+        self.changercadre("Gestion")
 
     def refresh(self):
         self.list_membre= self.list_nom_projet.get()
@@ -346,6 +375,14 @@ class Controleur:
     def trouverprojets(self):
         url = self.urlserveur+"/trouverprojets"
         params = {}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        return mondict
+
+    def trouverprojetsAvecTriage(self,triage):
+        url = self.urlserveur+"/trouverprojetsAvecTriage"
+        params = {"triage":triage}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)

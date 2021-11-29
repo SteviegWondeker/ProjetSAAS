@@ -23,6 +23,22 @@ class Dbclient():   # Base de données du locateur
         info=self.curs.fetchall()
         return info
     
+    def trouverprojetsAvecTriage(self,triage):
+        print("banana")
+        if(triage=="Ordre alphabétique"):
+            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY NomdeProjet")
+        elif(triage=="Date début"):
+            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY datedelancement")
+        elif(triage=="Date fin"):
+            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY datedefinprevue")
+        elif(triage=="Responsable"):
+            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY chargedeprojet")
+        elif(triage=="Client"):
+            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY client")
+        self.curs.execute(sqlnom)
+        info=self.curs.fetchall()
+        return info
+    
     def trouver_projet_infos(self,nom_projet):
         sqlnom=("select idprojet, Nomdeprojet, client, chargedeprojet, datedelancement, datedefinprevue, compagnie from 'projet' WHERE Nomdeprojet=:nom_projet")
         self.curs.execute(sqlnom, {'nom_projet': nom_projet})
@@ -376,6 +392,18 @@ def trouverprojets():
         projets=db.trouverprojets()
         #db=Dbman()
         #projets=db.trouvermembres()
+        db.fermerdb()
+        return Response(json.dumps(projets), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
+@app.route('/trouverprojetsAvecTriage', methods=["GET","POST"])
+def trouverprojetsAvecTriage():
+    if request.method=="POST":
+        triage=request.form["triage"]
+        db=Dbclient()
+        projets=db.trouverprojetsAvecTriage(triage)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
         #return repr(usager)
