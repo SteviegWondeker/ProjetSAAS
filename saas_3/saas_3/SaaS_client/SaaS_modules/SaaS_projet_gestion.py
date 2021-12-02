@@ -320,6 +320,12 @@ class Modele():
         print(sys.argv)
         self.usager=sys.argv[2].split()
         self.inscrireusager(self.usager)
+        self.usager_compagnie=json.loads(sys.argv[2])[1]
+        self.usager_id=json.loads(sys.argv[2])[1]["id"]
+        print(self.usager)
+        print(self.usager_compagnie)
+        print(self.usager_id)
+
 
     def inscrireusager(self,dictinfo):
         self.nom=dictinfo[0]

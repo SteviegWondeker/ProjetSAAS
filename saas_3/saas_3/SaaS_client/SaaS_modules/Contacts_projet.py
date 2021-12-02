@@ -85,11 +85,16 @@ class Vue():
         self.tableau.bind("<ButtonRelease-1>",self.afficher_details)
             # Remplissage tableau
         self.gerer_contacts_projet()
-
+#########################################################################################################################
+#########################################################################################################################
+#########################################################################################################################
         ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
-        xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
+        xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau_frame.xview)
         self.tableau.configure(yscrollcommand=ysb.set)
         self.tableau.configure(xscrollcommand=xsb.set)
+        #########################################################################################################################
+        #########################################################################################################################
+        #########################################################################################################################
 
         self.tableau.grid(in_=self.tableau_frame, row=0, column=0, sticky=NSEW)
         ysb.grid(in_=self.tableau_frame, row=0, column=1, sticky=NS)
