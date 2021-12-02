@@ -351,9 +351,9 @@ class Modele():
             #self.usager=sys.argv[2].split()
             self.usager=json.loads(sys.argv[2])[0]
             self.usager_compagnie=json.loads(sys.argv[2])[1]
-            print("USAGER USAGER USAGER")
-            print(self.usager)
-            print(self.usager_compagnie["nom"])
+            # print("USAGER USAGER USAGER")
+            # print(self.usager)
+            # print(self.usager_compagnie["nom"])
             #self.usager = [s.strip("[],\"") for s in self.usager]
         else:
             self.data_temp = ['jmd', '{"nom": Cineclub', 'id:1}']
@@ -363,6 +363,10 @@ class Modele():
             self.usager_compagnie["id"] = 1
 
         print(self.usager)
+        self.transaction_data = {"lecture": False,
+                                    "usager": self.parent.modele.usager,
+                                    "compagnie": self.parent.modele.usager_compagnie["id"],
+                                    "module": 1}
 
 class Controleur():
     def __init__(self):

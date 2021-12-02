@@ -172,16 +172,10 @@ class Dbclient():   # Base de données du locateur
         print(info)
         return info
 
-######################################################################################
-######################################################################################
-######################################################################################
     def supprimer_contact(self, idcontacts):
         sqlrequete = ("DELETE FROM 'contacts_projets' WHERE idcontacts = :idcontacts;")
         self.curs.execute(sqlrequete, {'idcontacts': idcontacts})
         self.conn.commit() 
-        ######################################################################################
-        ######################################################################################
-        ######################################################################################
 
     def ajouter_role():
         pass
@@ -216,13 +210,11 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         return info
 
     def trouver_permissions_par_membre(self, membre):        # Alex
-        sqlnom = ("select nommodule from 'modules' "
-                  "INNER JOIN 'Tbl_role_module' ON modules.idmodule=Tbl_role_module.id_role_module "
-                  "INNER JOIN 'Tbl_role' ON Tbl_role_module.role=Tbl_role.id_role "
-                  "INNER JOIN 'Tbl_membre_role' ON Tbl_role.id_role=Tbl_membre_role.role "
-                  "INNER JOIN 'membre' ON Tbl_membre_role.membre=membre.idmembre WHERE membre.identifiant=:membre")
+        sqlnom = ("select nommodule from 'modules' INNER JOIN 'Tbl_role_module' ON modules.idmodule=Tbl_role_module.module INNER JOIN 'Tbl_role' ON Tbl_role_module.role=Tbl_role.id_role INNER JOIN 'Tbl_membre_role' ON Tbl_role.id_role=Tbl_membre_role.role INNER JOIN 'membre' ON Tbl_membre_role.membre=membre.idmembre WHERE membre.identifiant=:membre")
         self.curs.execute(sqlnom, {'membre': membre})
         info = self.curs.fetchall()
+        print(membre)
+        print("testtestest")
         return info
 
     def trouver_compagnies(self):           # Alex
@@ -313,9 +305,16 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     'mdp': mdp,
                                     'id_complet': id_complet,
                                     'courriel': courriel,
-                                    'telephone': telephone})  
+                                    'telephone': telephone})
+        self.conn.commit()
+
+        sql_id=("select idmembre from 'membre' where identifiant=:id_complet")
+        self.curs.execute(sql_id, {'id_complet':id_complet})
+        id_membre=self.curs.fetchall()
+        print(f'ID MEMBRE : {id_membre[0][0]}')
+
         self.curs.execute(sql_role, {
-                                    'id_emp':id_emp,
+                                    'id_emp':id_membre[0][0],
                                     'nom_role':nom_role})                       
         self.conn.commit()
         return "test"
@@ -332,6 +331,8 @@ def demanderclients():
     clients=db.trouverclients()
     db.fermerdb()
     return clients
+
+#def inscrire
     
 mesfonctions={"demanderclients":demanderclients}
 
