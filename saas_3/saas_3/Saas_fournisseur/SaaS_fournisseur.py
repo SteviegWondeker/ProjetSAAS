@@ -137,10 +137,12 @@ class Vue():
         item = self.tableaux[0].selection()
         for i in item:
             membre = self.tableaux[0].item(i, "values")[0]
+            print(membre)
         if(membre):     # Safety au cas ou membre serait null
             listemembres = self.parent.trouver_permissions_par_membre(membre)
             entete = ["Modules accesibles"]
             self.integretableau(listemembres, entete, 1)
+            print(membre)
 
 class Modele():
     def __init__(self,parent):
@@ -222,7 +224,7 @@ class Controleur:
 
     def trouver_permissions_par_membre(self, membre):           # Alex
         url = self.urlserveur + "/trouver_permissions_par_membre"
-        params = {"membre": membre[0]}
+        params = {"membre": membre}
         reptext = self.appelserveur(url, params)
 
         mondict = json.loads(reptext)
