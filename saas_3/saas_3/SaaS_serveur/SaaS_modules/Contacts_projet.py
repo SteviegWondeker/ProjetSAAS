@@ -364,8 +364,8 @@ class Modele():
 
         print(self.usager)
         self.transaction_data = {"lecture": False,
-                                    "usager": self.parent.modele.usager,
-                                    "compagnie": self.parent.modele.usager_compagnie["id"],
+                                    "usager": self.usager,
+                                    "compagnie": self.usager_compagnie["id"],
                                     "module": 1}
 
 class Controleur():

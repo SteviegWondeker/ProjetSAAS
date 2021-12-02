@@ -55,21 +55,6 @@ class Vue():
         # Section Tags
         self.tag_frame = LabelFrame(self.tag_recherche_frame, text="Expertises", font=("Arial", 16))
         self.ajout_tag()
-        #self.tag1 = Checkbutton(self.tag_frame, text="Tag1")
-        #self.tag2 = Checkbutton(self.tag_frame, text="Tag2")
-        #self.tag3 = Checkbutton(self.tag_frame, text="Tag3")
-        #self.tag4 = Checkbutton(self.tag_frame, text="Tag4")
-        #self.tag5 = Checkbutton(self.tag_frame, text="Tag5")
-        #self.tag6 = Checkbutton(self.tag_frame, text="Tag6")
-        #self.ajout_tag_btn = Button(self.tag_frame, text="Ajouter un tag")
-        
-        #self.tag1.grid(row=0, column=0)
-        #self.tag2.grid(row=0, column=1)
-        #self.tag3.grid(row=0, column=2)
-        #self.tag4.grid(row=1, column=0)
-        #self.tag5.grid(row=1, column=1)
-        #self.tag6.grid(row=1, column=2)
-        #self.ajout_tag_btn.grid(row=2, column=0)
 
         # Section Recherche
         self.recherche_frame = LabelFrame(self.tag_recherche_frame, text="Recherche", font=("Arial", 16))
@@ -233,16 +218,6 @@ class Vue():
         self.contact_lab_note = Label(self.cadre_inscrire_contact, text="Notes importantes:", font=("Arial", 14))
         self.contact_note = Text(self.cadre_inscrire_contact, font=("Arial", 14), width=30, height=2)
 
-                
-        """ self.list_entry_contact.append(self.contact_prenom)
-        self.list_entry_contact.append(self.contact_nom)
-        self.list_entry_contact.append(self.contact_courriel)
-        self.list_entry_contact.append(self.contact_ville)
-        self.list_entry_contact.append(self.contact_adresse)
-        self.list_entry_contact.append(self.contact_telephone)
-        self.list_entry_contact.append(self.contact_details)
-        self.list_entry_contact.append(self.contact_note) """
-
         self.btn_inscrire_contact = Button(self.cadre_inscrire_contact, text="Inscrire le nouveau contact", font=("Arial", 12), padx=10, pady=10,
                                       command=self.inscrire_contact)
 
@@ -356,11 +331,17 @@ class Vue():
         if not rep:
             self.root.destroy()
 
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
     def inscrire_transaction(self, lecture, module):
         print(f'Transaction en lecture : {lecture}')
         print(f'Usager : {self.parent.modele.usager}')
         print(f'Compagnie : {self.parent.modele.usager_compagnie["id"]}')
         print(f'Module : {module}')
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
 
 
 class Modele():
@@ -370,9 +351,9 @@ class Modele():
             #self.usager=sys.argv[2].split()
             self.usager=json.loads(sys.argv[2])[0]
             self.usager_compagnie=json.loads(sys.argv[2])[1]
-            print("USAGER USAGER USAGER")
-            print(self.usager)
-            print(self.usager_compagnie["nom"])
+            # print("USAGER USAGER USAGER")
+            # print(self.usager)
+            # print(self.usager_compagnie["nom"])
             #self.usager = [s.strip("[],\"") for s in self.usager]
         else:
             self.data_temp = ['jmd', '{"nom": Cineclub', 'id:1}']
@@ -382,6 +363,10 @@ class Modele():
             self.usager_compagnie["id"] = 1
 
         print(self.usager)
+        self.transaction_data = {"lecture": False,
+                                    "usager": self.usager,
+                                    "compagnie": self.usager_compagnie["id"],
+                                    "module": 1}
 
 class Controleur():
     def __init__(self):
