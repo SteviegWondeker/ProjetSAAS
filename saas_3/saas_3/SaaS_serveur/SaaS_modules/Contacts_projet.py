@@ -331,18 +331,6 @@ class Vue():
         if not rep:
             self.root.destroy()
 
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-    def inscrire_transaction(self, lecture, module):
-        print(f'Transaction en lecture : {lecture}')
-        print(f'Usager : {self.parent.modele.usager}')
-        print(f'Compagnie : {self.parent.modele.usager_compagnie["id"]}')
-        print(f'Module : {module}')
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
 
 class Modele():
     def __init__(self,parent):
@@ -362,11 +350,16 @@ class Modele():
             self.usager_compagnie["nom"] = "Cinéclub"
             self.usager_compagnie["id"] = 1
 
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
         print(self.usager)
-        self.transaction_data = {"lecture": False,
-                                    "usager": self.usager,
+        self.transaction_data = {"usager": self.usager,
                                     "compagnie": self.usager_compagnie["id"],
                                     "module": 1}
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
 
 class Controleur():
     def __init__(self):
@@ -386,14 +379,15 @@ class Controleur():
 
     def retourner_expertises(self):
         url = self.urlserveur+"/trouver_expertises"
-        params = {}
+        params = {"transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
 
     def trouver_contacts_par_projet(self):
         url = self.urlserveur+"/trouver_contacts_par_projet"
-        params = {"comp": self.modele.usager_compagnie["id"]}
+        params = {"comp": self.modele.usager_compagnie["id"],
+                    "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)
 
         mondict=json.loads(reptext)
@@ -403,7 +397,8 @@ class Controleur():
         url = self.urlserveur+"/get_contact_details"
         params = {"prenom": prenom,
                     "nom": nom,
-                    "expertise": expertise}
+                    "expertise": expertise, 
+                    "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)
 
         mondict=json.loads(reptext)
@@ -414,15 +409,16 @@ class Controleur():
         identifiant_nom = form[0]+" "+form[1]
         params = {"prenom":form[0],
                     "nom":form[1],
-                  "courriel":form[2],
+                    "courriel":form[2],
                     "ville":form[3],
                     "adresse":form[4],
-                  "telephone":form[5],
-                  "details":form[6],
-                  "notes":form[7],
-                  "tag":form[8],
-                  "comp":self.modele.usager_compagnie["id"],
-                  "projet":1}
+                    "telephone":form[5],
+                    "details":form[6],
+                    "notes":form[7],
+                    "tag":form[8],
+                    "comp":self.modele.usager_compagnie["id"],
+                    "projet":1,
+                    "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -430,12 +426,14 @@ class Controleur():
 
     def supprimer_contact(self, idcontacts):
         url = self.urlserveur+"/supprimer_contact"
-        params = {"idcontacts":idcontacts}
+        params = {"idcontacts":idcontacts,
+                    "transac":self.modele.transaction_data}
         self.appelserveur(url,params)
 
     def verifier_contact(self,form):
         url = self.urlserveur+"/verifiercontact"
-        params = {"courriel":form[4]}
+        params = {"courriel":form[4],
+                    "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
