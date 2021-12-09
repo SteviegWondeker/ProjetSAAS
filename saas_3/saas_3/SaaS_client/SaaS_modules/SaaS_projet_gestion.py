@@ -271,8 +271,10 @@ class Vue():
 
 
         self.btn_afficher_infos.pack()
-        self.btn_modifier_projet.pack()
-        self.btn_supprimer_projet.pack()
+        for list in self.parent.modele.acces_modification_suppression:
+            if( 'GMedia_projet.py' in list):
+                self.btn_modifier_projet.pack()
+                self.btn_supprimer_projet.pack()
 
         return self.cadre_gestion
 
@@ -320,12 +322,14 @@ class Modele():
         print(sys.argv)
         self.usager=sys.argv[2].split()
         self.inscrireusager(self.usager)
-        self.usager_compagnie=json.loads(sys.argv[2])[1]
+        self.usager_compagnie=json.loads(sys.argv[2])[1]["nom"]
         self.usager_id=json.loads(sys.argv[2])[1]["id"]
-        print(self.usager)
-        print(self.usager_compagnie)
-        print(self.usager_id)
+        self.usager_nom=json.loads(sys.argv[2])[0]
+        print(self.usager_nom)
+        
 
+        self.acces_modification_suppression = self.parent.trouver_permissions_par_membre(self.usager_nom)
+        print(self.acces_modification_suppression)
 
     def inscrireusager(self,dictinfo):
         self.nom=dictinfo[0]
@@ -381,6 +385,14 @@ class Controleur:
     def trouverprojets(self):
         url = self.urlserveur+"/trouverprojets"
         params = {}
+        reptext=self.appelserveur(url,params)
+
+        mondict=json.loads(reptext)
+        return mondict
+    
+    def trouver_permissions_par_membre(self,membre):
+        url = self.urlserveur+"/trouver_permissions_par_membre"
+        params = {"membre":membre}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
