@@ -67,7 +67,7 @@ class Dbclient():   # Base de données du locateur
         info=self.curs.fetchall()
         return info
 
-    def inscrire_client(self, nom_client, courriel, telephone, compagnie, adresse, rue,ville):
+    def inscrire_client(self, nom_client, courriel, telephone, compagnie, adresse, rue, ville):
         sql_client=("insert into 'client' ('nom', 'courriel', 'tel', 'compagnie', 'adresse', 'rue', 'ville') values (:nom_client, :courriel, :telephone, :compagnie, :adresse, :rue, :ville)")                         
         self.curs.execute(sql_client, {
                                     'nom_client':nom_client,
@@ -326,6 +326,28 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.conn.commit()
         return "test"
 
+    # Inscrit les données de transactions de base de données
+    def dataWrite(self, transac):
+        print(transac)
+        transac = json.loads(transac)
+        print(f'VARIABLE TRANSAC: {transac["usager"]}')
+        sqltransac("insert into 'transactions' ('lecture', 'membre', 'compagnie', 'module', 'date') values (0, :usager, :comp, :mod, CURRENT_TIMESTAMP)")                         
+        self.curs.execute(sqltransac, {
+                                    'usager':transac["usager"],
+                                    'comp': transac["compagnie"],
+                                    'mod': transac["module"]})
+    
+    # Inscrit les données de transactions de base de données
+    def dataRead(self, transac):
+        print(transac)
+        transac = json.loads(transac)
+        print(f'VARIABLE TRANSAC: {transac["usager"]}')
+        sqltransac = ("insert into 'transactions' ('lecture', 'membre', 'compagnie', 'module', 'date') values (1, :usager, :comp, :mod, CURRENT_TIMESTAMP)")                         
+        self.curs.execute(sqltransac, {
+                                    'usager':transac["usager"],
+                                    'comp': transac["compagnie"],
+                                    'mod': transac["module"]})  
+
 def demanderclients():
     db=Dbclient()
     clients=db.trouverclients()
@@ -336,6 +358,16 @@ def demanderclients():
     
 mesfonctions={"demanderclients":demanderclients}
 
+def dataRead(transac):
+    db=Dbman()
+    db.dataRead(transac)
+    db.fermerdb()
+
+def dataWrite(transac):
+    db=Dbman()
+    db.dataRead(transac)
+    db.fermerdb()
+    
 @app.route('/')
 def index():
     return 'Hello world du serveur '+ os.getcwd()
@@ -375,14 +407,16 @@ def identifierusager():
     else:
         return repr("pas ok")
 
-
+#################################################################################################################
+#################################################################################################################
 @app.route('/trouverprojets', methods=["GET","POST"])
 def trouverprojets():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbclient()
         projets=db.trouverprojets()
-        #db=Dbman()
-        #projets=db.trouvermembres()
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
         #return repr(usager)
@@ -392,6 +426,9 @@ def trouverprojets():
 @app.route('/inscrire_contact', methods=["GET","POST"])
 def inscrire_contact():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         db=Dbclient()
         prenom = request.form["prenom"]
         nom = request.form["nom"]
@@ -404,6 +441,7 @@ def inscrire_contact():
         tag = request.form["tag"]
         projet = request.form["projet"]
         comp = request.form["comp"]
+        transac = request.form["transac"]
         projets=db.inscrire_contact(prenom, nom, courriel, ville, adresse, telephone, details, notes, tag, comp, projet)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
@@ -414,8 +452,12 @@ def inscrire_contact():
 @app.route('/supprimer_contact', methods=["GET","POST"])
 def supprimer_contact():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+        
         db=Dbclient()
         idcontacts = request.form["idcontacts"]
+        transac = request.form["transac"]
         projets=db.supprimer_contact(idcontacts)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
@@ -423,6 +465,9 @@ def supprimer_contact():
 @app.route('/trouver_projet_infos', methods=["GET","POST"])
 def trouver_projet_infos():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbclient()
         projet = request.form["projet"]
         infos=db.trouver_projet_infos(projet)
@@ -436,9 +481,11 @@ def trouver_projet_infos():
 @app.route('/trouvermembres', methods=["GET","POST"])
 def trouvermembres():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbman()
         membres=db.trouvermembres()
-
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')
         #return repr(usager)
@@ -448,6 +495,9 @@ def trouvermembres():
 @app.route('/trouvercompagnies', methods=["GET","POST"])        # Alex
 def trouvercompagnies():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbman()
         compagnies=db.trouver_compagnies()
 
@@ -457,6 +507,9 @@ def trouvercompagnies():
 @app.route('/trouver_membres_par_compagnie', methods=["GET","POST"])        # Alex
 def trouver_membres_par_compagnie():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbman()
         comp = request.form["comp"]
         membres=db.trouver_membres_par_compagnie(comp)
@@ -467,6 +520,9 @@ def trouver_membres_par_compagnie():
 @app.route('/trouver_contacts_par_projet', methods=["GET","POST"])        # Alex
 def trouver_contacts_par_projet():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbclient()
         comp = request.form["comp"]
         contacts=db.trouver_contacts_par_projet(comp)
@@ -477,6 +533,9 @@ def trouver_contacts_par_projet():
 @app.route('/get_contact_details', methods=["GET","POST"])        # Alex
 def get_contact_details():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbclient()
         prenom = request.form["prenom"]
         nom = request.form["nom"]
@@ -489,6 +548,9 @@ def get_contact_details():
 @app.route('/trouver_projet_par_compagnie', methods=["GET","POST"]) #N
 def trouver_projet_par_compagnie():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         id_comp=request.form["id"]
         db=Dbclient()
         projets=db.trouver_projet_par_compagnie(id_comp)
@@ -501,6 +563,9 @@ def trouver_projet_par_compagnie():
 @app.route('/trouver_permissions_par_membre', methods=["GET","POST"])        # Alex
 def trouver_permissions_par_membre():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db=Dbman()
         membre = request.form["membre"]
         membres=db.trouver_permissions_par_membre(membre)
@@ -512,6 +577,8 @@ def trouver_permissions_par_membre():
 def trouver_roles():
     if request.method == "POST":
         db = Dbman()
+        # transac = request.form["transac"]
+        # roles = db.trouver_roles(transac)
         roles = db.trouver_roles()
 
         db.fermerdb()
@@ -524,6 +591,8 @@ def trouver_roles():
 def trouver_roles_nom():
     if request.method == "POST":
         db = Dbman()
+        # transac = request.form["transac"]
+        # roles = db.trouver_roles_nom(transac)
         roles = db.trouver_roles_nom()
 
         db.fermerdb()
@@ -535,6 +604,9 @@ def trouver_roles_nom():
 @app.route('/trouver_expertises', methods=["GET","POST"])
 def trouver_expertises():
     if request.method == "POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         db = Dbclient()
         expertises = db.trouver_expertises()
 
@@ -548,6 +620,7 @@ def trouver_expertises():
 def requeteserveur():
     if request.method=="POST":
         nomfonction=request.form["fonction"]
+        transac = request.form["transac"]
         rep=mesfonctions[nomfonction]()
         n=1
         return Response(json.dumps(rep), mimetype='application/json')
@@ -559,6 +632,9 @@ def requeteserveur():
 @app.route('/verifierusager', methods=["GET","POST"]) #N
 def verifier_usager():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         nom_org=request.form["nom_org"]
         courriel=request.form["courriel"]
         db=Dbman()
@@ -575,6 +651,9 @@ def verifier_usager():
 @app.route('/verifiermembre', methods=["GET","POST"]) #N
 def verifier_membre():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         courriel=request.form["courriel"]
         db=Dbman()
         usager=db.verifier_membre(courriel)
@@ -588,6 +667,9 @@ def verifier_membre():
 @app.route('/verifierprojet', methods=["GET","POST"]) #N
 def verifier_projet():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         nom_projet=request.form["nom_projet"]
         nom_client=request.form["nom_client"]
         db=Dbclient()
@@ -601,6 +683,9 @@ def verifier_projet():
 @app.route('/verifierclient', methods=["GET","POST"]) #N
 def verifier_client():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataRead(transac)
+
         courriel=request.form["courriel"]
         db=Dbclient()
         usager=db.verifier_client(courriel)
@@ -614,6 +699,9 @@ def verifier_client():
 @app.route('/inscrireusager', methods=["GET","POST"]) #N
 def inscrire_usager():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         nom=request.form["nom_user"]
         courriel=request.form["courriel"]
         telephone=request.form["telephone"]
@@ -633,6 +721,9 @@ def inscrire_usager():
 @app.route('/inscriremodulemembre', methods=["GET","POST"]) #N
 def inscrire_module_role():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         nom_module=request.form["nom_module"]
         nom_role=request.form["nom_role"]
 
@@ -648,6 +739,9 @@ def inscrire_module_role():
 @app.route('/inscrireclient', methods=["GET","POST"]) #N
 def inscrire_client():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         nom_client=request.form["nom_client"]
         courriel=request.form["courriel"]
         telephone=request.form["telephone"]
@@ -668,6 +762,9 @@ def inscrire_client():
 @app.route('/inscriremembre', methods=["GET","POST"]) #N
 def inscrire_membre():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         nom=request.form["nom_user"]
         courriel=request.form["courriel"]
         telephone=request.form["telephone"]
@@ -689,6 +786,9 @@ def inscrire_membre():
 @app.route('/ajouterprojet', methods=["GET","POST"]) #N
 def ajouter_projet():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         nom_proj=request.form["nom_projet"]
         nom_client=request.form["nom_client"]
         responsable=request.form["responsable"]
@@ -708,6 +808,9 @@ def ajouter_projet():
 @app.route('/envoyer_modifs', methods=["GET","POST"]) #N
 def envoyer_modifs():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         idprojet=request.form["idprojet"]
         nom_proj=request.form["nom_projet"]
         nom_client=request.form["nom_client"]
@@ -730,8 +833,10 @@ def envoyer_modifs():
 def ajouter_module():
     if request.method=="POST":
         nom_module=request.form["nom_module"]
+        # transac = request.form["transac"]
 
         db=Dbman()
+        # usager=db.ajouter_module(nom_module, transac)
         usager=db.ajouter_module(nom_module)
 
         db.fermerdb()
@@ -743,6 +848,9 @@ def ajouter_module():
 @app.route('/ajouterrole', methods=["GET","POST"]) #N
 def ajouter_role():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+
         nom_role=request.form["nom_role"]
 
         db=Dbman()
