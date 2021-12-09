@@ -219,6 +219,26 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
             return [info,co]
         return "inconnu"
 
+    def ajouter_projet_fournisseur(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_compagnie):
+        sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue', 'compagnie') values (:nom_projet, :nom_client, :responsable, :date_deb, :date_fin, :nom_compagnie)")                         
+                              
+        self.curs.execute(sql_nom, {
+                                'nom_projet':nom_projet,
+                                'nom_client': nom_client,
+                                'responsable': responsable,
+                                'date_deb': date_deb,
+                                'date_fin': date_fin,
+                                'nom_compagnie':nom_compagnie})          
+
+        self.conn.commit()                                
+        #sql_projet("insert into 'tbl_projet_compagnie' ('nom_compagnie', 'id') values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from 'projet' where nomdeprojet=:nom_projet))")
+        #self.curs.execute(sql_projet, {
+        #                        'nom_admin':nom_admin,
+        #                        'nom_projet': nom_projet})     
+        self.conn.commit()
+        return "test"
+
+
     def trouvermembres(self):
         sqlnom=("select identifiant, permission,titre from 'membre'")
         self.curs.execute(sqlnom)
@@ -227,6 +247,12 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
     def trouver_membres_par_compagnie(self, comp):        # Alex
         sqlnom = ("select identifiant, permission,titre from 'membre' INNER JOIN 'compagnie' ON membre.compagnie=compagnie.idcompagnie WHERE compagnie.nomcompagnie=:comp")
+        self.curs.execute(sqlnom, {'comp': comp})
+        info = self.curs.fetchall()
+        return info
+
+    def trouver_projets_par_compagnie(self, comp):        # Alex
+        sqlnom = ("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' INNER JOIN 'compagnie' ON projet.compagnie=compagnie.idcompagnie WHERE compagnie.nomcompagnie=:comp")
         self.curs.execute(sqlnom, {'comp': comp})
         info = self.curs.fetchall()
         return info
@@ -498,6 +524,16 @@ def trouver_membres_par_compagnie():
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')
 
+@app.route('/trouver_projets_par_compagnie', methods=["GET","POST"])        # Alex
+def trouver_projets_par_compagnie():
+    if request.method=="POST":
+        db=Dbman()
+        comp = request.form["comp"]
+        membres=db.trouver_projets_par_compagnie(comp)
+
+        db.fermerdb()
+        return Response(json.dumps(membres), mimetype='application/json')
+
 @app.route('/trouver_contacts_par_projet', methods=["GET","POST"])        # Alex
 def trouver_contacts_par_projet():
     if request.method=="POST":
@@ -738,6 +774,26 @@ def ajouter_projet():
         #return repr(usager)
     else:
         return repr("pas ok")
+
+@app.route('/ajouterprojetfournisseur', methods=["GET","POST"]) #N
+def ajouter_projet_fournisseur():
+    if request.method=="POST":
+        nom_proj=request.form["nom_projet"]
+        nom_client=request.form["nom_client"]
+        responsable=request.form["responsable"]
+        date_deb=request.form["date_deb"]
+        date_fin=request.form["date_fin"]
+        nom_compagnie=request.form["nom_compagnie"]
+
+        db=Dbman()
+        usager=db.ajouter_projet_fournisseur(nom_proj, nom_client, responsable, date_deb, date_fin, nom_compagnie)
+
+        db.fermerdb()
+        return Response(json.dumps(usager), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")
+
 
 @app.route('/envoyer_modifs', methods=["GET","POST"]) #N
 def envoyer_modifs():

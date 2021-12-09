@@ -30,49 +30,100 @@ class Vue():
         self.cadreactif.pack()
 
     def creercadres(self):
-         self.cadres["principal"]=self.creercadreprincipal()
+        self.cadres["principal"]=self.creercadreprincipal()
+        self.cadres["user"]=self.creercadreuser()
+        self.cadres["projets"]=self.creercadreprojets()
 
+    def creercadreprincipal(self):
+        self.root.title("Menu principal")
+        self.cadreprincipal = Frame(self.cadreapp,width=400, height=400)
 
-    def creercadreprincipal(self):          # Alex
-        self.root.title("SaaS - ADMIN")
-        self.cadreprincipal = Frame(self.cadreapp, width=400, height=400)
+        self.btn_afficher_utilisateurs=Button(self.cadreprincipal,text="Afficher utilisateur", font=("Arial", 12),
+                                         padx=10, pady=10, command=self.afficherutilisateurs)
+        self.btn_afficher_projets=Button(self.cadreprincipal,text="Afficher projets", font=("Arial", 12),
+                                         padx=10, pady=10, command=self.afficherprojets)
 
-        self.cadretitre = Frame(self.cadreprincipal, width=400, height=400)
-        self.titreprincipal = Label(self.cadretitre, text="SaaS - ADMIN",
+        self.btn_afficher_utilisateurs.pack()
+        self.btn_afficher_projets.pack()
+
+        return self.cadreprincipal
+
+    def creercadreprojets(self):          # Alex
+        self.root.title("SaaS - ADMIN - Projets")
+        self.cadreprojets = Frame(self.cadreapp, width=400, height=400)
+
+        self.cadretitreprojets = Frame(self.cadreprojets, width=400, height=400)      
+        self.titreprojets = Label(self.cadretitreprojets, text="SaaS - ADMIN - Projets",
+                                    font=("Arial", 18),
+                                    borderwidth=2, relief=GROOVE)
+
+        self.titreprojets.pack()
+        self.cadretitreprojets.pack()
+
+        self.options_list_projets = self.parent.trouver_compagnies()
+        self.value_inside_projets = StringVar(self.cadreprojets)
+        self.value_inside_projets.set("Option")
+        self.menu_deroulant_projets = ttk.OptionMenu(self.cadreprojets, self.value_inside_projets, self.options_list_projets[0], *self.options_list_projets, command=self.trouver_projets_par_compagnie)
+        self.menu_deroulant_projets.pack()
+        self.cadrecontenu_projets = Frame(self.cadreprojets, width=600, height=400)
+        self.cadrecontenu_projets.pack()
+        self.cadrepied_projets = Frame(self.cadreprojets, width=600, height=80)
+        self.cadrepied_projets.pack()
+
+        
+        self.creertableau(2)
+
+        return self.cadreprojets
+
+    def creercadreuser(self):          # Alex
+        self.root.title("SaaS - ADMIN - Utilisateurs")
+        self.cadreuser = Frame(self.cadreapp, width=400, height=400)
+
+        self.cadretitre = Frame(self.cadreuser, width=400, height=400)
+        self.titreuser = Label(self.cadretitre, text="SaaS - ADMIN",
                                     font=("Arial", 18),
                                     borderwidth=2, relief=GROOVE)
 
         self.usagercourant = Label(self.cadretitre, text="ADMIN",# + ", " + usager.titre + " : " + usager.droit,
                                    font=("Arial", 14))
-        self.titreprincipal.pack()
+        self.titreuser.pack()
         self.usagercourant.pack()
         self.cadretitre.pack()
 
         # commande possible
-        #self.cadrecommande = Frame(self.cadreprincipal, width=400, height=400)
+        #self.cadrecommande = Frame(self.cadreuser, width=400, height=400)
         #btnsaction = []
         #for i in btnsaction:
         #    i.pack(side=LEFT, pady=10, padx=10)
         #self.cadrecommande.pack()
 
         self.options_list = self.parent.trouver_compagnies()
-        self.value_inside = StringVar(self.cadreprincipal)
+        self.value_inside = StringVar(self.cadreuser)
         self.value_inside.set("Option")
-        self.menu_deroulant = ttk.OptionMenu(self.cadreprincipal, self.value_inside, self.options_list[0], *self.options_list, command=self.trouver_membres_par_compagnie)
+        self.menu_deroulant = ttk.OptionMenu(self.cadreuser, self.value_inside, self.options_list[0], *self.options_list, command=self.trouver_membres_par_compagnie)
         self.menu_deroulant.pack()
-        self.cadrecontenu = Frame(self.cadreprincipal, width=600, height=400)
+        self.cadrecontenu = Frame(self.cadreuser, width=600, height=400)
         self.cadrecontenu.pack()
-        self.cadrepied = Frame(self.cadreprincipal, width=600, height=80)
+        self.cadrepied = Frame(self.cadreuser, width=600, height=80)
         self.cadrepied.pack()
 
         self.creertableau(0)
         self.creertableau(1)
 
 
-        return self.cadreprincipal
+        return self.cadreuser
+    
+    def afficherutilisateurs(self):
+        self.changercadre("user")
+
+    def afficherprojets(self):
+        self.changercadre("projets")
 
     def creertableau(self, id):             # Modifié par Alex
-        f = Frame(self.cadrecontenu)
+        if id==2:
+            f = Frame(self.cadrecontenu_projets)
+        else:
+             f = Frame(self.cadrecontenu)
         f.pack(side=TOP, fill=BOTH, expand=Y, padx=(15, 0))
 
         self.tableaux[id] = ttk.Treeview(show='headings')
@@ -94,7 +145,7 @@ class Vue():
         # set frame resize priorities
         f.rowconfigure(0, weight=1)
         f.columnconfigure(0, weight=1)
-
+    
     def integretableau(self, listeinfos, entete, id):       # Modifié par Alex
         self.data = listeinfos
         self.colonnestableau = entete
@@ -131,6 +182,11 @@ class Vue():
         listemembres = self.parent.trouver_membres_par_compagnie(comp)
         entete = ["identifiant", "permission", "titre"]
         self.integretableau(listemembres, entete, 0)
+
+    def trouver_projets_par_compagnie(self, comp):
+        listeprojets = self.parent.trouver_projets_par_compagnie(comp)
+        entete = ["Nom Projet", "Date de début", "Date de fin"]
+        self.integretableau(listeprojets, entete, 0)
 
     def trouver_permissions_par_membre(self, evt):
         membre = None
@@ -221,6 +277,15 @@ class Controleur:
 
         mondict = json.loads(reptext)
         return mondict
+    
+    def trouver_projets_par_compagnie(self, comp):           # Alex
+        url = self.urlserveur + "/trouver_projets_par_compagnie"
+        params = {"comp": comp[0]}
+        reptext = self.appelserveur(url, params)
+
+        mondict = json.loads(reptext)
+        return mondict
+
 
     def trouver_permissions_par_membre(self, membre):           # Alex
         url = self.urlserveur + "/trouver_permissions_par_membre"
@@ -244,8 +309,8 @@ class Controleur:
     #         self.vue.avertirusager("Compte non autorisé", "Voulez-vous vous connecter avec un autre compte?")
     #     else:
     #         self.modele.inscrireusager(mondict)
-    #         self.vue.creercadreprincipal(self.modele)
-    #         self.vue.changercadre("principal")
+    #         self.vue.creercadreuser(self.modele)
+    #         self.vue.changercadre("user")
 
     ####
 
