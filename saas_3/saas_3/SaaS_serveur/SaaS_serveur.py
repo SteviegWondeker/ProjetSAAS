@@ -151,12 +151,46 @@ class Dbclient():   # Base de données du locateur
 
         self.conn.commit()  
 
+    
+    def inscrire_taches(self, nom_tache, details, notes, employe, comp, courriel, projet,tag):
+        print(tag)
+        if tag != "":
+            sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
+            self.curs.execute(sql_tag_id, {'tag': tag})
+            tag_id=self.curs.fetchall()
+            print("TAG ID 1")
+            print(tag_id)
+            if not tag_id:
+                sql_tag_insert = ("insert into 'contacts_expertises' ('expertise') values (:tag)")
+                self.curs.execute(sql_tag_insert, {'tag': tag})
+                self.conn.commit()
+            self.curs.execute(sql_tag_id, {'tag': tag})
+            
+            tag_id=self.curs.fetchall()[0][0]
+        else:
+            tag_id = ""
+        sql_nom=("insert into 'tache' ('nom_tache','details','notes','employe','comp','courriel','projet','role') values (:nom_tache,:details,:notes,:employe,:compagnie,:courriel,:projet,:role)")
+        self.curs.execute(sql_nom, {
+                                'nom_tache':nom_tache,
+                                'details':details,
+                                'notes':notes,
+                                'employe':employe,
+                                'comp':comp,
+                                'courriel': courriel,
+                                'projet':projet,
+                                'role':tag
+                                # 'tag_id':tag                 
+                                })
+
+        self.conn.commit()      
+
     def trouver_expertises(self):
         sql_expertises = ("select expertise from 'contacts_expertises'")
         self.curs.execute(sql_expertises)
         info = self.curs.fetchall()
         return info
 
+    
         ##############################################################################################################
         ##############################################################################################################
         ##############################################################################################################
@@ -252,7 +286,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
         return info_user
         
-    def retourner_role(self): #n
+    def retourner_role(self,role): #n
         sql_user=("select nom_role from 'tbl_role'")
         self.curs.execute(sql_user)
         info_user=self.curs.fetchall()
@@ -397,6 +431,26 @@ def inscrire_contact():
         #return repr(usager)
     else:
         return repr("pas ok")
+
+@app.route('/inscrire_taches', methods=["GET","POST"])
+def inscrire_taches():
+    if request.method=="POST":
+        db=Dbclient()
+        nom_tache = request.form["nom_tache"]
+        employe = request.form["employe"]
+        role = request.form["role"]
+        courriel = request.form["courriel"]
+        details = request.form["details"]
+        notes = request.form["notes"]
+        # tag = request.form["tag"]
+        projet = request.form["projet"]
+        comp = request.form["comp"]
+        projets=db.inscrire_contact(  nom_tache , employe,role,courriel,details, notes,projet, comp)
+        db.fermerdb()
+        return Response(json.dumps(projets), mimetype='application/json')
+        #return repr(usager)
+    else:
+        return repr("pas ok")        
 
 @app.route('/trouver_projet_infos', methods=["GET","POST"])
 def trouver_projet_infos():
