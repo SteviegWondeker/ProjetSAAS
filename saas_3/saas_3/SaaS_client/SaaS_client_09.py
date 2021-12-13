@@ -690,6 +690,7 @@ class Vue():
     def ajouter_projet(self): #n
         if self.valider_projet():
             self.parent.ajouter_projet(self.form)
+            self.parent.ajouter_projet_fournisseur(self.form)
             self.retour_cadre_principal()
 
 
@@ -916,6 +917,18 @@ class Controleur:
 
     def ajouter_projet(self,form): #n
         url = self.urlserveur+"/ajouterprojet"
+        params = {"nom_projet":form[0],
+                "nom_client":form[1],
+                "responsable":form[2],
+                "date_deb":form[3],
+                "date_fin":form[4],
+                "nom_compagnie": self.modele.compagnie["nom"]}
+        reptext=self.appelserveur(url,params)
+        mondict=json.loads(reptext)         
+        print(mondict)
+
+    def ajouter_projet_fournisseur(self,form): #n
+        url = self.urlserveur+"/ajouterprojetfournisseur"
         params = {"nom_projet":form[0],
                 "nom_client":form[1],
                 "responsable":form[2],
