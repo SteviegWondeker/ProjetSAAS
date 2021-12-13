@@ -327,7 +327,7 @@ class Controleur():
 
     def retourner_role(self):
         url = self.urlserveur+"/trouver_roles"
-        params = {"transac":self.modele.transaction_data}
+        params = {}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
