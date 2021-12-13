@@ -129,6 +129,7 @@ class Vue():
     def ajout_tag(self):
         self.radio_var = StringVar()
         tag = Radiobutton(self.tag_frame, text="Aucun filtre", variable=self.radio_var, value="Aucun filtre", command=self.filtrer_contacts, tristatevalue=0)
+        tag.select()
         tag.grid(row=0, column=0, sticky=W)
         for count, value in enumerate(self.parent.retourner_expertises()):
             tag = Radiobutton(self.tag_frame, text=value, variable=self.radio_var, value=value, command=self.filtrer_contacts, tristatevalue=0)
@@ -148,7 +149,6 @@ class Vue():
         self.integretableau(data_temp, entete)
         for i in range(len(entete)):
             self.tableau.column('#' + str(i), width=60, stretch=0)
-        self.inscrire_transaction(True, "Contacts")
 
     def gerer_contacts_projet(self):
         self.liste_contacts=self.parent.trouver_contacts_par_projet()
@@ -305,6 +305,8 @@ class Vue():
         self.text_box.config(state=NORMAL)
         self.text_box.delete('1.0', END)
         self.text_box.config(state=DISABLED)
+        self.parent.supprimer_contact(self.contact_select[0][9])
+        self.gerer_contacts_projet()
 
     def recherche_contacts(self):
         pass

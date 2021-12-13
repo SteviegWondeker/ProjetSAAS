@@ -328,7 +328,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
     # Inscrit les données de transactions de base de données
     def dataWrite(self, transac):
-        print(transac)
+        print("Je passe une transaction!")
         transac = json.loads(transac)
         print(f'VARIABLE TRANSAC: {transac["usager"]}')
         sqltransac("insert into 'transactions' ('lecture', 'membre', 'compagnie', 'module', 'date') values (0, :usager, :comp, :mod, CURRENT_TIMESTAMP)")                         
@@ -336,10 +336,11 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     'usager':transac["usager"],
                                     'comp': transac["compagnie"],
                                     'mod': transac["module"]})
+        self.conn.commit()
     
     # Inscrit les données de transactions de base de données
     def dataRead(self, transac):
-        print(transac)
+        print("Je passe une transaction!")
         transac = json.loads(transac)
         print(f'VARIABLE TRANSAC: {transac["usager"]}')
         sqltransac = ("insert into 'transactions' ('lecture', 'membre', 'compagnie', 'module', 'date') values (1, :usager, :comp, :mod, CURRENT_TIMESTAMP)")                         
@@ -347,6 +348,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     'usager':transac["usager"],
                                     'comp': transac["compagnie"],
                                     'mod': transac["module"]})  
+        self.conn.commit()
 
 def demanderclients():
     db=Dbclient()
@@ -495,8 +497,8 @@ def trouvermembres():
 @app.route('/trouvercompagnies', methods=["GET","POST"])        # Alex
 def trouvercompagnies():
     if request.method=="POST":
-        transac = request.form["transac"]
-        dataRead(transac)
+        # transac = request.form["transac"]
+        # dataRead(transac)
 
         db=Dbman()
         compagnies=db.trouver_compagnies()
@@ -507,8 +509,8 @@ def trouvercompagnies():
 @app.route('/trouver_membres_par_compagnie', methods=["GET","POST"])        # Alex
 def trouver_membres_par_compagnie():
     if request.method=="POST":
-        transac = request.form["transac"]
-        dataRead(transac)
+        # transac = request.form["transac"]
+        # dataRead(transac)
 
         db=Dbman()
         comp = request.form["comp"]
@@ -563,8 +565,8 @@ def trouver_projet_par_compagnie():
 @app.route('/trouver_permissions_par_membre', methods=["GET","POST"])        # Alex
 def trouver_permissions_par_membre():
     if request.method=="POST":
-        transac = request.form["transac"]
-        dataRead(transac)
+        # transac = request.form["transac"]
+        # dataRead(transac)
 
         db=Dbman()
         membre = request.form["membre"]
