@@ -24,7 +24,7 @@ class Vue():
 
     def creercadres(self):
         self.cadres["principal"]=self.creercadreprincipal(self.parent.modele.usager)
-        self.cadres["nouvelle_tache"]=self.creer_cadre_nouveau_contact()
+        self.cadres["nouvelle_tache"]=self.creer_cadre_nouvelle_tache()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
@@ -37,19 +37,19 @@ class Vue():
     def creercadreprincipal(self, usager):
         self.usager=usager
         print(self.usager)
-        self.cadre_contacts=Frame(self.cadreapp)
+        self.cadre_taches=Frame(self.cadreapp)
         # Titre
-        self.compagnie_label = Label(self.cadre_contacts, text=self.parent.modele.usager_compagnie["nom"],font=("Arial",18),    # ATTENTION!!! Usager n'est pas le même si on roule le module depuis le fichier client ou depuis VS Code
+        self.compagnie_label = Label(self.cadre_taches, text=self.parent.modele.usager_compagnie["nom"],font=("Arial",18),    # ATTENTION!!! Usager n'est pas le même si on roule le module depuis le fichier client ou depuis VS Code
                               borderwidth=2, relief=GROOVE)
 
-        # Frame d'entête -> Contacts - Nom du projet
-        self.entete = Frame(self.cadre_contacts)
-        self.nom_module_label = Label(self.entete, text="Contact - ",font=("Arial",18),
+        # Frame d'entête  - Nom du projet
+        self.entete = Frame(self.cadre_taches)
+        self.nom_module_label = Label(self.entete, text="Taches - ",font=("Arial",18),
                               borderwidth=2)
         self.nom_projet_label = Label(self.entete, text="Nom du Projet",font=("Arial",16),
                               borderwidth=2)
 
-        self.tag_recherche_frame = Frame(self.cadre_contacts)
+        self.tag_recherche_frame = Frame(self.cadre_taches)
         # Section Tags
         self.tag_frame = LabelFrame(self.tag_recherche_frame, text="Tags", font=("Arial", 16))
         self.tag1 = Checkbutton(self.tag_frame, text="fini")
@@ -66,20 +66,20 @@ class Vue():
         # Section Recherche
         self.recherche_frame = LabelFrame(self.tag_recherche_frame, text="Recherche", font=("Arial", 16))
         self.search_box = Entry(self.recherche_frame, width=15, font=("Arial", 14))
-        self.btn_search = Button(self.recherche_frame, text="Rechercher", command=self.recherche_contacts)
+        self.btn_search = Button(self.recherche_frame, text="Rechercher", command=self.recherche_taches)
 
         self.search_box.pack(padx=20)
         self.btn_search.pack(padx=20, pady = 10, anchor=E)
 
-        # Section Contacts
-        self.contacts_frame = Frame(self.cadre_contacts)
-            # Tableau Contacts
-        self.tableau_frame = Frame(self.contacts_frame, width=500, height=300)
+        # Section Taches
+        self.taches_frame = Frame(self.cadre_taches)
+            # Tableau taches
+        self.tableau_frame = Frame(self.taches_frame, width=500, height=300)
         self.tableau = Frame(self.tableau_frame)
         self.tableau = ttk.Treeview(show = 'headings')
         self.tableau.bind("<ButtonRelease-1>",self.afficher_details)
             # Remplissage tableau
-        self.gerer_contacts_projet()
+        self.gerer_projet()
 
         ysb = ttk.Scrollbar(orient=VERTICAL, command= self.tableau.yview)
         xsb = ttk.Scrollbar(orient=HORIZONTAL, command= self.tableau.xview)
@@ -93,15 +93,15 @@ class Vue():
         self.tableau.rowconfigure(0, weight=1)
         self.tableau.columnconfigure(0, weight=1)
 
-            # Frame Contacts détails
-        self.contacts_details_frame = Frame(self.contacts_frame)
-        self.btn_new_tache = Button(self.contacts_details_frame, text="Ajouter une tache", command= self.ajouter_tache)
-        self.btn_edit_tache = Button(self.contacts_details_frame, text="Éditer une tache")#command=self.modifier_tache a creer
+            # Frame tache détails
+        self.taches_details_frame = Frame(self.taches_frame)
+        self.btn_new_tache = Button(self.taches_details_frame, text="Ajouter une tache", command= self.ajouter_tache)
+        self.btn_edit_tache = Button(self.taches_details_frame, text="Éditer une tache")#command=self.modifier_tache a creer
         self.btn_new_tache.pack(anchor=NW, padx=5, pady=5)
         self.btn_edit_tache.pack(anchor=NW, padx=5, pady=5)
         self.details_txt = StringVar()
         self.details_txt.set("")
-        self.details_label = LabelFrame(self.contacts_details_frame, font=("Arial", 12))
+        self.details_label = LabelFrame(self.taches_details_frame, font=("Arial", 12))
         self.text_box = Label(self.details_label, textvariable=self.details_txt)
         self.text_box.pack()
         self.details_label.pack(anchor=NW, padx=5, pady=5)
@@ -118,24 +118,24 @@ class Vue():
         self.tag_recherche_frame.pack(expand=1, fill=BOTH)
 
         self.tableau_frame.pack(side=LEFT, anchor=N)
-        self.contacts_details_frame.pack(side=LEFT, anchor=N)
-        self.contacts_frame.pack(expand=1, fill=BOTH)
+        self.taches_details_frame.pack(side=LEFT, anchor=N)
+        self.taches_frame.pack(expand=1, fill=BOTH)
 
-        self.cadre_contacts.pack(fill=BOTH, expand=1, padx=20, pady=20)
+        self.cadre_taches.pack(fill=BOTH, expand=1, padx=20, pady=20)
 
-        return self.cadre_contacts
+        return self.cadre_taches
 
-    def gerer_contacts_projet(self):
-        liste_contacts=self.parent.trouver_contacts_par_projet()
+    def gerer_projet(self):
+        liste_taches=self.parent.trouver_tache_par_projet()
         print("ID COMPAGNIE ID COMPAGNIE")
         print(self.parent.modele.usager_compagnie["id"])
         entete=["Prénom","Nom","Expertise", "Courriel",  "Notes", "Détails"]
-        self.integretableau(liste_contacts,entete)
+        self.integretableau(liste_taches,entete)
         for i in range(len(entete)):
             self.tableau.column('#' + str(i), width=50, stretch=0)
 
-    def integretableau(self,liste_contacts,entete):
-        self.data=liste_contacts
+    def integretableau(self,liste_taches,entete):
+        self.data=liste_taches
         self.colonnestableau = entete
 
         self.tableau.config(columns=self.colonnestableau)
@@ -153,10 +153,10 @@ class Vue():
         for item in self.data:
             self.tableau.insert('', 'end', values=item)
 
-    def creer_cadre_nouveau_contact(self):
+    def creer_cadre_nouvelle_tache(self):
         self.cadre_inscrire_tache = Frame(self.cadreapp, width=800, height=400)
 
-        self.contact_titre = Label(self.cadre_inscrire_tache, text="Ajout d'une nouvelle tache à votre projet", font=("Arial", 18),
+        self.tache_titre = Label(self.cadre_inscrire_tache, text="Ajout d'une nouvelle tache à votre projet", font=("Arial", 18),
                                 borderwidth=2, relief=GROOVE)
 
         self.list_entry_tache = []
@@ -202,7 +202,7 @@ class Vue():
         self.btn_annuler = Button(self.cadre_inscrire_tache, text="Annuler", font=("Arial", 12), padx=10, pady=10,
                                 command=self.retour_cadre_principal)
 
-        self.contact_titre.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
+        self.tache_titre.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
         self.tache_lab_nom.grid(row=20, column=10, sticky=E, padx=5, pady=5)
         self.tache_nom.grid(row=20, column=20, padx=10, pady=5)
         self.employe_lab_nom.grid(row=30, column=10, sticky=E, padx=5, pady=5)
@@ -271,7 +271,7 @@ class Vue():
     def ajouter_tache(self):
         self.changercadre("nouvelle_tache")
 
-    def recherche_contacts(self):
+    def recherche_taches(self):
         pass
 
     def afficher_details(self, evt):
@@ -327,8 +327,8 @@ class Controleur():
         mondict=json.loads(reptext)         
         return (mondict)
 
-    def trouver_contacts_par_projet(self):
-        url = self.urlserveur+"/trouver_contacts_par_projet"
+    def trouver_tache_par_projet(self):
+        url = self.urlserveur+"/trouver_tache_par_projet"
         params = {"comp": self.modele.usager_compagnie["id"]}
         reptext=self.appelserveur(url, params)
 
@@ -354,8 +354,8 @@ class Controleur():
         mondict=json.loads(reptext)
         print(mondict)
 
-    def verifier_contact(self,form):
-        url = self.urlserveur+"/verifiercontact"
+    def verifier_tache(self,form):
+        url = self.urlserveur+"/verifierprojet"
         params = {"courriel":form[4]}
         reptext=self.appelserveur(url,params)
 

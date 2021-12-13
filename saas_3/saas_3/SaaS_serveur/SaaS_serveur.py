@@ -235,6 +235,14 @@ class Dbclient():   # Base de données du locateur
     def ajouter_role():
         pass
 
+    def trouver_tache_par_projet(self, comp):        #a changer pour tache
+        # Va devoir ajouter le critère "compagnie"
+
+        sqlnom = ("select prenom, nom, contacts_expertises.expertise from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise")  #, courriel, ville, adresse, telephone, notes, details
+        #self.curs.execute(sqlnom, {'comp': comp})
+        self.curs.execute(sqlnom)
+        info = self.curs.fetchall()
+        return info
 class Dbman():  # DB Manager - Base donnée du fournisseur
     def __init__(self):
         self.conn = sqlite3.connect("CVMJMD_clientscorpo.sqlite")
