@@ -355,7 +355,7 @@ class Controleur():
         print(mondict)
 
     def verifier_tache(self,form):
-        url = self.urlserveur+"/verifierprojet"
+        url = self.urlserveur+"/verifiercontact"
         params = {"courriel":form[4]}
         reptext=self.appelserveur(url,params)
 
