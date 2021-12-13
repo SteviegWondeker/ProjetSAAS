@@ -33,6 +33,7 @@ class Vue():
         self.cadres["principal"]=self.creercadreprincipal()
         self.cadres["user"]=self.creercadreuser()
         self.cadres["projets"]=self.creercadreprojets()
+        self.cadres["transactions"]=self.creercadretransactions()
 
     def creercadreprincipal(self):
         self.root.title("Menu principal")
@@ -42,9 +43,12 @@ class Vue():
                                          padx=10, pady=10, command=self.afficherutilisateurs)
         self.btn_afficher_projets=Button(self.cadreprincipal,text="Afficher projets", font=("Arial", 12),
                                          padx=10, pady=10, command=self.afficherprojets)
+        self.btn_afficher_transactions=Button(self.cadreprincipal,text="Afficher transactions", font=("Arial", 12),
+                                         padx=10, pady=10, command=self.affichertransactions)
 
         self.btn_afficher_utilisateurs.pack()
         self.btn_afficher_projets.pack()
+        self.btn_afficher_transactions.pack()
 
         return self.cadreprincipal
 
@@ -74,6 +78,33 @@ class Vue():
         self.creertableau(2)
 
         return self.cadreprojets
+
+    def creercadretransactions(self):          # Alex
+        self.root.title("SaaS - ADMIN - Transactions de données")
+        self.cadretransactions = Frame(self.cadreapp, width=400, height=400)
+
+        self.cadretitretransactions = Frame(self.cadretransactions, width=400, height=400)      
+        self.titretransactions = Label(self.cadretitretransactions, text="SaaS - ADMIN - Transactions de données",
+                                    font=("Arial", 18),
+                                    borderwidth=2, relief=GROOVE)
+
+        self.titretransactions.pack()
+        self.cadretitretransactions.pack()
+
+        self.options_list_transactions = self.parent.trouver_compagnies()
+        self.value_inside_transactions = StringVar(self.cadretransactions)
+        self.value_inside_transactions.set("Option")
+        self.menu_deroulant_projets = ttk.OptionMenu(self.cadretransactions, self.value_inside_transactions, self.options_list_transactions[0], *self.options_list_transactions, command=self.trouver_transactions_par_compagnie)
+        self.menu_deroulant_projets.pack()
+        self.cadrecontenu_transactions = Frame(self.cadretransactions, width=600, height=400)
+        self.cadrecontenu_transactions.pack()
+        self.cadrepied_transactions = Frame(self.cadretransactions, width=600, height=80)
+        self.cadrepied_transactions.pack()
+
+        
+        self.creertableau(3)
+
+        return self.cadretransactions
 
     def creercadreuser(self):          # Alex
         self.root.title("SaaS - ADMIN - Utilisateurs")
@@ -119,9 +150,14 @@ class Vue():
     def afficherprojets(self):
         self.changercadre("projets")
 
+    def affichertransactions(self):
+        self.changercadre("transactions")
+
     def creertableau(self, id):             # Modifié par Alex
         if id==2:
             f = Frame(self.cadrecontenu_projets)
+        elif id==3:
+            f = Frame(self.cadrecontenu_transactions)
         else:
              f = Frame(self.cadrecontenu)
         f.pack(side=TOP, fill=BOTH, expand=Y, padx=(15, 0))
@@ -189,6 +225,13 @@ class Vue():
         print(listeprojets)
         entete = ["Nom Projet", "Date de début", "Date de fin"]
         self.integretableau(listeprojets, entete, 2)
+
+    def trouver_transactions_par_compagnie(self, comp):
+        print(comp)
+        listeprojets = self.parent.trouver_transactions_par_compagnie(comp)
+        print(listeprojets)
+        entete = ["Module", "Nb Accès Lecture", "Nb Accès Écriture", "Première Transaction", "Dernière Transaction"]
+        self.integretableau(listeprojets, entete, 3)
 
     def trouver_permissions_par_membre(self, evt):
         membre = None
@@ -288,6 +331,13 @@ class Controleur:
         mondict = json.loads(reptext)
         return mondict
 
+    def trouver_transactions_par_compagnie(self, comp):
+        url = self.urlserveur + "/trouver_transactions_par_compagnie"
+        params = {"comp": comp[0]}
+        reptext = self.appelserveur(url, params)
+
+        mondict = json.loads(reptext)
+        return mondict
 
     def trouver_permissions_par_membre(self, membre):           # Alex
         url = self.urlserveur + "/trouver_permissions_par_membre"

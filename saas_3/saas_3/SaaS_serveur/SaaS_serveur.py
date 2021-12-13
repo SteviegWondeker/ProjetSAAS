@@ -273,6 +273,25 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         self.curs.execute(sqlnom, {'comp': comp})
         info = self.curs.fetchall()
         return info
+#######################################################################################################################################
+#######################################################################################################################################
+#######################################################################################################################################
+    def trouver_transactions_par_compagnie(self, comp):        # Alex
+        print(comp)
+        sqlnom = ("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' WHERE compagnie=:comp")
+        self.curs.execute(sqlnom, {'comp': comp})
+        info = self.curs.fetchall()
+        return info
+
+        """SELECT modules.nommodule, (SELECT COUNT(*) FROM transactions WHERE lecture = 1), (SELECT COUNT(*) FROM transactions WHERE lecture = 0)
+	FROM transactions
+		INNER JOIN modules ON transactions.module = modules.idmodule
+		INNER JOIN compagnie ON compagnie.idcompagnie = transactions.compagnie 
+	WHERE compagnie.nomcompagnie = 'Cineclub'
+	GROUP BY modules.nommodule;"""
+#######################################################################################################################################
+#######################################################################################################################################
+#######################################################################################################################################
 
     def trouver_roles(self):
         sql_role = ("select id_role, nom_role from 'Tbl_role'")
@@ -379,10 +398,10 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
     # Inscrit les données de transactions de base de données
     def dataWrite(self, transac):
-        print("Je passe une transaction!")
+        print("I'M WRITING!!!")
         transac = json.loads(transac)
         print(f'VARIABLE TRANSAC: {transac["usager"]}')
-        sqltransac("insert into 'transactions' ('lecture', 'membre', 'compagnie', 'module', 'date') values (0, :usager, :comp, :mod, CURRENT_TIMESTAMP)")                         
+        sqltransac = ("insert into 'transactions' ('lecture', 'membre', 'compagnie', 'module', 'date') values (0, :usager, :comp, :mod, CURRENT_TIMESTAMP)")                         
         self.curs.execute(sqltransac, {
                                     'usager':transac["usager"],
                                     'comp': transac["compagnie"],
@@ -418,7 +437,7 @@ def dataRead(transac):
 
 def dataWrite(transac):
     db=Dbman()
-    db.dataRead(transac)
+    db.dataWrite(transac)
     db.fermerdb()
     
 @app.route('/')
@@ -585,15 +604,21 @@ def trouver_membres_par_compagnie():
 @app.route('/trouver_projets_par_compagnie', methods=["GET","POST"])        # Alex
 def trouver_projets_par_compagnie():
     if request.method=="POST":
-        # db=Dbman()
-        # comp = request.form["comp"]
-        # comp = db.trouver_compagnie_id(comp)
-        # db.fermerdb()
-
         db=Dbclient()
         comp = request.form["comp"]
         print(comp)
         membres=db.trouver_projets_par_compagnie(comp)
+
+        db.fermerdb()
+        return Response(json.dumps(membres), mimetype='application/json')
+
+@app.route('/trouver_transactions_par_compagnie', methods=["GET","POST"])        # Alex
+def trouver_transactions_par_compagnie():
+    if request.method=="POST":
+        db=Dbman()
+        comp = request.form["comp"]
+        print(comp)
+        membres=db.trouver_transactions_par_compagnie(comp)
 
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')

@@ -1,0 +1,6 @@
+Lisez-moi :
+2 sections
+-Section pour le client/utilisateur
+-Section pour JM (prof) : qu'est-ce qu'on livre?
+	->Modules, fonctionnalités, état des modules/fonctionnalités...
+	-> Indiquer si des fonctionnalités plantent!
