@@ -323,9 +323,15 @@ class Modele():
         self.usager=sys.argv[2].split()
         self.inscrireusager(self.usager)
         self.usager_compagnie=json.loads(sys.argv[2])[1]["nom"]
+        self.usager_compagnie_id=json.loads(sys.argv[2])[1]["id"]
         self.usager_id=json.loads(sys.argv[2])[1]["id"]
         self.usager_nom=json.loads(sys.argv[2])[0]
         print(self.usager_nom)
+        print(self.usager_compagnie_id)
+        self.transaction_data = {"usager": self.usager_nom,
+                                    "compagnie": self.usager_compagnie_id,
+                                    "module": 5}
+        self.transaction_data = json.dumps(self.transaction_data)
         
 
         self.acces_modification_suppression = self.parent.trouver_permissions_par_membre(self.usager_nom)
@@ -352,14 +358,16 @@ class Controleur:
                 "responsable":form[3],
                 "date_deb":form[4],
                 "date_fin":form[5],
-                "nom_compagnie": form[6]}
+                "nom_compagnie": form[6],
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
 
     def envoyer_supression(self,selection): #n
         url = self.urlserveur+"/envoyer_supression"
-        params = {"nom_projet":selection}
+        params = {"nom_projet":selection,
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
@@ -367,7 +375,8 @@ class Controleur:
 
     def trouver_projets_par_compagnie(self):
         url = self.urlserveur+"/trouver_projet_par_compagnie"
-        params ={"id": self.modele.compagnie["id"]}
+        params ={"id": self.modele.compagnie["id"],
+                "transac":self.modele.transaction_data}
         #params = {self.modele.usager[1]}
         reptext=self.appelserveur(url,params)
 
@@ -376,7 +385,8 @@ class Controleur:
 
     def trouvermembres(self, comp):
         url = self.urlserveur+"/trouver_membres_par_compagnie"
-        params = {"comp": comp}
+        params = {"comp": comp,
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)
 
         mondict=json.loads(reptext)
@@ -400,7 +410,8 @@ class Controleur:
 
     def trouverprojetsAvecTriage(self,triage):
         url = self.urlserveur+"/trouverprojetsAvecTriage"
-        params = {"triage":triage}
+        params = {"triage":triage,
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -408,7 +419,8 @@ class Controleur:
 
     def trouver_projet_infos(self,projet):
         url = self.urlserveur+"/trouver_projet_infos"
-        params = {"projet":projet}
+        params = {"projet":projet,
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)

@@ -184,9 +184,11 @@ class Vue():
         self.integretableau(listemembres, entete, 0)
 
     def trouver_projets_par_compagnie(self, comp):
+        print(comp)
         listeprojets = self.parent.trouver_projets_par_compagnie(comp)
+        print(listeprojets)
         entete = ["Nom Projet", "Date de début", "Date de fin"]
-        self.integretableau(listeprojets, entete, 0)
+        self.integretableau(listeprojets, entete, 2)
 
     def trouver_permissions_par_membre(self, evt):
         membre = None

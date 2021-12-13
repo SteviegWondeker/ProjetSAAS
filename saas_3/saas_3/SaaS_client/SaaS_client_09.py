@@ -690,7 +690,7 @@ class Vue():
     def ajouter_projet(self): #n
         if self.valider_projet():
             self.parent.ajouter_projet(self.form)
-            self.parent.ajouter_projet_fournisseur(self.form)
+            # self.parent.ajouter_projet_fournisseur(self.form)
             self.retour_cadre_principal()
 
 
@@ -711,6 +711,7 @@ class Vue():
 class Modele():
     def __init__(self,parent):
         self.parent=parent
+        self.transaction_data = ""
 
     def inscrireusager(self,dictinfo):
         self.nom=dictinfo[0][0][2]
@@ -718,6 +719,10 @@ class Modele():
         self.titre=dictinfo[0][0][5]
         self.compagnie={"nom":dictinfo[1][0][0],
                         "id":dictinfo[0][0][0]}
+        self.transaction_data = {"usager": self.nom,
+                                    "compagnie": self.compagnie["id"],
+                                    "module": 0}
+        self.transaction_data = json.dumps(self.transaction_data)
 
 class Controleur:
     def __init__(self):
@@ -757,7 +762,7 @@ class Controleur:
 
     def trouverprojets(self):
         url = self.urlserveur+"/trouverprojets"
-        params = {}
+        params = {"transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -765,7 +770,8 @@ class Controleur:
 
     def trouvermembres(self):
         url = self.urlserveur+"/trouver_membres_par_compagnie"
-        params = {"comp": self.modele.compagnie["nom"]}
+        params = {"comp": self.modele.compagnie["nom"],
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)
 
         mondict=json.loads(reptext)
@@ -773,7 +779,7 @@ class Controleur:
 
     def trouver_roles(self):
         url = self.urlserveur+"/trouver_roles"
-        params = {}
+        params = {"transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)
         mondict=json.loads(reptext)
         return mondict
@@ -781,7 +787,8 @@ class Controleur:
     def identifierusager(self,nom,mdp):
         url = self.urlserveur+"/identifierusager"
         params = {"nom":nom,
-                  "mdp":mdp}
+                  "mdp":mdp,
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -816,7 +823,8 @@ class Controleur:
     
     def verifier_client(self,form): #n
         url = self.urlserveur+"/verifierclient"
-        params = {"courriel":form[1]}
+        params = {"courriel":form[1],
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -842,7 +850,8 @@ class Controleur:
     def verifier_projet(self,form): #n
         url = self.urlserveur+"/verifierprojet"
         params = {"nom_projet":form[0],
-                "nom_client":form[1]}
+                "nom_client":form[1],
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -863,7 +872,8 @@ class Controleur:
                   "courriel":form[4],
                   "telephone":form[5],
                   "mdp":"AAAaaa111",
-                  "nom_admin":self.vue.loginnom.get()}
+                  "nom_admin":self.vue.loginnom.get(),
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -877,7 +887,8 @@ class Controleur:
                   "telephone":form[3],
                   "mdp":form[4],
                   "nom_org":form[6],
-                  "type_org":form[7]}
+                  "type_org":form[7],
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -891,7 +902,8 @@ class Controleur:
                   "compagnie":form[3],
                   "adresse":form[4],
                   "rue":form[5],
-                  "ville":form[6]}
+                  "ville":form[6],
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -909,7 +921,8 @@ class Controleur:
     def inscrire_module_role(self,nom_module, nom_role): #n
         url = self.urlserveur+"/inscriremodulemembre"
         params = {"nom_module":nom_module,
-                "nom_role": nom_role}
+                "nom_role": nom_role,
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)
@@ -922,40 +935,43 @@ class Controleur:
                 "responsable":form[2],
                 "date_deb":form[3],
                 "date_fin":form[4],
-                "nom_compagnie": self.modele.compagnie["nom"]}
+                "nom_compagnie": self.modele.compagnie["nom"],
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
 
-    def ajouter_projet_fournisseur(self,form): #n
-        url = self.urlserveur+"/ajouterprojetfournisseur"
-        params = {"nom_projet":form[0],
-                "nom_client":form[1],
-                "responsable":form[2],
-                "date_deb":form[3],
-                "date_fin":form[4],
-                "nom_compagnie": self.modele.compagnie["nom"]}
-        reptext=self.appelserveur(url,params)
-        mondict=json.loads(reptext)         
-        print(mondict)
+    # def ajouter_projet_fournisseur(self,form): #n
+    #     url = self.urlserveur+"/ajouterprojetfournisseur"
+    #     params = {"nom_projet":form[0],
+    #             "nom_client":form[1],
+    #             "responsable":form[2],
+    #             "date_deb":form[3],
+    #             "date_fin":form[4],
+    #             "nom_compagnie": self.modele.compagnie["nom"],
+    #             "transac":self.modele.transaction_data}
+    #     reptext=self.appelserveur(url,params)
+    #     mondict=json.loads(reptext)         
+    #     print(mondict)
 
     def ajouter_role(self,role): #n
         url = self.urlserveur+"/ajouterrole"
-        params = {"nom_role":role}
+        params = {"nom_role":role,
+                "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         print(mondict)
 
     def retourner_role(self): #n
         url = self.urlserveur+"/trouver_roles"
-        params = {}
+        params = {"transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
 
     def retourner_roles_nom(self): #n
         url = self.urlserveur+"/trouver_roles_nom"
-        params = {}
+        params = {"transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
