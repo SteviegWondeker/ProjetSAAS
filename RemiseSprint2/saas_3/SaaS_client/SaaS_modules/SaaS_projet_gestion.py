@@ -25,7 +25,6 @@ class Vue():
         self.tbi_crée=FALSE
         self.data_infos=None
 
-
     
 
     def creertableau(self):
@@ -143,7 +142,7 @@ class Vue():
     def creer_tableau_infos(self):
         if(self.tbi_crée is FALSE):
             self.f = Frame(self.cadre_gestion)
-            self.f.pack(fill=X)
+            self.f.pack(side=TOP, fill=X)
 
         self.tableau_infos = ttk.Treeview(show = 'headings')
         
@@ -176,10 +175,6 @@ class Vue():
                 self.tableau_infos.insert('', 'end', values=item)
 
         self.tbi_crée=TRUE
-    
-    def choisirTriage(self):
-         self.data_infos=self.afficher_infos_projet_avec_triage(self.selection,self.choixTriage)
-        
 
     def creer_cadre_mp(self):
         self.root.title("modifier_projet")
@@ -233,27 +228,12 @@ class Vue():
         return self.cadre_mp
 
 
-    def creer_cadre_gestion(self,triage=None):
+    def creer_cadre_gestion(self):
         self.root.title("Gestion")
         self.cadre_gestion = Frame(self.cadreapp)
 
-        self.cblabel = Label(self.cadre_gestion,text="Trier selon :",font=('Times', 16))
-        self.choixTriage=""
-        self.cb=ttk.Combobox(self.cadre_gestion, textvariable=self.choixTriage, values=[
-                                "Ordre alphabétique", 
-                                "Date début",
-                                "Date fin",
-                                "Client",
-                                "Responsable"])
-        self.cblabel.pack()
-        self.cb.pack()
-        self.cb.bind('<<ComboboxSelected>>', self.choisirTriage)
-
         self.creertableau()
-        if(triage==None):
-            listeprojets=self.parent.trouverprojets()
-        else:
-            listeprojets=self.parent.trouverprojetsAvecTriage(triage)
+        listeprojets=self.parent.trouverprojets()
         entete=["Nom du projet","date de début","date de fin"]
         self.integretableau(listeprojets,entete)
 
@@ -266,22 +246,11 @@ class Vue():
         self.btn_afficher_infos = Button(self.cadre_gestion,text="Afficher Infos", font=("Arial", 12),
                                          padx=20, pady=10, command=self.creer_tableau_infos)
 
-     
-        
-
-
         self.btn_afficher_infos.pack()
-        for list in self.parent.modele.acces_modification_suppression:
-            if( 'GMedia_projet.py' in list):
-                self.btn_modifier_projet.pack()
-                self.btn_supprimer_projet.pack()
+        self.btn_modifier_projet.pack()
+        self.btn_supprimer_projet.pack()
 
         return self.cadre_gestion
-
-    def choisirTriage(self,event):
-        self.cadres["Gestion"]=self.creer_cadre_gestion(self.cb.get())
-        self.tbi_crée=FALSE
-        self.changercadre("Gestion")
 
     def refresh(self):
         self.list_membre= self.list_nom_projet.get()
@@ -296,19 +265,9 @@ class Vue():
             self.listbox.insert(END, items)
 
     def supprimer_projet(self):
-        if(self.selection!=None):
-            rep=messagebox.askyesno("Supression","Voulez-vous confirmer la supression du projet ?")
-            if not rep:
-                self.root.destroy()
-            else:
-                self.parent.envoyer_supression(self.selection)
-                self.cadres["Gestion"]=self.creer_cadre_gestion()
-                self.tbi_crée=FALSE
-                self.changercadre("Gestion")
-        else:
-            show_method = getattr(messagebox, 'show{}'.format('warning'))
-            show_method('ERREUR', 'Veuillez choisir un projet)')
-
+        rep=messagebox.askyesno("Supression","Voulez-vous confirmer la supression du projet ?")
+        if not rep:
+            self.root.destroy()
     
     def afficher_infos_projet(self,projet):
         infos=self.parent.trouver_projet_infos(projet)
@@ -322,14 +281,6 @@ class Modele():
         print(sys.argv)
         self.usager=sys.argv[2].split()
         self.inscrireusager(self.usager)
-        self.usager_compagnie=json.loads(sys.argv[2])[1]["nom"]
-        self.usager_id=json.loads(sys.argv[2])[1]["id"]
-        self.usager_nom=json.loads(sys.argv[2])[0]
-        print(self.usager_nom)
-        
-
-        self.acces_modification_suppression = self.parent.trouver_permissions_par_membre(self.usager_nom)
-        print(self.acces_modification_suppression)
 
     def inscrireusager(self,dictinfo):
         self.nom=dictinfo[0]
@@ -357,13 +308,6 @@ class Controleur:
         mondict=json.loads(reptext)         
         print(mondict)
 
-    def envoyer_supression(self,selection): #n
-        url = self.urlserveur+"/envoyer_supression"
-        params = {"nom_projet":selection}
-        reptext=self.appelserveur(url,params)
-        mondict=json.loads(reptext)         
-        print(mondict)
-
 
     def trouver_projets_par_compagnie(self):
         url = self.urlserveur+"/trouver_projet_par_compagnie"
@@ -385,22 +329,6 @@ class Controleur:
     def trouverprojets(self):
         url = self.urlserveur+"/trouverprojets"
         params = {}
-        reptext=self.appelserveur(url,params)
-
-        mondict=json.loads(reptext)
-        return mondict
-    
-    def trouver_permissions_par_membre(self,membre):
-        url = self.urlserveur+"/trouver_permissions_par_membre"
-        params = {"membre":membre}
-        reptext=self.appelserveur(url,params)
-
-        mondict=json.loads(reptext)
-        return mondict
-
-    def trouverprojetsAvecTriage(self,triage):
-        url = self.urlserveur+"/trouverprojetsAvecTriage"
-        params = {"triage":triage}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)

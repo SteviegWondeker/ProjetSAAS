@@ -23,22 +23,6 @@ class Dbclient():   # Base de données du locateur
         info=self.curs.fetchall()
         return info
     
-    def trouverprojetsAvecTriage(self,triage):
-        print("banana")
-        if(triage=="Ordre alphabétique"):
-            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY NomdeProjet")
-        elif(triage=="Date début"):
-            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY datedelancement")
-        elif(triage=="Date fin"):
-            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY datedefinprevue")
-        elif(triage=="Responsable"):
-            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY chargedeprojet")
-        elif(triage=="Client"):
-            sqlnom=("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' ORDER BY client")
-        self.curs.execute(sqlnom)
-        info=self.curs.fetchall()
-        return info
-    
     def trouver_projet_infos(self,nom_projet):
         sqlnom=("select idprojet, Nomdeprojet, client, chargedeprojet, datedelancement, datedefinprevue, compagnie from 'projet' WHERE Nomdeprojet=:nom_projet")
         self.curs.execute(sqlnom, {'nom_projet': nom_projet})
@@ -135,12 +119,6 @@ class Dbclient():   # Base de données du locateur
         self.conn.commit()
         return "test"
 
-    def envoyer_supression(self,nom_projet): 
-        sql_nom=("DELETE from projet where Nomdeprojet=:nom_projet")               
-        self.curs.execute(sql_nom, {'nom_projet': nom_projet})          
-        self.conn.commit()                                
-        return "test"
-
     def inscrire_contact(self, prenom, nom, courriel, ville, adresse, telephone, details, notes, tag, comp, projet):
         if tag != "":
             sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
@@ -173,64 +151,25 @@ class Dbclient():   # Base de données du locateur
 
         self.conn.commit()  
 
-    
-    def inscrire_taches(self, nom_tache, details, notes, employe, comp, courriel, projet,tag):
-        print(tag)
-        if tag != "":
-            sql_tag_id = ("select idexpertise from 'contacts_expertises' where expertise = :tag")
-            self.curs.execute(sql_tag_id, {'tag': tag})
-            tag_id=self.curs.fetchall()
-            print("TAG ID 1")
-            print(tag_id)
-            if not tag_id:
-                sql_tag_insert = ("insert into 'contacts_expertises' ('expertise') values (:tag)")
-                self.curs.execute(sql_tag_insert, {'tag': tag})
-                self.conn.commit()
-            self.curs.execute(sql_tag_id, {'tag': tag})
-            
-            tag_id=self.curs.fetchall()[0][0]
-        else:
-            tag_id = ""
-        sql_nom=("insert into 'tache' ('nom_tache','details','notes','employe','comp','courriel','projet','role') values (:nom_tache,:details,:notes,:employe,:compagnie,:courriel,:projet,:role)")
-        self.curs.execute(sql_nom, {
-                                'nom_tache':nom_tache,
-                                'details':details,
-                                'notes':notes,
-                                'employe':employe,
-                                'comp':comp,
-                                'courriel': courriel,
-                                'projet':projet,
-                                'role':tag
-                                # 'tag_id':tag                 
-                                })
-
-        self.conn.commit()      
-
     def trouver_expertises(self):
         sql_expertises = ("select expertise from 'contacts_expertises'")
         self.curs.execute(sql_expertises)
         info = self.curs.fetchall()
         return info
 
+        ##############################################################################################################
+        ##############################################################################################################
+        ##############################################################################################################
     def trouver_contacts_par_projet(self, comp):        # Alex
         # Va devoir ajouter le critère "compagnie"
-        sqlnom = ("select prenom, nom, contacts_expertises.expertise from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise")  #, courriel, ville, adresse, telephone, notes, details
+        sqlnom = ("select prenom, nom, contacts_expertises.expertise, courriel, ville, adresse, telephone, notes, details from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise")
         #self.curs.execute(sqlnom, {'comp': comp})
         self.curs.execute(sqlnom)
         info = self.curs.fetchall()
         return info
-
-    def get_contact_details(self, prenom, nom, expertise):        # Alex
-        sqldetails = ("select prenom, nom, contacts_expertises.expertise, courriel, ville, adresse, telephone, notes, details, idcontacts from 'contacts_projets' INNER JOIN 'contacts_expertises' ON contacts_projets.expertise=contacts_expertises.idexpertise WHERE prenom = :prenom AND nom = :nom AND contacts_expertises.expertise = :expertise")
-        self.curs.execute(sqldetails, {'prenom': prenom, "nom": nom, "expertise": expertise})
-        info = self.curs.fetchall()
-        print(info)
-        return info
-
-    def supprimer_contact(self, idcontacts):
-        sqlrequete = ("DELETE FROM 'contacts_projets' WHERE idcontacts = :idcontacts;")
-        self.curs.execute(sqlrequete, {'idcontacts': idcontacts})
-        self.conn.commit() 
+        ##############################################################################################################
+        ##############################################################################################################
+        ##############################################################################################################
 
     def ajouter_role():
         pass
@@ -252,26 +191,6 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
             return [info,co]
         return "inconnu"
 
-    def ajouter_projet_fournisseur(self,nom_projet, nom_client, responsable, date_deb, date_fin, nom_compagnie):
-        sql_nom=("insert into 'projet' ('Nomdeprojet', 'client', 'chargedeprojet', 'datedelancement', 'datedefinprevue', 'compagnie') values (:nom_projet, :nom_client, :responsable, :date_deb, :date_fin, :nom_compagnie)")                         
-                              
-        self.curs.execute(sql_nom, {
-                                'nom_projet':nom_projet,
-                                'nom_client': nom_client,
-                                'responsable': responsable,
-                                'date_deb': date_deb,
-                                'date_fin': date_fin,
-                                'nom_compagnie':nom_compagnie})          
-
-        self.conn.commit()                                
-        #sql_projet("insert into 'tbl_projet_compagnie' ('nom_compagnie', 'id') values ((select compagnie from 'membre' where identifiant=:nom_admin), (select idprojet from 'projet' where nomdeprojet=:nom_projet))")
-        #self.curs.execute(sql_projet, {
-        #                        'nom_admin':nom_admin,
-        #                        'nom_projet': nom_projet})     
-        self.conn.commit()
-        return "test"
-
-
     def trouvermembres(self):
         sqlnom=("select identifiant, permission,titre from 'membre'")
         self.curs.execute(sqlnom)
@@ -284,18 +203,14 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
         info = self.curs.fetchall()
         return info
 
-    def trouver_projets_par_compagnie(self, comp):        # Alex
-        sqlnom = ("select Nomdeprojet, datedelancement, datedefinprevue from 'projet' INNER JOIN 'compagnie' ON projet.compagnie=compagnie.idcompagnie WHERE compagnie.nomcompagnie=:comp")
-        self.curs.execute(sqlnom, {'comp': comp})
-        info = self.curs.fetchall()
-        return info
-
     def trouver_permissions_par_membre(self, membre):        # Alex
-        sqlnom = ("select nommodule from 'modules' INNER JOIN 'Tbl_role_module' ON modules.idmodule=Tbl_role_module.module INNER JOIN 'Tbl_role' ON Tbl_role_module.role=Tbl_role.id_role INNER JOIN 'Tbl_membre_role' ON Tbl_role.id_role=Tbl_membre_role.role INNER JOIN 'membre' ON Tbl_membre_role.membre=membre.idmembre WHERE membre.identifiant=:membre")
+        sqlnom = ("select nommodule from 'modules' "
+                  "INNER JOIN 'Tbl_role_module' ON modules.idmodule=Tbl_role_module.id_role_module "
+                  "INNER JOIN 'Tbl_role' ON Tbl_role_module.role=Tbl_role.id_role "
+                  "INNER JOIN 'Tbl_membre_role' ON Tbl_role.id_role=Tbl_membre_role.role "
+                  "INNER JOIN 'membre' ON Tbl_membre_role.membre=membre.idmembre WHERE membre.identifiant=:membre")
         self.curs.execute(sqlnom, {'membre': membre})
         info = self.curs.fetchall()
-        print(membre)
-        print("testtestest")
         return info
 
     def trouver_compagnies(self):           # Alex
@@ -337,7 +252,7 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
 
         return info_user
         
-    def retourner_role(self,role): #n
+    def retourner_role(self): #n
         sql_user=("select nom_role from 'tbl_role'")
         self.curs.execute(sql_user)
         info_user=self.curs.fetchall()
@@ -386,16 +301,9 @@ class Dbman():  # DB Manager - Base donnée du fournisseur
                                     'mdp': mdp,
                                     'id_complet': id_complet,
                                     'courriel': courriel,
-                                    'telephone': telephone})
-        self.conn.commit()
-
-        sql_id=("select idmembre from 'membre' where identifiant=:id_complet")
-        self.curs.execute(sql_id, {'id_complet':id_complet})
-        id_membre=self.curs.fetchall()
-        print(f'ID MEMBRE : {id_membre[0][0]}')
-
+                                    'telephone': telephone})  
         self.curs.execute(sql_role, {
-                                    'id_emp':id_membre[0][0],
+                                    'id_emp':id_emp,
                                     'nom_role':nom_role})                       
         self.conn.commit()
         return "test"
@@ -412,8 +320,6 @@ def demanderclients():
     clients=db.trouverclients()
     db.fermerdb()
     return clients
-
-#def inscrire
     
 mesfonctions={"demanderclients":demanderclients}
 
@@ -470,18 +376,6 @@ def trouverprojets():
     else:
         return repr("pas ok")
 
-@app.route('/trouverprojetsAvecTriage', methods=["GET","POST"])
-def trouverprojetsAvecTriage():
-    if request.method=="POST":
-        triage=request.form["triage"]
-        db=Dbclient()
-        projets=db.trouverprojetsAvecTriage(triage)
-        db.fermerdb()
-        return Response(json.dumps(projets), mimetype='application/json')
-        #return repr(usager)
-    else:
-        return repr("pas ok")
-
 @app.route('/inscrire_contact', methods=["GET","POST"])
 def inscrire_contact():
     if request.method=="POST":
@@ -503,34 +397,6 @@ def inscrire_contact():
         #return repr(usager)
     else:
         return repr("pas ok")
-
-@app.route('/inscrire_taches', methods=["GET","POST"])
-def inscrire_taches():
-    if request.method=="POST":
-        db=Dbclient()
-        nom_tache = request.form["nom_tache"]
-        employe = request.form["employe"]
-        role = request.form["role"]
-        courriel = request.form["courriel"]
-        details = request.form["details"]
-        notes = request.form["notes"]
-        # tag = request.form["tag"]
-        projet = request.form["projet"]
-        comp = request.form["comp"]
-        projets=db.inscrire_contact(  nom_tache , employe,role,courriel,details, notes,projet, comp)
-        db.fermerdb()
-        return Response(json.dumps(projets), mimetype='application/json')
-        #return repr(usager)
-    else:
-        return repr("pas ok")        
-@app.route('/supprimer_contact', methods=["GET","POST"])
-def supprimer_contact():
-    if request.method=="POST":
-        db=Dbclient()
-        idcontacts = request.form["idcontacts"]
-        projets=db.supprimer_contact(idcontacts)
-        db.fermerdb()
-        return Response(json.dumps(projets), mimetype='application/json')
 
 @app.route('/trouver_projet_infos', methods=["GET","POST"])
 def trouver_projet_infos():
@@ -576,34 +442,12 @@ def trouver_membres_par_compagnie():
         db.fermerdb()
         return Response(json.dumps(membres), mimetype='application/json')
 
-@app.route('/trouver_projets_par_compagnie', methods=["GET","POST"])        # Alex
-def trouver_projets_par_compagnie():
-    if request.method=="POST":
-        db=Dbman()
-        comp = request.form["comp"]
-        membres=db.trouver_projets_par_compagnie(comp)
-
-        db.fermerdb()
-        return Response(json.dumps(membres), mimetype='application/json')
-
 @app.route('/trouver_contacts_par_projet', methods=["GET","POST"])        # Alex
 def trouver_contacts_par_projet():
     if request.method=="POST":
         db=Dbclient()
         comp = request.form["comp"]
         contacts=db.trouver_contacts_par_projet(comp)
-
-        db.fermerdb()
-        return Response(json.dumps(contacts), mimetype='application/json')
-
-@app.route('/get_contact_details', methods=["GET","POST"])        # Alex
-def get_contact_details():
-    if request.method=="POST":
-        db=Dbclient()
-        prenom = request.form["prenom"]
-        nom = request.form["nom"]
-        expertise = request.form["expertise"]
-        contacts=db.get_contact_details(prenom, nom, expertise)
 
         db.fermerdb()
         return Response(json.dumps(contacts), mimetype='application/json')
@@ -827,26 +671,6 @@ def ajouter_projet():
     else:
         return repr("pas ok")
 
-@app.route('/ajouterprojetfournisseur', methods=["GET","POST"]) #N
-def ajouter_projet_fournisseur():
-    if request.method=="POST":
-        nom_proj=request.form["nom_projet"]
-        nom_client=request.form["nom_client"]
-        responsable=request.form["responsable"]
-        date_deb=request.form["date_deb"]
-        date_fin=request.form["date_fin"]
-        nom_compagnie=request.form["nom_compagnie"]
-
-        db=Dbman()
-        usager=db.ajouter_projet_fournisseur(nom_proj, nom_client, responsable, date_deb, date_fin, nom_compagnie)
-
-        db.fermerdb()
-        return Response(json.dumps(usager), mimetype='application/json')
-        #return repr(usager)
-    else:
-        return repr("pas ok")
-
-
 @app.route('/envoyer_modifs', methods=["GET","POST"]) #N
 def envoyer_modifs():
     if request.method=="POST":
@@ -867,17 +691,6 @@ def envoyer_modifs():
     else:
         return repr("pas ok")
 
-@app.route('/envoyer_supression', methods=["GET","POST"]) #N
-def envoyer_supression():
-    if request.method=="POST":
-        nom_proj=request.form["nom_projet"]
-        db=Dbclient()
-        usager=db.envoyer_supression(nom_proj)
-        db.fermerdb()
-        return Response(json.dumps(usager), mimetype='application/json')
-        #return repr(usager)
-    else:
-        return repr("pas ok")
 
 @app.route('/ajoutermodulebd', methods=["GET","POST"]) #N
 def ajouter_module():

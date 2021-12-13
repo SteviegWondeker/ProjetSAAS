@@ -24,7 +24,7 @@ class Vue():
 
     def creercadres(self):
         self.cadres["principal"]=self.creercadreprincipal(self.parent.modele.usager)
-        self.cadres["nouvelle_tache"]=self.creer_cadre_nouveau_contact()
+        self.cadres["nouveau_contact"]=self.creer_cadre_nouveau_contact()
 
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
@@ -52,15 +52,20 @@ class Vue():
         self.tag_recherche_frame = Frame(self.cadre_contacts)
         # Section Tags
         self.tag_frame = LabelFrame(self.tag_recherche_frame, text="Tags", font=("Arial", 16))
-        self.tag1 = Checkbutton(self.tag_frame, text="fini")
-        self.tag2 = Checkbutton(self.tag_frame, text="en cours")
-        self.tag3 = Checkbutton(self.tag_frame, text="A prevoir")       
-        self.ajout_tag_btn = Button(self.tag_frame, text="Ajouter un statut")
+        self.tag1 = Checkbutton(self.tag_frame, text="Tag1")
+        self.tag2 = Checkbutton(self.tag_frame, text="Tag2")
+        self.tag3 = Checkbutton(self.tag_frame, text="Tag3")
+        self.tag4 = Checkbutton(self.tag_frame, text="Tag4")
+        self.tag5 = Checkbutton(self.tag_frame, text="Tag5")
+        self.tag6 = Checkbutton(self.tag_frame, text="Tag6")
+        self.ajout_tag_btn = Button(self.tag_frame, text="Ajouter un tag")
         
         self.tag1.grid(row=0, column=0)
         self.tag2.grid(row=0, column=1)
         self.tag3.grid(row=0, column=2)
-        
+        self.tag4.grid(row=1, column=0)
+        self.tag5.grid(row=1, column=1)
+        self.tag6.grid(row=1, column=2)
         self.ajout_tag_btn.grid(row=2, column=0)
 
         # Section Recherche
@@ -95,10 +100,10 @@ class Vue():
 
             # Frame Contacts détails
         self.contacts_details_frame = Frame(self.contacts_frame)
-        self.btn_new_tache = Button(self.contacts_details_frame, text="Ajouter une tache", command= self.ajouter_tache)
-        self.btn_edit_tache = Button(self.contacts_details_frame, text="Éditer une tache")#command=self.modifier_tache a creer
-        self.btn_new_tache.pack(anchor=NW, padx=5, pady=5)
-        self.btn_edit_tache.pack(anchor=NW, padx=5, pady=5)
+        self.btn_new_contact = Button(self.contacts_details_frame, text="Ajouter un contact", command= self.ajouter_contact)
+        self.btn_edit_contact = Button(self.contacts_details_frame, text="Éditer un contact")
+        self.btn_new_contact.pack(anchor=NW, padx=5, pady=5)
+        self.btn_edit_contact.pack(anchor=NW, padx=5, pady=5)
         self.details_txt = StringVar()
         self.details_txt.set("")
         self.details_label = LabelFrame(self.contacts_details_frame, font=("Arial", 12))
@@ -129,7 +134,7 @@ class Vue():
         liste_contacts=self.parent.trouver_contacts_par_projet()
         print("ID COMPAGNIE ID COMPAGNIE")
         print(self.parent.modele.usager_compagnie["id"])
-        entete=["Prénom","Nom","Expertise", "Courriel",  "Notes", "Détails"]
+        entete=["Prénom","Nom","Expertise", "Courriel", "Ville", "Adresse", "Téléphone", "Notes", "Détails"]
         self.integretableau(liste_contacts,entete)
         for i in range(len(entete)):
             self.tableau.column('#' + str(i), width=50, stretch=0)
@@ -154,106 +159,120 @@ class Vue():
             self.tableau.insert('', 'end', values=item)
 
     def creer_cadre_nouveau_contact(self):
-        self.cadre_inscrire_tache = Frame(self.cadreapp, width=800, height=400)
+        self.cadre_inscrire_contact = Frame(self.cadreapp, width=800, height=400)
 
-        self.contact_titre = Label(self.cadre_inscrire_tache, text="Ajout d'une nouvelle tache à votre projet", font=("Arial", 18),
+        self.contact_titre = Label(self.cadre_inscrire_contact, text="Ajout d'un nouveau contact à votre projet", font=("Arial", 18),
                                 borderwidth=2, relief=GROOVE)
 
-        self.list_entry_tache = []
+        self.list_entry_contact = []
 
-        self.list_tags=self.parent.retourner_role()
+        self.list_tags=self.parent.retourner_expertises()
         self.list_tags.append("Ajouter un tag")
 
         #self.combobox_role = ttk.Combobox(self.cadre_role, values=self.list_role)
 
-        self.tache_lab_nom = Label(self.cadre_inscrire_tache, text="Nom tache:", font=("Arial", 14))
-        self.tache_nom = Entry(self.cadre_inscrire_tache, font=("Arial", 14), width=30)
-        self.employe_lab_nom = Label(self.cadre_inscrire_tache, text="Nom employe:", font=("Arial", 14))
-        self.employe_nom = Entry(self.cadre_inscrire_tache, font=("Arial", 14), width=30)
-        self.role_lab_tags = Label(self.cadre_inscrire_tache, text="Role:", font=("Arial", 14))
-        self.role_ajout_tag = Entry(self.cadre_inscrire_tache, font=("Arial", 14), width=20)
+        self.contact_lab_prenom = Label(self.cadre_inscrire_contact, text="Prénom:", font=("Arial", 14))
+        self.contact_prenom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_nom = Label(self.cadre_inscrire_contact, text="Nom:", font=("Arial", 14))
+        self.contact_nom = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_tags = Label(self.cadre_inscrire_contact, text="Expertise:", font=("Arial", 14))
+        self.contact_ajout_tag = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=20)
 
-#        self.membre_role = Entry(self.cadre_inscrire_tache, font=("Arial", 14), width=30)
+#        self.membre_role = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
 
-        self.value_inside = StringVar(self.cadre_inscrire_tache)
+        self.value_inside = StringVar(self.cadre_inscrire_contact)
         #self.value_inside.set("Option")
-        self.statut_tags = ttk.OptionMenu(self.cadre_inscrire_tache, self.value_inside, "Choisir une option", *self.list_tags, command=self.selection_tag)
-        #ttk.Combobox(self.cadre_inscrire_tache, values=self.list_tags)
+        self.contact_tags = ttk.OptionMenu(self.cadre_inscrire_contact, self.value_inside, "Choisir une option", *self.list_tags, command=self.selection_tag)
+        #ttk.Combobox(self.cadre_inscrire_contact, values=self.list_tags)
 
-        self.employe_lab_courriel = Label(self.cadre_inscrire_tache, text="Courriel:", font=("Arial", 14))
-        self.employe_courriel = Entry(self.cadre_inscrire_tache, font=("Arial", 14), width=30)
-       
-        self.projet_lab_details = Label(self.cadre_inscrire_tache, text="Détails:", font=("Arial", 14))
-        self.projet_details = Text(self.cadre_inscrire_tache, font=("Arial", 14), width=30, height=5)
-        self.projet_lab_note = Label(self.cadre_inscrire_tache, text="Notes importantes:", font=("Arial", 14))
-        self.projet_note = Text(self.cadre_inscrire_tache, font=("Arial", 14), width=30, height=2)
+        self.contact_lab_courriel = Label(self.cadre_inscrire_contact, text="Courriel:", font=("Arial", 14))
+        self.contact_courriel = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_ville = Label(self.cadre_inscrire_contact, text="Ville:", font=("Arial", 14))
+        self.contact_ville = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_adresse = Label(self.cadre_inscrire_contact, text="Adresse:", font=("Arial", 14))
+        self.contact_adresse = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_telephone = Label(self.cadre_inscrire_contact, text="Téléphone:", font=("Arial", 14))
+        self.contact_telephone = Entry(self.cadre_inscrire_contact, font=("Arial", 14), width=30)
+        self.contact_lab_details = Label(self.cadre_inscrire_contact, text="Détails:", font=("Arial", 14))
+        self.contact_details = Text(self.cadre_inscrire_contact, font=("Arial", 14), width=30, height=5)
+        self.contact_lab_note = Label(self.cadre_inscrire_contact, text="Notes importantes:", font=("Arial", 14))
+        self.contact_note = Text(self.cadre_inscrire_contact, font=("Arial", 14), width=30, height=2)
 
                 
-        """ self.list_entry_tache.append(self.tache_nom)
-        self.list_entry_tache.append(self.employe_nom)
-        self.list_entry_tache.append(self.employe_courriel)
+        """ self.list_entry_contact.append(self.contact_prenom)
+        self.list_entry_contact.append(self.contact_nom)
+        self.list_entry_contact.append(self.contact_courriel)
+        self.list_entry_contact.append(self.contact_ville)
+        self.list_entry_contact.append(self.contact_adresse)
+        self.list_entry_contact.append(self.contact_telephone)
+        self.list_entry_contact.append(self.contact_details)
+        self.list_entry_contact.append(self.contact_note) """
 
-        self.list_entry_tache.append(self.projet_details)
-        self.list_entry_tache.append(self.projet_note) """
+        self.btn_inscrire_contact = Button(self.cadre_inscrire_contact, text="Inscrire le nouveau contact", font=("Arial", 12), padx=10, pady=10,
+                                      command=self.inscrire_contact)
 
-        self.btn_inscrire_tache = Button(self.cadre_inscrire_tache, text="Inscrire la nouvelle tache", font=("Arial", 12), padx=10, pady=10,
-                                      command=self.inscrire_tache)
-
-        self.btn_annuler = Button(self.cadre_inscrire_tache, text="Annuler", font=("Arial", 12), padx=10, pady=10,
+        self.btn_annuler = Button(self.cadre_inscrire_contact, text="Annuler", font=("Arial", 12), padx=10, pady=10,
                                 command=self.retour_cadre_principal)
 
         self.contact_titre.grid(row=10, column=10, columnspan=20, padx=10, pady=10, ipadx=10, ipady=10)
-        self.tache_lab_nom.grid(row=20, column=10, sticky=E, padx=5, pady=5)
-        self.tache_nom.grid(row=20, column=20, padx=10, pady=5)
-        self.employe_lab_nom.grid(row=30, column=10, sticky=E, padx=5, pady=5)
-        self.employe_nom.grid(row=30, column=20, padx=10, pady=5)
-        self.role_lab_tags.grid(row=40, column=10, sticky=E, padx=5, pady=5)
-        self.statut_tags.grid(row=40, column=20, padx=10, pady=5)
-        self.employe_lab_courriel.grid(row=50, column=10, sticky=E, padx=5, pady=5)
-        self.employe_courriel.grid(row=50, column=20, padx=10, pady=5)
-       
-        self.projet_lab_details.grid(row=90, column=10, sticky=NE, padx=5, pady=5)
-        self.projet_details.grid(row=90, column=20, padx=10, pady=5)
-        self.projet_lab_note.grid(row=100, column=10, sticky=NE, padx=5, pady=5)
-        self.projet_note.grid(row=100, column=20, padx=10, pady=5)
+        self.contact_lab_prenom.grid(row=20, column=10, sticky=E, padx=5, pady=5)
+        self.contact_prenom.grid(row=20, column=20, padx=10, pady=5)
+        self.contact_lab_nom.grid(row=30, column=10, sticky=E, padx=5, pady=5)
+        self.contact_nom.grid(row=30, column=20, padx=10, pady=5)
+        self.contact_lab_tags.grid(row=40, column=10, sticky=E, padx=5, pady=5)
+        self.contact_tags.grid(row=40, column=20, padx=10, pady=5)
+        self.contact_lab_courriel.grid(row=50, column=10, sticky=E, padx=5, pady=5)
+        self.contact_courriel.grid(row=50, column=20, padx=10, pady=5)
+        self.contact_lab_ville.grid(row=60, column=10, sticky=E, padx=5, pady=5)
+        self.contact_ville.grid(row=60, column=20, padx=10, pady=5)
+        self.contact_lab_adresse.grid(row=70, column=10, sticky=E, padx=5, pady=5)
+        self.contact_adresse.grid(row=70, column=20, padx=10, pady=5)
+        self.contact_lab_telephone.grid(row=80, column=10, sticky=E, padx=5, pady=5)
+        self.contact_telephone.grid(row=80, column=20, padx=10, pady=5)
+        self.contact_lab_details.grid(row=90, column=10, sticky=NE, padx=5, pady=5)
+        self.contact_details.grid(row=90, column=20, padx=10, pady=5)
+        self.contact_lab_note.grid(row=100, column=10, sticky=NE, padx=5, pady=5)
+        self.contact_note.grid(row=100, column=20, padx=10, pady=5)
 
-        self.btn_inscrire_tache.grid(row=110, column=20, sticky=E, padx=10, pady=10)
+        self.btn_inscrire_contact.grid(row=110, column=20, sticky=E, padx=10, pady=10)
 
         self.btn_annuler.grid(row=110, column=10, sticky=E, padx=10, pady=10)
 
-        return self.cadre_inscrire_tache
+        return self.cadre_inscrire_contact
 
     def selection_tag(self, evt):
         if self.value_inside.get() == "Ajouter un tag":
-            self.statut_tags.grid(row=40, column=20, sticky=W, padx=10, pady=5)
-            self.role_ajout_tag.grid(row=40, column=20, sticky=E, padx=10, pady=5)
+            self.contact_tags.grid(row=40, column=20, sticky=W, padx=10, pady=5)
+            self.contact_ajout_tag.grid(row=40, column=20, sticky=E, padx=10, pady=5)
 
         else:
-            self.statut_tags.grid(row=40, column=20, padx=10, pady=5)
-            self.role_ajout_tag.forget()
+            self.contact_tags.grid(row=40, column=20, padx=10, pady=5)
+            self.contact_ajout_tag.forget()
 
-    def inscrire_tache(self):
-        self.valider_tache()
+    def inscrire_contact(self):
+        self.valider_contact()
         self.changercadre("principal")
 
-    def valider_tache(self): #n
+    def valider_contact(self): #n
         form_valide = True
 
         self.form=[]
 
-        self.form.append(self.tache_nom.get())
-        self.form.append(self.employe_nom.get())
-        self.form.append(self.employe_courriel.get())
-       
-        self.form.append(self.projet_details.get("1.0",END))
-        self.form.append(self.projet_note.get("1.0",END))
+        self.form.append(self.contact_prenom.get())
+        self.form.append(self.contact_nom.get())
+        self.form.append(self.contact_courriel.get())
+        self.form.append(self.contact_ville.get())
+        self.form.append(self.contact_adresse.get())
+        self.form.append(self.contact_telephone.get())
+        self.form.append(self.contact_details.get("1.0",END))
+        self.form.append(self.contact_note.get("1.0",END))
         if self.value_inside.get() == "Choisir une option":  # Aucune option sélectionnée
             self.form.append("")
         elif self.value_inside.get() == "Ajouter un tag":
-            if self.role_ajout_tag.get() == "":        # Champ vide
+            if self.contact_ajout_tag.get() == "":        # Champ vide
                 self.form.append("")
             else:
-                self.form.append(self.tache_ajout_tag.get())  # Ajout d'un NOUVEAU tag
+                self.form.append(self.contact_ajout_tag.get())  # Ajout d'un NOUVEAU tag
         else:
             self.tag = self.value_inside.get()
             self.tag = self.tag.replace("(", "")
@@ -263,13 +282,13 @@ class Vue():
             self.form.append(self.tag)       # Ajout d'un tag existant
 
         if form_valide == True:
-            self.parent.inscrire_tache(self.form)
+            self.parent.inscrire_contact(self.form)
 
     def retour_cadre_principal(self):
         self.changercadre("principal")
 
-    def ajouter_tache(self):
-        self.changercadre("nouvelle_tache")
+    def ajouter_contact(self):
+        self.changercadre("nouveau_contact")
 
     def recherche_contacts(self):
         pass
@@ -279,10 +298,10 @@ class Vue():
         self.details_txt.set(self.tableau.item(curItem)["values"][8])
         pass
 
-    # def avertirusager(self,titre,message):
-    #     rep=messagebox.askyesno(titre,message)
-    #     if not rep:
-    #         self.root.destroy()
+    def avertirusager(self,titre,message):
+        rep=messagebox.askyesno(titre,message)
+        if not rep:
+            self.root.destroy()
 
 class Modele():
     def __init__(self,parent):
@@ -320,8 +339,8 @@ class Controleur():
         reptext=rep.read()
         return reptext
 
-    def retourner_role(self):
-        url = self.urlserveur+"/trouver_roles"
+    def retourner_expertises(self):
+        url = self.urlserveur+"/trouver_expertises"
         params = {}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
@@ -335,16 +354,18 @@ class Controleur():
         mondict=json.loads(reptext)
         return mondict
 
-    def inscrire_tache(self,form):        # On va devoir éventuellement ajouter l'ID du projet!
-        url = self.urlserveur+"/inscrire_taches"
-        # identifiant_nom = form[0]+" "+form[1]
-        params = {"nom_tache":form[0],
-                    "employe":form[1],
-                  "courriel":form[2], 
-                  "role":form[3],
-                  "details":form[4],
-                  "notes":form[5],
-                #   "tag":form[6],
+    def inscrire_contact(self,form):        # On va devoir éventuellement ajouter l'ID du projet!
+        url = self.urlserveur+"/inscrire_contact"
+        identifiant_nom = form[0]+" "+form[1]
+        params = {"prenom":form[0],
+                    "nom":form[1],
+                  "courriel":form[2],
+                    "ville":form[3],
+                    "adresse":form[4],
+                  "telephone":form[5],
+                  "details":form[6],
+                  "notes":form[7],
+                  "tag":form[8],
                   "comp":self.modele.usager_compagnie["id"],
                   "projet":1}
         print(params)
@@ -361,7 +382,7 @@ class Controleur():
 
         mondict=json.loads(reptext)
         if len(mondict)>0:
-            # self.vue.avertirusager("Compte existe déjà","Reprendre?")
+            self.vue.avertirusager("Compte existe déjà","Reprendre?")
             return True
         else:
             return False
