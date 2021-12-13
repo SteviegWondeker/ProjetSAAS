@@ -333,7 +333,7 @@ class Controleur():
         return (mondict)
 
     def trouver_tache_par_projet(self):
-        url = self.urlserveur+"/trouver_projet_infos"
+        url = self.urlserveur+"/trouver_projets_par_compagnie"
         params = {"comp": self.modele.usager_compagnie["id"],
                     "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)
@@ -362,7 +362,7 @@ class Controleur():
         print(mondict)
 
     def verifier_tache(self,form):
-        url = self.urlserveur+"/verifiercontact"
+        url = self.urlserveur+"/verifier_projet"
         params = {"courriel":form[4],
                     "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)

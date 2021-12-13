@@ -243,8 +243,7 @@ class Vue():
 
         self.form.append(self.tache_nom.get())
         self.form.append(self.employe_nom.get())
-        self.form.append(self.employe_courriel.get())
-       
+        self.form.append(self.employe_courriel.get())       
         self.form.append(self.projet_details.get("1.0",END))
         self.form.append(self.projet_note.get("1.0",END))
         if self.value_inside.get() == "Choisir une option":  # Aucune option sélectionnée
@@ -283,7 +282,16 @@ class Vue():
     #     rep=messagebox.askyesno(titre,message)
     #     if not rep:
     #         self.root.destroy()
+   def get_taches_details(self, prenom, nom, expertise):
+        url = self.urlserveur+"/get_contact_details"
+        params = {"prenom": prenom,
+                    "nom": nom,
+                    "expertise": expertise, 
+                    "transac":self.modele.transaction_data}
+        reptext=self.appelserveur(url, params)
 
+        mondict=json.loads(reptext)
+        return mondict
 class Modele():
     def __init__(self,parent):
         self.parent=parent
@@ -333,7 +341,7 @@ class Controleur():
         return (mondict)
 
     def trouver_tache_par_projet(self):
-        url = self.urlserveur+"/trouver_projet_infos"
+        url = self.urlserveur+"/trouver_projets_par_compagnie"
         params = {"comp": self.modele.usager_compagnie["id"],
                     "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)

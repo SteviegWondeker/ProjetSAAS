@@ -226,7 +226,9 @@ class Dbclient():   # Base de données du locateur
                                 # 'tag_id':tag                 
                                 })
 
-        self.conn.commit()      
+        self.conn.commit()    
+
+      
 
     def trouver_expertises(self):
         sql_expertises = ("select expertise from 'contacts_expertises'")
@@ -590,7 +592,7 @@ def inscrire_taches():
         # tag = request.form["tag"]
         projet = request.form["projet"]
         comp = request.form["comp"]
-        projets=db.inscrire_contact(  nom_tache , employe,role,courriel,details, notes,projet, comp)
+        projets=db.inscrire_taches(  nom_tache , employe,role,courriel,details, notes,projet, comp)
         db.fermerdb()
         return Response(json.dumps(projets), mimetype='application/json')
         #return repr(usager)
