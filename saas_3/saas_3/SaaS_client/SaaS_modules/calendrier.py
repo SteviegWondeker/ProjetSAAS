@@ -302,6 +302,11 @@ class Modele():
             self.usager_compagnie["nom"] = "Cinéclub"
             self.usager_compagnie["id"] = 1
 
+        self.transaction_data = {"usager": self.usager,
+                                    "compagnie": self.usager_compagnie["id"],
+                                    "module": 1}
+        self.transaction_data = json.dumps(self.transaction_data)
+
         print(self.usager)
 
 class Controleur():
@@ -322,14 +327,15 @@ class Controleur():
 
     def retourner_role(self):
         url = self.urlserveur+"/trouver_roles"
-        params = {}
+        params = {"transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)         
         return (mondict)
 
     def trouver_contacts_par_projet(self):
         url = self.urlserveur+"/trouver_contacts_par_projet"
-        params = {"comp": self.modele.usager_compagnie["id"]}
+        params = {"comp": self.modele.usager_compagnie["id"],
+                    "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url, params)
 
         mondict=json.loads(reptext)
@@ -346,7 +352,8 @@ class Controleur():
                   "notes":form[5],
                 #   "tag":form[6],
                   "comp":self.modele.usager_compagnie["id"],
-                  "projet":1}
+                  "projet":1,
+                    "transac":self.modele.transaction_data}
         print(params)
         pass
         reptext=self.appelserveur(url,params)
@@ -356,7 +363,8 @@ class Controleur():
 
     def verifier_contact(self,form):
         url = self.urlserveur+"/verifiercontact"
-        params = {"courriel":form[4]}
+        params = {"courriel":form[4],
+                    "transac":self.modele.transaction_data}
         reptext=self.appelserveur(url,params)
 
         mondict=json.loads(reptext)

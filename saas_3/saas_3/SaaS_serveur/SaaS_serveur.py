@@ -569,6 +569,9 @@ def inscrire_contact():
 @app.route('/inscrire_taches', methods=["GET","POST"])
 def inscrire_taches():
     if request.method=="POST":
+        transac = request.form["transac"]
+        dataWrite(transac)
+        
         db=Dbclient()
         nom_tache = request.form["nom_tache"]
         employe = request.form["employe"]
