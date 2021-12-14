@@ -1,0 +1,60 @@
+Nom de compagnie : Ink inc.
+
+Membres :
+Alex Bouchard
+Gabriel Kirouac	
+Hiba Ikbal
+
+---------------------------------------------------------------------
+
+Utilisateurs pour le test:
+
+nom:jmd/mdp:jmd1 (intégré par défaut au logiciel)
+
+nom:Caron321654/mdp:AAAaaa111
+
+----------------------------------------------------------------------
+
+Modules ajoutés :
+
+-SaaS_Projet_Gestion: Les compagnies peuvent maintenant, en plus d'afficher les informations de leur projets, 
+modifier et supprimer ces informations ainsi que trier tous les projets selon la date, le responsable ou l'ordre alphabétique.
+
+-Calendrier: Les compagnies peuvent créer et modifier des tâches. Elle peuvent également les ajouter à un calendrier.
+
+LOGICIEL FOURNISSEUR:
+-On peut afficher les projets et les usagers par compagnie.
+
+----------------------------------------------------------------------
+
+Fonctionnalités :
+-Un client peut créer des usagers.
+-Un client peut créer des projets.
+-Un client peut afficher les informations de projets.
+-Un client peut modifier/supprimer ces informations.
+-Un client peut établir une liste de contacts par projet.
+-Un client peut faire une ébauche de communiqué de presse.
+-Un client peut créer des rôles et mettre des permissions sur ces rôles.
+-Un client peut attribuer des rôles à des usagers.
+-Un client sera facturé selon le nombre d'accès qu'il a fait aux modules.
+-Un client peut créer des tâches et modifier/observer leur statut dans le calendrier .
+
+
+----------------------------------------------------------------------
+
+Ce qui plante/pas terminé:
+
+-Les liens de compagnies/clients sont à revoir dans la BD clients, ce n'est pas clair comment le nom de la compagnie cliente
+est reliée à son ID, et ça transparaît dans les infos affichés pour les projets.
+
+-On a pas mis de bouton Contact dans les détails des projets pour afficher les contacts par projets. Les contacts sont donc
+encore indépendants des projets.
+
+-L'ajout des projets à la BD fournisseur a été ajouté à la fin, son implémentation peut bugger. Nous n'avons qu'une BD cliente
+(pour les projets), donc il y aura des compagnies sans projets dans le logiciel fournisseur.
+
+-Il n'y a pas de bouton retour dans le logiciel fournisseur, il faut donc éteindre le logiciel pour changer sa sélection.
+
+-Le module communiqué de presse n'est pas encore connecté à la base de donné.
+
+-La base de donnée du calendrier n'est pas totalement complète.

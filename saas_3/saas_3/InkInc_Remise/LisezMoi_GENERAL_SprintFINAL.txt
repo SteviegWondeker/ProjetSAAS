@@ -1,0 +1,83 @@
+Nom de compagnie : Ink inc.
+
+Membres :
+Alex Bouchard
+Gabriel Kirouac
+Hiba Ikbal
+
+---------------------------------------------------------------
+
+ORIENTATION
+
+Nous avons présentement un logiciel stable à fournir pour nos clients. De nouveaux modules et des updates de quality of life
+sont prévus pour le futur.
+
+Tout commentaires, questions et suggestions sont appréciés et peuvent être envoyés à : SaaS@inkinc.com
+
+----------------------------------------------------------------
+ORGANISATION DES MODULES
+
+Le logiciel client a plusieurs modules utilisables:
+-Module de création de projets:
+
+-Modules de Gestion de membres:
+	-Inscrire un nouvel usager:Permet d'inscrire un nouvel utilisateur à la compagnie avec ces informations:
+				-Prénom
+				-Nom
+				-Rôle
+				-ID Employé
+				-Courriel
+				-Numéro téléphone
+				-Mot-de-passe (Par défaut AAAaaa111)
+	-Définir les rôles:Permet d'inscrire un nouveau rôle ou de modifier un rôle existant avec des permissions sur
+				des modules précis.
+
+-Gestion des projetsERP:
+	-Ajouter un client: Permet d'ajouter une compagnie cliente aux dossiers de la compagnie avec ces informations:
+				-Nom du client
+				-Courriel
+				-Téléphone
+				-Nom de la compagnie
+				-Adresse
+				-Rue
+				-Ville
+	-Ajouter un projet: Permet de créer un nouveau projet associé à une compagnie cliente avec ces informations:
+				-Nom du projet
+				-Nom de la compagnie cliente
+				-Responsable du projet
+				-Date de début
+				-Date de fin
+-Modules disponiblesSaaS:
+	-Calendrier: Permet d'ajouter/modifier une tâche avec ces informations: (EN TRAVAIL)
+				-Nom de tâche
+				-Nom employé
+				-Courriel
+				-Détails
+				-Notes importantes
+	-Communique_presse: Permet de créer un communiqué de presse avec ces informations: (EN TRAVAIL)
+				-Nom de la compagnie
+				-Date
+				-Adresse
+	-Contacts_projet: Permet de créer, supprimer et filtrer des contacts associé à un projet avec ces informations:
+				-Prénom
+				-Nom
+				-Expertise
+				-Courriel
+				-Ville
+				-Adresse
+				-Téléphone
+				-Détails
+				-Notes importantes
+	-SaaS_projets_gestion: Permet d'afficher les informations des projets, de les modifier, supprimer et trier.
+				-Triage selon dates
+				-Triage selon responsable
+				-Triage selon client
+				-Triage en ordre alphabétique
+
+----------------------------------------------------------------
+FACTURATION
+
+Le client est facturé en fonction des accès aux bases de données qu'il fait. On charge 10 cents pour chaque tranche de 50 transactions.
+Le fournisseur peut voir le nombre de transactions effectuées aux bases de données en cliquant sur l'onglet "Afficher Transactions"
+	depuis le logiciel fournisseur.
+
